@@ -163,9 +163,21 @@ namespace Datos
 
         /// <summary>Busca hospedajes con el nombre del huésped ya resuelto, para la pantalla de Reservas.
         /// Todos los filtros son opcionales y combinables.</summary>
-        public static List<HospedajeDetalle> BuscarDetalle(string? dni = null, string? nombre = null, int? nroHabitacion = null, DateTime? fecha = null)
+        public static List<HospedajeDetalle> BuscarDetalle(string? dni = null, string? nombre = null, int? nroHabitacion = null, DateTime? fecha = null, string? termino = null)
         {
             var resultado = new List<HospedajeDetalle>();
+
+            dni = string.IsNullOrWhiteSpace(dni) ? null : dni.Trim();
+            nombre = string.IsNullOrWhiteSpace(nombre) ? null : nombre.Trim();
+            termino = string.IsNullOrWhiteSpace(termino) ? null : termino.Trim();
+
+            // Si se envió el mismo valor para dni y nombre (búsqueda unificada), tratarlo como término general
+            if (termino == null && dni != null && dni == nombre)
+            {
+                termino = dni;
+                dni = null;
+                nombre = null;
+            }
 
             string query = @"
                 SELECT h.id_hospedaje, h.id_turno, h.dni_huesped, hu.nombre_huesped, hu.apellido_huesped, h.nro_habitacion,
@@ -173,7 +185,15 @@ namespace Datos
                 FROM hospedaje h
                 INNER JOIN Huesped hu ON hu.dni_huesped = h.dni_huesped
                 WHERE (@dni IS NULL OR h.dni_huesped LIKE @dni)
-                  AND (@nombre IS NULL OR hu.nombre_huesped LIKE @nombre OR hu.apellido_huesped LIKE @nombre)
+                  AND (@nombre IS NULL OR hu.nombre_huesped LIKE @nombre 
+                                       OR hu.apellido_huesped LIKE @nombre
+                                       OR (hu.nombre_huesped + ' ' + hu.apellido_huesped) LIKE @nombre
+                                       OR (hu.apellido_huesped + ' ' + hu.nombre_huesped) LIKE @nombre)
+                  AND (@termino IS NULL OR h.dni_huesped LIKE @termino
+                                        OR hu.nombre_huesped LIKE @termino 
+                                        OR hu.apellido_huesped LIKE @termino
+                                        OR (hu.nombre_huesped + ' ' + hu.apellido_huesped) LIKE @termino
+                                        OR (hu.apellido_huesped + ' ' + hu.nombre_huesped) LIKE @termino)
                   AND (@nroHabitacion IS NULL OR h.nro_habitacion = @nroHabitacion)
                   AND (@fecha IS NULL OR h.fecha_entrada = @fecha)
                 ORDER BY h.fecha_entrada DESC, h.hora_entrada DESC";
@@ -181,8 +201,9 @@ namespace Datos
             using (SqlConnection con = _conexion.ObtenerConexion())
             {
                 SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.Add("@dni", System.Data.SqlDbType.VarChar).Value = (object?)(dni != null ? $"%{dni}%" : null) ?? DBNull.Value;
-                cmd.Parameters.Add("@nombre", System.Data.SqlDbType.VarChar).Value = (object?)(nombre != null ? $"%{nombre}%" : null) ?? DBNull.Value;
+                cmd.Parameters.Add("@dni", System.Data.SqlDbType.VarChar, 50).Value = (object?)(dni != null ? $"%{dni}%" : null) ?? DBNull.Value;
+                cmd.Parameters.Add("@nombre", System.Data.SqlDbType.VarChar, 100).Value = (object?)(nombre != null ? $"%{nombre}%" : null) ?? DBNull.Value;
+                cmd.Parameters.Add("@termino", System.Data.SqlDbType.VarChar, 100).Value = (object?)(termino != null ? $"%{termino}%" : null) ?? DBNull.Value;
                 cmd.Parameters.Add("@nroHabitacion", System.Data.SqlDbType.Int).Value = (object?)nroHabitacion ?? DBNull.Value;
                 cmd.Parameters.Add("@fecha", System.Data.SqlDbType.Date).Value = (object?)fecha?.Date ?? DBNull.Value;
 
@@ -200,8 +221,8 @@ namespace Datos
                             NroHabitacion = Convert.ToInt32(reader["nro_habitacion"]),
                             FechaEntrada = Convert.ToDateTime(reader["fecha_entrada"]),
                             HoraEntrada = (TimeSpan)reader["hora_entrada"],
-                            FechaSalida = Convert.ToDateTime(reader["fecha_salida"]),
-                            HoraSalida = (TimeSpan)reader["hora_salida"]
+                            FechaSalida = reader["fecha_salida"] != DBNull.Value ? Convert.ToDateTime(reader["fecha_salida"]) : DateTime.MinValue,
+                            HoraSalida = reader["hora_salida"] != DBNull.Value ? (TimeSpan)reader["hora_salida"] : TimeSpan.Zero
                         });
                     }
                 }

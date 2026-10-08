@@ -168,7 +168,58 @@ namespace Datos
             cmd.Parameters.AddWithValue("@direccion", huesped.Direccion);
             cmd.Parameters.AddWithValue("@correo", huesped.Correo);
         }
+        /// <summary>
+        /// Obtiene únicamente los huéspedes que NO se encuentran alojados actualmente en ninguna habitación.
+        /// Excluye a aquellos cuyo hospedaje activo aún no ha finalizado.
+        /// </summary>
+        public static List<Huesped> ObtenerDisponiblesParaCheckIn()
+        {
+            var huespedes = new List<Huesped>();
 
+            string query = @"
+        SELECT 
+            h.dni_huesped, 
+            h.nombre_huesped, 
+            h.apellido_huesped, 
+            h.telefono_huesped,
+            h.direccion_huesped, 
+            h.correo_huesped, 
+            h.alta_huesped
+        FROM Huesped h
+        WHERE h.dni_huesped NOT IN (
+            SELECT ho.dni_huesped 
+            FROM hospedaje ho
+            INNER JOIN habitacion ha ON ho.nro_habitacion = ha.nro_habitacion
+            INNER JOIN Estado_habitacion eh ON ha.id_estado = eh.id_estado
+            WHERE LOWER(TRIM(eh.nom_estado_habitacion)) = 'ocupada'
+        )
+        ORDER BY h.apellido_huesped, h.nombre_huesped";
+
+            using (SqlConnection con = _conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                con.Open();
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        huespedes.Add(new Huesped
+                        {
+                            DniHuesped = reader["dni_huesped"] != DBNull.Value ? reader["dni_huesped"].ToString()! : string.Empty,
+                            Nombre = reader["nombre_huesped"] != DBNull.Value ? reader["nombre_huesped"].ToString()! : string.Empty,
+                            Apellido = reader["apellido_huesped"] != DBNull.Value ? reader["apellido_huesped"].ToString()! : string.Empty,
+                            Telefono = reader["telefono_huesped"] != DBNull.Value ? reader["telefono_huesped"].ToString()! : string.Empty,
+                            Direccion = reader["direccion_huesped"] != DBNull.Value ? reader["direccion_huesped"].ToString()! : string.Empty,
+                            Correo = reader["correo_huesped"] != DBNull.Value ? reader["correo_huesped"].ToString()! : string.Empty,
+                            AltaHuesped = reader["alta_huesped"] != DBNull.Value ? Convert.ToDateTime(reader["alta_huesped"]) : null
+                        });
+                    }
+                }
+            }
+
+            return huespedes;
+        }
         private static Huesped MapearHuesped(SqlDataReader reader)
         {
             return new Huesped

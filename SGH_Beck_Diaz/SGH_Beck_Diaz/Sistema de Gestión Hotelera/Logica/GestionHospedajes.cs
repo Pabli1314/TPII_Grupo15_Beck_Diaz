@@ -125,9 +125,9 @@ namespace Logica
         }
 
         /// <summary>Búsqueda para la pantalla de Reservas: todos los filtros son opcionales y combinables.</summary>
-        public List<HospedajeDetalle> BuscarHospedajes(string? dni = null, string? nombre = null, int? nroHabitacion = null, DateTime? fecha = null)
+        public List<HospedajeDetalle> BuscarHospedajes(string? dni = null, string? nombre = null, int? nroHabitacion = null, DateTime? fecha = null, string? termino = null)
         {
-            return HospedajeDAO.BuscarDetalle(dni, nombre, nroHabitacion, fecha);
+            return HospedajeDAO.BuscarDetalle(dni, nombre, nroHabitacion, fecha, termino);
         }
 
         /// <summary>Habitación donde el huésped está alojado ahora mismo, o null si no tiene una estadía en curso.</summary>

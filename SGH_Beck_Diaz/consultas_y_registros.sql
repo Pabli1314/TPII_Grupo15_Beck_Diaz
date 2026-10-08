@@ -98,3 +98,5 @@ SET id_estado = (SELECT id_estado FROM Estado_habitacion WHERE nom_estado_habita
 WHERE nro_habitacion IN (102, 302)
   AND id_estado = (SELECT id_estado FROM Estado_habitacion WHERE nom_estado_habitacion = 'Ocupada')
   AND NOT EXISTS (SELECT 1 FROM hospedaje h WHERE h.nro_habitacion = habitacion.nro_habitacion);
+
+SELECT * FROM Huesped;

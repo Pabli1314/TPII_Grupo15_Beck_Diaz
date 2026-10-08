@@ -48,8 +48,8 @@ namespace Presentacion.Recepcionista.Vistas
             _grilla.Columns.Add("nombre", "Nombre");
             _grilla.Columns.Add("apellido", "Apellido");
             _grilla.Columns.Add("telefono", "Teléfono");
-            _grilla.Columns.Add("habitacion", "Habitación actual");
-            _grilla.Columns.Add("estado", "Estado");
+            _grilla.Columns.Add("habitacion", "Correo");
+            _grilla.Columns.Add("estado", "Dirección");
 
             Controls.Add(lblTitulo);
             Controls.Add(panelAcciones);
@@ -72,6 +72,8 @@ namespace Presentacion.Recepcionista.Vistas
                     huesped.Nombre,
                     huesped.Apellido,
                     huesped.Telefono,
+                    huesped.Correo,
+                    huesped.Direccion,
                     estadia != null ? estadia.NroHabitacion.ToString() : "-",
                     estadia != null ? "Alojado" : "Sin estadía activa");
             }

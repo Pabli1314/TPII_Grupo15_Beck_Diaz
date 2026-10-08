@@ -24,6 +24,7 @@ namespace Presentacion.Recepcionista
         {
             ["dashboard"] = "Centro de Operaciones",
             ["habitaciones"] = "Mapa de Habitaciones",
+            ["huespedes"] = "Listado de huespedes",
             ["reservas"] = "Gestión de Reservas",
             ["check-in"] = "Check-in",
             ["check-out"] = "Check-out",
@@ -109,6 +110,9 @@ namespace Presentacion.Recepcionista
                     // Recarga huéspedes con check-in activo, stock y ventas: pudo haber check-in/check-out
                     // en otra pantalla desde la última vez. El carrito en curso se conserva.
                     vistaVentas.Refrescar();
+                    break;
+                case VistaReservas vistaReservas:
+                    vistaReservas.Refrescar();
                     break;
             }
 

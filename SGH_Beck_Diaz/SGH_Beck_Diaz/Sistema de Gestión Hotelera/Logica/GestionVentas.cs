@@ -20,9 +20,17 @@ namespace Logica
                 .ToList();
         }
 
-        public List<Producto> ObtenerProductosDisponibles()
+        public List<Producto> ObtenerProductosDisponibles(string? filtro = null)
         {
-            return ProductoDAO.ObtenerTodos().Where(p => p.Activo).ToList();
+            var productos = ProductoDAO.ObtenerTodos().Where(p => p.Activo);
+            if (!string.IsNullOrWhiteSpace(filtro))
+            {
+                string texto = filtro.Trim();
+                productos = productos.Where(p =>
+                    (p.Nombre != null && p.Nombre.Contains(texto, StringComparison.OrdinalIgnoreCase)) ||
+                    (p.Codigo != null && p.Codigo.Contains(texto, StringComparison.OrdinalIgnoreCase)));
+            }
+            return productos.ToList();
         }
 
         public List<MetodoPago> ObtenerMetodosPago()
@@ -33,11 +41,12 @@ namespace Logica
         /// <summary>
         /// Ventas adicionales realizadas, con el huésped que hizo la consumición y lo que consumió.
         /// La habitación se toma de la estadía del huésped vigente al momento de la venta.
-        /// <paramref name="filtro"/> busca por nombre, apellido o DNI del huésped, o por número de
-        /// habitación; "mostrador" trae las ventas sin huésped. <paramref name="soloHuespedes"/> excluye
-        /// las ventas de mostrador.
+        /// <paramref name="filtro"/> busca por nombre, apellido o DNI del huésped, número de
+        /// habitación, producto consumido, método de pago o N° de venta; "mostrador" trae las ventas sin huésped.
+        /// <paramref name="soloHuespedes"/> excluye las ventas de mostrador.
+        /// <paramref name="fecha"/> filtra opcionalmente por fecha de venta.
         /// </summary>
-        public List<VentaRealizada> ObtenerVentasRealizadas(string? filtro = null, bool soloHuespedes = false)
+        public List<VentaRealizada> ObtenerVentasRealizadas(string? filtro = null, bool soloHuespedes = false, DateTime? fecha = null)
         {
             List<VentaRealizada> ventas = VentaDAO.ObtenerRealizadas();
             List<HospedajeDetalle> hospedajes = HospedajeDAO.BuscarDetalle();
@@ -58,6 +67,11 @@ namespace Logica
                 resultado = resultado.Where(v => !v.EsDeMostrador);
             }
 
+            if (fecha.HasValue)
+            {
+                resultado = resultado.Where(v => v.FechaVenta.Date == fecha.Value.Date);
+            }
+
             if (!string.IsNullOrWhiteSpace(filtro))
             {
                 string texto = filtro.Trim();
@@ -67,7 +81,10 @@ namespace Logica
                     (buscaMostrador && v.EsDeMostrador)
                     || (v.NombreHuesped?.Contains(texto, StringComparison.OrdinalIgnoreCase) ?? false)
                     || (v.DniHuesped?.Contains(texto) ?? false)
-                    || (v.NroHabitacion?.ToString() == texto));
+                    || (v.NroHabitacion?.ToString().Contains(texto) ?? false)
+                    || v.IdVenta.ToString() == texto
+                    || (v.ResumenProductos?.Contains(texto, StringComparison.OrdinalIgnoreCase) ?? false)
+                    || (v.MetodoPago?.Contains(texto, StringComparison.OrdinalIgnoreCase) ?? false));
             }
 
             return resultado.ToList();
