@@ -6,8 +6,10 @@ using Datos;
 
 namespace Logica
 {
-    /// <summary>Combina check-in/check-out (hospedaje) y ventas adicionales en una sola línea de
-    /// tiempo, para la pantalla Historial.</summary>
+    /// <summary>
+    /// Combina check-in/check-out (hospedaje) y ventas adicionales en una sola línea de
+    /// tiempo, para la pantalla Historial.
+    /// </summary>
     public class GestionHistorialRecepcion
     {
         public List<OperacionHistorial> Obtener(DateTime? fecha = null, string? huesped = null, int? nroHabitacion = null, string? usuario = null, string? tipo = null)
@@ -16,10 +18,10 @@ namespace Logica
                 .Where(t => !string.IsNullOrWhiteSpace(t.DniUsuario))
                 .ToList();
 
-            // Mapeo adaptado: id_turno -> dni_usuario (string)
+            // Mapeo: id_turno -> dni_usuario
             Dictionary<int, string> usuarioPorTurno = turnos.ToDictionary(t => t.IdTurno, t => t.DniUsuario.Trim());
 
-            // La tabla venta no guarda el turno: se busca el turno que estaba abierto en ese momento.
+            // Identifica el turno activo durante la venta
             int? TurnoDeVenta(Venta venta) => turnos
                 .Where(t => t.FechaApertura.Date + t.HoraApertura <= venta.Momento
                          && (!t.FechaCierre.HasValue || t.FechaCierre.Value.Date + (t.HoraCierre ?? TimeSpan.Zero) >= venta.Momento))
@@ -27,7 +29,7 @@ namespace Logica
                 .Select(t => (int?)t.IdTurno)
                 .FirstOrDefault();
 
-            // Mapeo adaptado: dni_usuario (string) -> Nombre Completo (Apellido Nombre)
+            // Mapeo: dni_usuario -> Nombre Completo (Apellido, Nombre)
             Dictionary<string, string> nombreUsuario = UsuarioDAO.ObtenerTodos()
                 .Where(u => !string.IsNullOrWhiteSpace(u.DniUsuario))
                 .GroupBy(u => u.DniUsuario.Trim())
@@ -38,32 +40,47 @@ namespace Logica
                     ? nombre
                     : "-";
 
+            // Mapeo: dni_huesped -> Nombre Completo (Nombre Apellido)
+            Dictionary<string, string> nombreHuespedPorDni = HuespedDAO.ObtenerTodos()
+                .Where(h => !string.IsNullOrWhiteSpace(h.DniHuesped))
+                .GroupBy(h => h.DniHuesped.Trim())
+                .ToDictionary(g => g.Key, g => $"{g.First().Nombre} {g.First().Apellido}".Trim());
+
+            string ObtenerNombreHuesped(string? dni) =>
+                !string.IsNullOrWhiteSpace(dni) && nombreHuespedPorDni.TryGetValue(dni.Trim(), out string? nom)
+                    ? nom
+                    : (dni ?? "-");
+
             var operaciones = new List<OperacionHistorial>();
 
-            List<HospedajeDetalle> hospedajes = HospedajeDAO.BuscarDetalle();
+            // Recupera la lista de hospedajes especificando el parámetro nombrado para evitar CS0121
+            List<Hospedaje> hospedajes = HospedajeDAO.BuscarDetalle(termino: null);
 
-            foreach (HospedajeDetalle hospedaje in hospedajes)
+            foreach (Hospedaje hospedaje in hospedajes)
             {
+                string nombreH = ObtenerNombreHuesped(hospedaje.DniHuesped);
+
                 operaciones.Add(new OperacionHistorial
                 {
                     Fecha = hospedaje.FechaEntrada,
                     Hora = hospedaje.HoraEntrada,
                     Tipo = "Check-in",
-                    Descripcion = $"Check-in de {hospedaje.NombreHuesped} en habitación {hospedaje.NroHabitacion}",
-                    Huesped = hospedaje.NombreHuesped,
+                    Descripcion = $"Check-in de {nombreH} en habitación {hospedaje.NroHabitacion}",
+                    Huesped = nombreH,
                     NroHabitacion = hospedaje.NroHabitacion,
                     Usuario = NombreUsuarioDeTurno(hospedaje.IdTurno)
                 });
 
-                if (hospedaje.Finalizada)
+                // Reemplazo de la evaluación .Finalizada en memoria sin modificar la entidad Hospedaje
+                if ((hospedaje.FechaSalida.Date + hospedaje.HoraSalida) <= DateTime.Now)
                 {
                     operaciones.Add(new OperacionHistorial
                     {
                         Fecha = hospedaje.FechaSalida,
                         Hora = hospedaje.HoraSalida,
                         Tipo = "Check-out",
-                        Descripcion = $"Check-out de {hospedaje.NombreHuesped} de habitación {hospedaje.NroHabitacion}",
-                        Huesped = hospedaje.NombreHuesped,
+                        Descripcion = $"Check-out de {nombreH} de habitación {hospedaje.NroHabitacion}",
+                        Huesped = nombreH,
                         NroHabitacion = hospedaje.NroHabitacion,
                         Usuario = NombreUsuarioDeTurno(hospedaje.IdTurno)
                     });
@@ -74,11 +91,15 @@ namespace Logica
             {
                 int? idTurnoVenta = TurnoDeVenta(venta);
 
-                // Estadía del huésped en el momento de la venta, para mostrar nombre y habitación.
-                HospedajeDetalle? estadia = venta.DniHuesped == null ? null : hospedajes
+                // Estadía del huésped vigente al momento de la venta
+                Hospedaje? estadia = venta.DniHuesped == null ? null : hospedajes
                     .Where(h => h.DniHuesped == venta.DniHuesped && h.FechaEntrada.Date + h.HoraEntrada <= venta.Momento)
                     .OrderByDescending(h => h.FechaEntrada.Date + h.HoraEntrada)
                     .FirstOrDefault();
+
+                string? nombreHuespedVenta = estadia != null
+                    ? ObtenerNombreHuesped(estadia.DniHuesped)
+                    : (venta.DniHuesped != null ? ObtenerNombreHuesped(venta.DniHuesped) : null);
 
                 operaciones.Add(new OperacionHistorial
                 {
@@ -86,9 +107,9 @@ namespace Logica
                     Hora = venta.HoraVenta,
                     Tipo = "Venta",
                     Descripcion = estadia != null
-                        ? $"Venta adicional #{venta.IdVenta} a {estadia.NombreHuesped} (habitación {estadia.NroHabitacion})"
+                        ? $"Venta adicional #{venta.IdVenta} a {nombreHuespedVenta} (habitación {estadia.NroHabitacion})"
                         : $"Venta adicional #{venta.IdVenta} (mostrador)",
-                    Huesped = estadia?.NombreHuesped,
+                    Huesped = nombreHuespedVenta,
                     NroHabitacion = estadia?.NroHabitacion,
                     Usuario = idTurnoVenta.HasValue ? NombreUsuarioDeTurno(idTurnoVenta.Value) : "-",
                     Monto = venta.Total
@@ -104,7 +125,8 @@ namespace Logica
 
             if (!string.IsNullOrWhiteSpace(huesped))
             {
-                resultado = resultado.Where(o => o.Huesped != null && o.Huesped.Contains(huesped, StringComparison.OrdinalIgnoreCase));
+                string filtroHuesped = huesped.Trim();
+                resultado = resultado.Where(o => o.Huesped != null && o.Huesped.Contains(filtroHuesped, StringComparison.OrdinalIgnoreCase));
             }
 
             if (nroHabitacion.HasValue)
@@ -114,15 +136,19 @@ namespace Logica
 
             if (!string.IsNullOrWhiteSpace(usuario))
             {
-                resultado = resultado.Where(o => o.Usuario != null && o.Usuario.Contains(usuario, StringComparison.OrdinalIgnoreCase));
+                string filtroUsuario = usuario.Trim();
+                resultado = resultado.Where(o => o.Usuario != null && o.Usuario.Contains(filtroUsuario, StringComparison.OrdinalIgnoreCase));
             }
 
-            if (!string.IsNullOrWhiteSpace(tipo) && tipo != "Todas")
+            if (!string.IsNullOrWhiteSpace(tipo) && !tipo.Equals("Todas", StringComparison.OrdinalIgnoreCase))
             {
-                resultado = resultado.Where(o => o.Tipo == tipo);
+                resultado = resultado.Where(o => o.Tipo.Equals(tipo.Trim(), StringComparison.OrdinalIgnoreCase));
             }
 
-            return resultado.OrderByDescending(o => o.Fecha).ThenByDescending(o => o.Hora).ToList();
+            return resultado
+                .OrderByDescending(o => o.Fecha)
+                .ThenByDescending(o => o.Hora)
+                .ToList();
         }
     }
 }

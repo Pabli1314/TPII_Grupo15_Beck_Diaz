@@ -25,8 +25,8 @@ namespace Presentacion.Recepcionista.Vistas
         private readonly ComboBox _cmbMetodoPago;
         private readonly Button _btnConfirmar;
 
-        // Sección "Ventas realizadas": quién consumió qué.
-        private const int AnchoSeccionVentas = 708; // mismo ancho que las 3 columnas de productos
+        // Sección "Ventas realizadas"
+        private const int AnchoSeccionVentas = 708;
         private readonly Panel _panelVentasRealizadas;
         private readonly TextBox _txtFiltroVentas;
         private readonly ComboBox _cmbTipoVentas;
@@ -77,7 +77,7 @@ namespace Presentacion.Recepcionista.Vistas
             panelFiltroProductos.Controls.Add(btnLimpiarProductos);
 
             const int columnasProductos = 3;
-            const int anchoTarjetaProducto = 220 + 16; // TarjetaProducto.Width + su margen derecho
+            const int anchoTarjetaProducto = 220 + 16;
             _panelProductos = new FlowLayoutPanel
             {
                 Location = new Point(0, 72),
@@ -87,12 +87,13 @@ namespace Presentacion.Recepcionista.Vistas
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 MaximumSize = new Size(anchoTarjetaProducto * columnasProductos, 0)
             };
+
             panelIzquierdo.Controls.Add(lblTitulo);
             panelIzquierdo.Controls.Add(panelFiltroProductos);
             panelIzquierdo.Controls.Add(_panelProductos);
 
-            // --- Ventas realizadas (debajo de los productos; se reubica en Refrescar según su alto) ---
-            _panelVentasRealizadas = new Panel { Location = new Point(0, 36), Size = new Size(AnchoSeccionVentas, 530), BackColor = Paleta.FondoApp };
+            // --- Ventas realizadas ---
+            _panelVentasRealizadas = new Panel { Location = new Point(0, 36), Size = new Size(AnchoSeccionVentas, 535), BackColor = Paleta.FondoApp };
 
             var lblVentas = new Label { Text = "Ventas realizadas", Font = Paleta.FuenteSeccion, ForeColor = Paleta.TextoPrimario, AutoSize = true, Location = new Point(0, 0) };
             _lblResumenVentas = new Label { Font = Paleta.FuenteChica, ForeColor = Paleta.TextoTerciario, AutoSize = true, Location = new Point(0, 26) };
@@ -100,7 +101,7 @@ namespace Presentacion.Recepcionista.Vistas
             var panelBarraVentas = new FlowLayoutPanel
             {
                 Location = new Point(0, 48),
-                Size = new Size(1100, 40),
+                Size = new Size(AnchoSeccionVentas, 40),
                 FlowDirection = FlowDirection.LeftToRight,
                 AutoSize = true
             };
@@ -156,6 +157,7 @@ namespace Presentacion.Recepcionista.Vistas
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             };
             EstiloGrid.Aplicar(_grillaVentas);
+
             _grillaVentas.Columns.Add("nro", "N°");
             _grillaVentas.Columns.Add("fecha", "Fecha y hora");
             _grillaVentas.Columns.Add("huesped", "Huésped");
@@ -189,14 +191,14 @@ namespace Presentacion.Recepcionista.Vistas
             _grillaVentas.Columns["total"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
             _grillaVentas.Columns["habitacion"].MinimumWidth = 45;
             _grillaVentas.Columns["colTicket"].MinimumWidth = 78;
-            // Huésped (nombre + DNI) y productos pueden ser largos: se muestran en dos líneas en vez de cortarse.
-            // (En el estilo de la columna: el DefaultCellStyle de la grilla se reinicia al agregarla al formulario.)
+
             foreach (string columna in new[] { "fecha", "huesped", "productos" })
             {
                 _grillaVentas.Columns[columna].DefaultCellStyle.WrapMode = DataGridViewTriState.True;
             }
             _grillaVentas.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             _grillaVentas.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
             _grillaVentas.CellClick += (s, e) =>
             {
                 if (e.RowIndex >= 0 && _grillaVentas.Columns[e.ColumnIndex].Name == "colTicket")
@@ -219,12 +221,12 @@ namespace Presentacion.Recepcionista.Vistas
             _panelVentasRealizadas.Controls.Add(panelBarraVentas);
             _panelVentasRealizadas.Controls.Add(_grillaVentas);
             _panelVentasRealizadas.Controls.Add(lblAyuda);
-            _panelVentasRealizadas.Height = 515;
+
             panelIzquierdo.Controls.Add(_panelVentasRealizadas);
             _panelProductos.SizeChanged += (s, e) => _panelVentasRealizadas.Top = _panelProductos.Bottom + 24;
-            // La tabla de ventas usa todo el ancho libre a la izquierda del carrito (mínimo el de los productos).
             panelIzquierdo.Resize += (s, e) => _panelVentasRealizadas.Width = Math.Max(AnchoSeccionVentas, panelIzquierdo.ClientSize.Width - 16);
 
+            // --- Carrito de compra (panel derecho) ---
             var panelCarrito = new Panel { Dock = DockStyle.Right, Width = 420, BackColor = Paleta.FondoTarjeta, Padding = new Padding(20) };
             var lblCarrito = new Label { Text = "Carrito de venta", Font = Paleta.FuenteSeccion, ForeColor = Paleta.TextoPrimario, AutoSize = true, Location = new Point(0, 0) };
 
@@ -251,11 +253,8 @@ namespace Presentacion.Recepcionista.Vistas
 
             _lblTotal = new Label { Text = "TOTAL: $0", Font = new Font("Segoe UI Semibold", 16f), ForeColor = Paleta.TextoPrimario, AutoSize = true, Location = new Point(0, 430) };
 
-            // La venta se asigna al huésped que compra (venta.dni_huesped); solo se listan huéspedes
-            // alojados en habitaciones Ocupadas y es obligatorio elegir uno para confirmar la venta.
             var lblHuesped = CamposFormulario.Etiqueta("Huésped que realiza la compra", new Point(0, 470));
             _cmbHuesped = CamposFormulario.Combo(new Point(0, 492), 380);
-            // Al desplegar se vuelve a consultar quién tiene check-in activo, para no mostrar una lista vieja.
             _cmbHuesped.DropDown += (s, e) => RefrescarHuespedes();
 
             var lblMetodo = CamposFormulario.Etiqueta("Método de pago", new Point(0, 524));
@@ -287,8 +286,6 @@ namespace Presentacion.Recepcionista.Vistas
             FiltrarProductos();
             RefrescarHuespedes();
             RedibujarCarrito();
-
-            // La sección de ventas va debajo de las tarjetas de productos, que cambian de alto.
             _panelVentasRealizadas.Top = _panelProductos.Bottom + 24;
             RefrescarVentasRealizadas();
         }
@@ -440,7 +437,6 @@ namespace Presentacion.Recepcionista.Vistas
             }
         }
 
-        /// <summary>Recarga los huéspedes alojados conservando la selección actual si sigue alojado.</summary>
         private void RefrescarHuespedes()
         {
             string? seleccionActual = (_cmbHuesped.SelectedItem as OpcionHuesped)?.DniHuesped;
@@ -455,7 +451,6 @@ namespace Presentacion.Recepcionista.Vistas
                 });
             }
 
-            // Sin huéspedes alojados el selector queda vacío y no se puede confirmar la venta.
             int indice = _cmbHuesped.Items.Count > 0 ? 0 : -1;
             for (int i = 0; i < _cmbHuesped.Items.Count; i++)
             {
@@ -521,7 +516,6 @@ namespace Presentacion.Recepcionista.Vistas
             RedibujarCarrito();
         }
 
-        /// <summary>Avisa y devuelve false si la cantidad pedida dejaría el stock por debajo del mínimo.</summary>
         private bool HayUnidadesVendibles(Producto producto, int cantidad)
         {
             int vendibles = GestionVentas.UnidadesVendibles(producto);

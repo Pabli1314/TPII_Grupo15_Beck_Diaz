@@ -126,6 +126,7 @@ namespace Logica
             return texto.Length == 0 ? texto : char.ToUpper(texto[0]) + texto.Substring(1);
         }
 
+
         /// <summary>
         /// Retorna la lista de huéspedes aptos para Check-In (excluye a los alojados actualmente).
         /// </summary>

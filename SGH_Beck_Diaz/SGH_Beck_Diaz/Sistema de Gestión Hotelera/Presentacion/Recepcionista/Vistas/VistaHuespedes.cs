@@ -44,12 +44,16 @@ namespace Presentacion.Recepcionista.Vistas
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             };
             EstiloGrid.Aplicar(_grilla);
+
+            // Nombres de columnas corregidos sin duplicados
             _grilla.Columns.Add("dni", "DNI");
             _grilla.Columns.Add("nombre", "Nombre");
             _grilla.Columns.Add("apellido", "Apellido");
             _grilla.Columns.Add("telefono", "Teléfono");
-            _grilla.Columns.Add("habitacion", "Correo");
-            _grilla.Columns.Add("estado", "Dirección");
+            _grilla.Columns.Add("correo", "Correo");
+            _grilla.Columns.Add("direccion", "Dirección");
+            _grilla.Columns.Add("habitacionActual", "Habitación actual");
+            _grilla.Columns.Add("estadoEstadia", "Estado");
 
             Controls.Add(lblTitulo);
             Controls.Add(panelAcciones);
@@ -65,7 +69,8 @@ namespace Presentacion.Recepcionista.Vistas
             _grilla.Rows.Clear();
             foreach (Huesped huesped in huespedes)
             {
-                HospedajeDetalle? estadia = _gestionHospedajes.ObtenerEstadiaActual(huesped.DniHuesped);
+                // Uso de la entidad de dominio Hospedaje en lugar del DTO HospedajeDetalle
+                Hospedaje? estadia = _gestionHospedajes.ObtenerEstadiaActual(huesped.DniHuesped);
 
                 _grilla.Rows.Add(
                     huesped.DniHuesped,

@@ -9,7 +9,8 @@ using System.Windows.Forms;
 namespace Presentacion.Recepcionista
 {
     /// <summary>
-    /// Modal de Check-In mediante selección de un huésped no alojado actualmente.
+    /// Alta de (huésped + hospedaje + pase de la habitación a Ocupada).
+    /// Permite seleccionar un huésped registrado o ingresar/actualizar sus datos manualmente.
     /// </summary>
     internal class FCheckIn : FormModalBase
     {
@@ -20,9 +21,16 @@ namespace Presentacion.Recepcionista
 
         private readonly ComboBox _cmbHuespedes;
         private readonly Label _lblDetalleHuesped;
+        private readonly TextBox _txtDni;
+        private readonly TextBox _txtNombre;
+        private readonly TextBox _txtApellido;
+        private readonly TextBox _txtTelefono;
+        private readonly TextBox _txtDireccion;
+        private readonly TextBox _txtCorreo;
         private readonly ComboBox _cmbMetodoPago;
         private readonly DateTimePicker _dtpFechaSalida;
         private readonly DateTimePicker _dtpHoraSalida;
+        private readonly Label _lblEncontrado;
         private readonly Label _lblError;
 
         public string NombreCompleto { get; private set; } = string.Empty;
@@ -37,46 +45,81 @@ namespace Presentacion.Recepcionista
 
             _dniUsuario = dniUsuario ?? string.Empty;
 
-            Size = new Size(520, 520);
+            Size = new Size(520, 750);
             EstablecerTitulo($"Check-in — Habitación {nroHabitacion}");
 
             const int ancho = 440;
             int y = 0;
 
-            // Selección de Huésped (filtrado)
-            Contenido.Controls.Add(CamposFormulario.Etiqueta("Seleccionar Huésped", new Point(0, y)));
+            // Selector de Huéspedes Registrados
+            Contenido.Controls.Add(CamposFormulario.Etiqueta("Seleccionar Huésped existente", new Point(0, y)));
             _cmbHuespedes = CamposFormulario.Combo(new Point(0, y + 22), ancho);
             _cmbHuespedes.DropDownStyle = ComboBoxStyle.DropDownList;
-
-            // Suscribir el evento ANTES de cargar para garantizar la actualización inicial limpia
             _cmbHuespedes.SelectedIndexChanged += CmbHuespedes_SelectedIndexChanged;
             Contenido.Controls.Add(_cmbHuespedes);
             y += 54;
 
-            // Panel informativo del Huésped
             _lblDetalleHuesped = new Label
             {
                 Location = new Point(0, y),
-                Size = new Size(ancho, 60),
+                Size = new Size(ancho, 40),
                 Font = Paleta.FuenteChica,
                 ForeColor = Paleta.TextoSecundario,
                 BackColor = Color.FromArgb(245, 247, 250),
-                Padding = new Padding(8),
-                Text = "Seleccione un huésped para ver su información."
+                Padding = new Padding(6),
+                Text = "Seleccione un huésped o complete los datos a continuación."
             };
             Contenido.Controls.Add(_lblDetalleHuesped);
-            y += 68;
+            y += 48;
+
+            // Datos del Huésped
+            Contenido.Controls.Add(CamposFormulario.Etiqueta("DNI", new Point(0, y)));
+            _txtDni = CamposFormulario.SoloNumeros(CamposFormulario.Texto(new Point(0, y + 22), ancho), Huesped.LargoDni);
+            _txtDni.Leave += (s, e) => BuscarHuespedPorDni();
+            Contenido.Controls.Add(_txtDni);
+            y += 50;
+
+            _lblEncontrado = new Label { Location = new Point(0, y), AutoSize = true, Font = Paleta.FuenteChica, Visible = false };
+            Contenido.Controls.Add(_lblEncontrado);
+            y += 20;
+
+            Contenido.Controls.Add(CamposFormulario.Etiqueta("Nombre", new Point(0, y)));
+            _txtNombre = CamposFormulario.Texto(new Point(0, y + 22), ancho);
+            _txtNombre.MaxLength = Huesped.LargoNombre;
+            Contenido.Controls.Add(_txtNombre);
+            y += 50;
+
+            Contenido.Controls.Add(CamposFormulario.Etiqueta("Apellido", new Point(0, y)));
+            _txtApellido = CamposFormulario.Texto(new Point(0, y + 22), ancho);
+            _txtApellido.MaxLength = Huesped.LargoApellido;
+            Contenido.Controls.Add(_txtApellido);
+            y += 50;
+
+            Contenido.Controls.Add(CamposFormulario.Etiqueta("Teléfono", new Point(0, y)));
+            _txtTelefono = CamposFormulario.SoloNumeros(CamposFormulario.Texto(new Point(0, y + 22), ancho), Huesped.LargoTelefono);
+            Contenido.Controls.Add(_txtTelefono);
+            y += 50;
+
+            Contenido.Controls.Add(CamposFormulario.Etiqueta("Dirección", new Point(0, y)));
+            _txtDireccion = CamposFormulario.Texto(new Point(0, y + 22), ancho);
+            _txtDireccion.MaxLength = Huesped.LargoDireccion;
+            Contenido.Controls.Add(_txtDireccion);
+            y += 50;
+
+            Contenido.Controls.Add(CamposFormulario.Etiqueta("Correo electrónico", new Point(0, y)));
+            _txtCorreo = CamposFormulario.Texto(new Point(0, y + 22), ancho);
+            _txtCorreo.MaxLength = Huesped.LargoCorreo;
+            Contenido.Controls.Add(_txtCorreo);
+            y += 50;
 
             // Método de Pago
             Contenido.Controls.Add(CamposFormulario.Etiqueta("Método de pago", new Point(0, y)));
             _cmbMetodoPago = CamposFormulario.Combo(new Point(0, y + 22), ancho);
             _cmbMetodoPago.DisplayMember = nameof(MetodoPago.NomMetodoPago);
             _cmbMetodoPago.ValueMember = nameof(MetodoPago.IdMetodo);
-
-            var metodosPago = _gestionHospedajes.ObtenerMetodosPago();
-            _cmbMetodoPago.DataSource = metodosPago ?? new List<MetodoPago>();
+            _cmbMetodoPago.DataSource = _gestionHospedajes.ObtenerMetodosPago() ?? new List<MetodoPago>();
             Contenido.Controls.Add(_cmbMetodoPago);
-            y += 54;
+            y += 50;
 
             // Fecha de Salida
             Contenido.Controls.Add(CamposFormulario.Etiqueta("Fecha de salida", new Point(0, y)));
@@ -89,7 +132,7 @@ namespace Presentacion.Recepcionista
                 Value = DateTime.Today.AddDays(1)
             };
             Contenido.Controls.Add(_dtpFechaSalida);
-            y += 54;
+            y += 50;
 
             // Hora Estimada de Salida
             Contenido.Controls.Add(CamposFormulario.Etiqueta("Hora estimada de salida", new Point(0, y)));
@@ -102,7 +145,7 @@ namespace Presentacion.Recepcionista
                 Value = DateTime.Today.AddHours(12)
             };
             Contenido.Controls.Add(_dtpHoraSalida);
-            y += 62;
+            y += 54;
 
             // Mensajes de Error
             _lblError = CamposFormulario.Error(new Point(0, y), ancho);
@@ -110,26 +153,15 @@ namespace Presentacion.Recepcionista
             y += 30;
 
             // Botones de Acción
-            var btnCancelar = EstiloBoton.Secundario(new Button
-            {
-                Text = "Cancelar",
-                Size = new Size(120, 40),
-                Location = new Point(ancho - 120 - 140, y)
-            });
+            var btnCancelar = EstiloBoton.Secundario(new Button { Text = "Cancelar", Size = new Size(120, 40), Location = new Point(ancho - 120 - 140, y) });
             btnCancelar.Click += (s, e) => { DialogResult = DialogResult.Cancel; Close(); };
 
-            var btnConfirmar = EstiloBoton.Primario(new Button
-            {
-                Text = "Confirmar",
-                Size = new Size(140, 40),
-                Location = new Point(ancho - 140, y)
-            });
+            var btnConfirmar = EstiloBoton.Primario(new Button { Text = "Confirmar", Size = new Size(140, 40), Location = new Point(ancho - 140, y) });
             btnConfirmar.Click += (s, e) => Confirmar();
 
             Contenido.Controls.Add(btnCancelar);
             Contenido.Controls.Add(btnConfirmar);
 
-            // Cargar datos a los controles
             CargarHuespedesDisponibles();
         }
 
@@ -157,12 +189,6 @@ namespace Presentacion.Recepcionista
             _cmbHuespedes.ValueMember = "Dni";
             _cmbHuespedes.DataSource = listaCombo;
             _cmbHuespedes.Enabled = true;
-
-            // Seleccionar el primer elemento por defecto si hay items disponibles
-            if (_cmbHuespedes.Items.Count > 0)
-            {
-                _cmbHuespedes.SelectedIndex = 0;
-            }
         }
 
         private void CmbHuespedes_SelectedIndexChanged(object? sender, EventArgs e)
@@ -176,15 +202,20 @@ namespace Presentacion.Recepcionista
 
                     if (h != null)
                     {
-                        _lblDetalleHuesped.Text = $"Teléfono: {h.Telefono ?? "-"}\n" +
-                                                  $"Correo: {h.Correo ?? "-"}\n" +
-                                                  $"Dirección: {h.Direccion ?? "-"}";
+                        _txtDni.Text = h.DniHuesped;
+                        _txtNombre.Text = h.Nombre;
+                        _txtApellido.Text = h.Apellido;
+                        _txtTelefono.Text = h.Telefono;
+                        _txtDireccion.Text = h.Direccion;
+                        _txtCorreo.Text = h.Correo;
+
+                        _lblDetalleHuesped.Text = $"Registrado: {h.Nombre} {h.Apellido} (DNI: {h.DniHuesped})";
                         return;
                     }
                 }
                 catch
                 {
-                    // Fallback en caso de que falle la evaluación de la propiedad dinámica
+                    // Fallback si no se recupera el objeto
                 }
             }
 
@@ -194,49 +225,59 @@ namespace Presentacion.Recepcionista
             }
         }
 
+        private void BuscarHuespedPorDni()
+        {
+            string dni = _txtDni.Text.Trim();
+            if (string.IsNullOrWhiteSpace(dni))
+            {
+                _lblEncontrado.Visible = false;
+                return;
+            }
+
+            Huesped? huesped = _gestionHospedajes.BuscarHuespedPorDni(dni);
+            if (huesped != null)
+            {
+                _txtNombre.Text = huesped.Nombre;
+                _txtApellido.Text = huesped.Apellido;
+                _txtTelefono.Text = huesped.Telefono;
+                _txtDireccion.Text = huesped.Direccion;
+                _txtCorreo.Text = huesped.Correo;
+
+                _lblEncontrado.Text = "Huésped encontrado. Si modifica sus datos, se actualizarán al confirmar.";
+                _lblEncontrado.ForeColor = Paleta.Exito;
+                _lblEncontrado.Visible = true;
+            }
+            else
+            {
+                _lblEncontrado.Text = "Nuevo huésped.";
+                _lblEncontrado.ForeColor = Paleta.TextoTerciario;
+                _lblEncontrado.Visible = true;
+            }
+        }
+
         private void Confirmar()
         {
             _lblError.Visible = false;
 
-            if (!_cmbHuespedes.Enabled || _cmbHuespedes.SelectedItem == null)
+            if (!ValidarCampos(out string mensaje, out Control controlInvalido))
             {
-                _lblError.Text = "Debe seleccionar un huésped válido.";
+                _lblError.Text = mensaje;
                 _lblError.Visible = true;
+                controlInvalido.Focus();
                 return;
             }
 
-            if (_cmbMetodoPago.SelectedValue == null)
+            var huesped = new Huesped
             {
-                _lblError.Text = "Debe seleccionar un método de pago.";
-                _lblError.Visible = true;
-                _cmbMetodoPago.Focus();
-                return;
-            }
+                DniHuesped = _txtDni.Text.Trim(),
+                Nombre = _txtNombre.Text.Trim(),
+                Apellido = _txtApellido.Text.Trim(),
+                Telefono = _txtTelefono.Text.Trim(),
+                Direccion = _txtDireccion.Text.Trim(),
+                Correo = _txtCorreo.Text.Trim()
+            };
 
-            Huesped? huesped = null;
-            try
-            {
-                dynamic seleccionado = _cmbHuespedes.SelectedItem;
-                huesped = seleccionado?.ObjetoHuesped;
-            }
-            catch
-            {
-                huesped = null;
-            }
-
-            if (huesped == null)
-            {
-                _lblError.Text = "Error al recuperar los datos del huésped seleccionado.";
-                _lblError.Visible = true;
-                return;
-            }
-
-            if (!int.TryParse(_cmbMetodoPago.SelectedValue.ToString(), out int idMetodo))
-            {
-                _lblError.Text = "Método de pago no válido.";
-                _lblError.Visible = true;
-                return;
-            }
+            int idMetodo = Convert.ToInt32(_cmbMetodoPago.SelectedValue);
 
             try
             {
@@ -264,6 +305,40 @@ namespace Presentacion.Recepcionista
             {
                 MessageBox.Show($"Ocurrió un error al registrar el check-in.\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private bool ValidarCampos(out string mensaje, out Control controlInvalido)
+        {
+            (string valor, string etiqueta, Control control)[] requeridos =
+            {
+                (_txtDni.Text, "el DNI", _txtDni),
+                (_txtNombre.Text, "el nombre", _txtNombre),
+                (_txtApellido.Text, "el apellido", _txtApellido),
+                (_txtTelefono.Text, "el teléfono", _txtTelefono),
+                (_txtDireccion.Text, "la dirección", _txtDireccion),
+                (_txtCorreo.Text, "el correo electrónico", _txtCorreo),
+            };
+
+            foreach (var (valor, etiqueta, control) in requeridos)
+            {
+                if (string.IsNullOrWhiteSpace(valor))
+                {
+                    mensaje = $"Debe ingresar {etiqueta}.";
+                    controlInvalido = control;
+                    return false;
+                }
+            }
+
+            if (_cmbMetodoPago.SelectedValue == null)
+            {
+                mensaje = "Debe seleccionar un método de pago.";
+                controlInvalido = _cmbMetodoPago;
+                return false;
+            }
+
+            mensaje = string.Empty;
+            controlInvalido = _txtDni;
+            return true;
         }
     }
 }

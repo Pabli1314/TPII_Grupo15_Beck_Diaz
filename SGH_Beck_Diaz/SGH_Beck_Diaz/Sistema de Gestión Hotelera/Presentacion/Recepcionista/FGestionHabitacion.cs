@@ -194,14 +194,19 @@ namespace Presentacion.Recepcionista
 
             if (confirmacion != DialogResult.Yes)
             {
+
                 _gestionHabitaciones.MarcarComoDisponible(nroHabitacion, _usuario!.DniUsuario);
                 _habitacion.Estado = EstadoOcupacion.Disponible;
+
                 return;
             }
 
             try
             {
                 _gestionHabitaciones.MarcarComoDisponible(nroHabitacion, _usuario!.DniUsuario);
+
+                //_gestionHabitaciones.marcarComoDisponible(nroHabitacion, _usuario!.DniUsuario);
+
                 _habitacion.Estado = EstadoOcupacion.Disponible;
                 CerrarConCambios();
             }

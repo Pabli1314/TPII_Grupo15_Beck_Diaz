@@ -49,8 +49,8 @@ namespace Logica
         public List<VentaRealizada> ObtenerVentasRealizadas(string? filtro = null, bool soloHuespedes = false, DateTime? fecha = null)
         {
             List<VentaRealizada> ventas = VentaDAO.ObtenerRealizadas();
-            List<HospedajeDetalle> hospedajes = HospedajeDAO.BuscarDetalle();
-
+       
+            List<Hospedaje> hospedajes = HospedajeDAO.BuscarDetalle(dni: null, nombre: null, nroHabitacion: null, fecha: null, termino: null);
             foreach (VentaRealizada venta in ventas.Where(v => v.DniHuesped != null))
             {
                 venta.NroHabitacion = hospedajes
@@ -69,7 +69,7 @@ namespace Logica
 
             if (fecha.HasValue)
             {
-                resultado = resultado.Where(v => v.FechaVenta.Date == fecha.Value.Date);
+                resultado = resultado.Where(v => v.Momento.Date == fecha.Value.Date);
             }
 
             if (!string.IsNullOrWhiteSpace(filtro))
@@ -99,13 +99,7 @@ namespace Logica
 
         /// <summary>
         /// Registra una venta de mostrador (carrito de productos) y descuenta stock en una sola
-        /// transacción. Antes se asegura de que el usuario tenga un turno de caja abierto (lo abre si
-        /// hace falta): la base no guarda el turno en la venta, así que la venta se le imputa al turno
-        /// por su fecha/hora. Valida contra la base: producto existente y activo, cantidad &gt; 0
-        /// (CK_detalle_cantidad), un solo renglón por producto (PK de detalle_venta) y que el stock no
-        /// quede por debajo del mínimo (CH_producto_disponible). Si se indica <paramref name="dniHuesped"/>,
-        /// la venta queda asignada a ese huésped (venta.dni_huesped), que tiene que estar alojado en
-        /// una habitación Ocupada; null = venta de mostrador.
+        /// transacción.
         /// </summary>
         public Venta RegistrarVenta(List<(Producto Producto, int Cantidad)> carrito, int idMetodo, string dniUsuario, string? dniHuesped = null)
         {
@@ -138,7 +132,7 @@ namespace Logica
                 throw new InvalidOperationException("El método de pago seleccionado no es válido.");
             }
 
-            // detalle_venta tiene PK (id_venta, cod_producto): el mismo producto va en un solo renglón.
+            // Agrupar productos para evitar duplicación de claves primarias en detalle_venta
             var renglones = carrito
                 .GroupBy(item => item.Producto.Codigo)
                 .Select(g => (Codigo: g.Key, Nombre: g.First().Producto.Nombre, Cantidad: g.Sum(i => i.Cantidad)))
@@ -153,7 +147,6 @@ namespace Logica
                     throw new InvalidOperationException($"La cantidad de \"{nombre}\" debe ser mayor a cero.");
                 }
 
-                // Precio y stock se toman de la base, no del carrito (pueden haber cambiado).
                 Producto actual = ProductoDAO.ObtenerPorCodigo(codigo)
                     ?? throw new InvalidOperationException($"El producto \"{nombre}\" ya no existe.");
 

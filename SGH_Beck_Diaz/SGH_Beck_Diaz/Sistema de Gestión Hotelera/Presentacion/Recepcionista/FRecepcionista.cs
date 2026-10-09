@@ -111,9 +111,11 @@ namespace Presentacion.Recepcionista
                     // en otra pantalla desde la última vez. El carrito en curso se conserva.
                     vistaVentas.Refrescar();
                     break;
+
                 case VistaReservas vistaReservas:
                     vistaReservas.Refrescar();
                     break;
+
             }
 
             _sidebar.EstablecerActivo(clave);

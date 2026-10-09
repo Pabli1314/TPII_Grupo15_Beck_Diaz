@@ -28,9 +28,7 @@ namespace Logica
         /// <summary>
         /// Da de alta el hospedaje de un huésped nuevo o existente y pasa la habitación a Ocupada.
         /// Requiere una habitación Disponible y una fecha/hora de salida planificada posterior al
-        /// momento actual (hospedaje.fecha_salida/hora_salida son obligatorias en la base, no se puede
-        /// dejar "abierto"). Valida todo antes de escribir, para no dejar un huésped o turno creado
-        /// a medias si algún dato es inválido. Si el huésped ya existe, actualiza sus datos de contacto.
+        /// momento actual.
         /// </summary>
         public void RegistrarCheckIn(int nroHabitacion, string dniUsuario, Huesped huesped, int idMetodo, DateTime fechaSalida, TimeSpan horaSalida)
         {
@@ -81,8 +79,6 @@ namespace Logica
                 throw new InvalidOperationException($"La habitación {nroHabitacion} no está Disponible.");
             }
 
-            // El turno va antes de tocar al huésped: si el usuario no es válido para abrir turno
-            // (FK_TurnoCaja_Usuario), no queda un huésped guardado sin hospedaje.
             TurnoCaja turno = _gestionTurnoCaja.ObtenerOAbrirTurno(dniUsuario);
 
             if (huespedExiste)
@@ -107,9 +103,7 @@ namespace Logica
             HabitacionDAO.ActualizarEstado(nroHabitacion, estadoOcupada.IdEstado);
         }
 
-        /// <summary>Número de la habitación Ocupada cuyo hospedaje vigente es de ese huésped, o null si
-        /// no está alojado. No depende de la salida estimada: un huésped con la salida vencida que
-        /// todavía no hizo check-out sigue contando como alojado.</summary>
+        /// <summary>Número de la habitación Ocupada cuyo hospedaje vigente es de ese huésped, o null si no está alojado.</summary>
         private static int? ObtenerHabitacionOcupadaPor(string dniHuesped, int idEstadoOcupada)
         {
             foreach (Habitacion ocupada in HabitacionDAO.ObtenerTodas().Where(h => h.IdEstado == idEstadoOcupada))
@@ -125,19 +119,37 @@ namespace Logica
         }
 
         /// <summary>Búsqueda para la pantalla de Reservas: todos los filtros son opcionales y combinables.</summary>
-        public List<HospedajeDetalle> BuscarHospedajes(string? dni = null, string? nombre = null, int? nroHabitacion = null, DateTime? fecha = null, string? termino = null)
+        public List<Hospedaje> BuscarHospedajes(string? dni = null, string? nombre = null, int? nroHabitacion = null, DateTime? fecha = null, string? termino = null)
         {
-            return HospedajeDAO.BuscarDetalle(dni, nombre, nroHabitacion, fecha, termino);
+            dni = string.IsNullOrWhiteSpace(dni) ? null : dni.Trim();
+            nombre = string.IsNullOrWhiteSpace(nombre) ? null : nombre.Trim();
+            termino = string.IsNullOrWhiteSpace(termino) ? null : termino.Trim();
+
+            List<Hospedaje> resultado = HospedajeDAO.BuscarDetalle(
+                dni: dni,
+                nombre: nombre,
+                nroHabitacion: nroHabitacion,
+                fecha: fecha,
+                termino: termino);
+
+            return resultado ?? new List<Hospedaje>();
         }
 
         /// <summary>Habitación donde el huésped está alojado ahora mismo, o null si no tiene una estadía en curso.</summary>
-        public HospedajeDetalle? ObtenerEstadiaActual(string dniHuesped)
+        /// <summary>Habitación donde el huésped está alojado ahora mismo, o null si no tiene una estadía en curso.</summary>
+        public Hospedaje? ObtenerEstadiaActual(string dniHuesped)
         {
-            return HospedajeDAO.BuscarDetalle(dni: dniHuesped).FirstOrDefault(h => !h.Finalizada);
-        }
+            List<Hospedaje> lista = HospedajeDAO.BuscarDetalle(
+                dni: dniHuesped,
+                nombre: null,
+                nroHabitacion: null,
+                fecha: null,
+                termino: null);
 
-        /// <summary>Huésped y hospedaje vigentes de la habitación, para precargar la pantalla de check-out.
-        /// Null si la habitación no tiene un hospedaje cargado.</summary>
+            // En lugar de !h.Finalizada, evaluamos si la fecha y hora de salida son futuras:
+            return lista?.FirstOrDefault(h => (h.FechaSalida.Date + h.HoraSalida) > DateTime.Now);
+        }
+        /// <summary>Huésped y hospedaje vigentes de la habitación, para precargar la pantalla de check-out.</summary>
         public (Huesped Huesped, Hospedaje Hospedaje)? ObtenerHuespedActivoPorHabitacion(int nroHabitacion)
         {
             Hospedaje? hospedaje = HospedajeDAO.ObtenerActivoPorHabitacion(nroHabitacion);
@@ -155,8 +167,7 @@ namespace Logica
             return (huesped, hospedaje);
         }
 
-        /// <summary>Consumos (ventas adicionales asignadas al huésped) desde su check-in en este hospedaje,
-        /// para mostrarlos en el check-out. Cada venta ya tiene su método de pago registrado.</summary>
+        /// <summary>Consumos (ventas adicionales asignadas al huésped) desde su check-in en este hospedaje.</summary>
         public List<VentaRealizada> ObtenerConsumosDeEstadia(Hospedaje hospedaje)
         {
             DateTime entrada = hospedaje.FechaEntrada.Date + hospedaje.HoraEntrada;
@@ -170,7 +181,7 @@ namespace Logica
             return consumos;
         }
 
-        /// <summary>Actualiza los datos de contacto del huésped (se usa para corregirlos al confirmar el check-out).</summary>
+        /// <summary>Actualiza los datos de contacto del huésped.</summary>
         public void ActualizarHuesped(Huesped huesped)
         {
             GestionHuespedes.Validar(huesped, esNuevo: false);
@@ -178,8 +189,7 @@ namespace Logica
         }
 
         /// <summary>
-        /// Cierra el hospedaje vigente de la habitación (pisa fecha/hora de salida con el momento real
-        /// del check-out) y la pasa a Limpieza.
+        /// Cierra el hospedaje vigente de la habitación y la pasa a Limpieza.
         /// </summary>
         public void RegistrarCheckOut(int nroHabitacion)
         {

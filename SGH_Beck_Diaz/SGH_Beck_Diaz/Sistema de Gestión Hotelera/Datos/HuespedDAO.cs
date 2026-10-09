@@ -168,6 +168,7 @@ namespace Datos
             cmd.Parameters.AddWithValue("@direccion", huesped.Direccion);
             cmd.Parameters.AddWithValue("@correo", huesped.Correo);
         }
+
         /// <summary>
         /// Obtiene únicamente los huéspedes que NO se encuentran alojados actualmente en ninguna habitación.
         /// Excluye a aquellos cuyo hospedaje activo aún no ha finalizado.
@@ -220,6 +221,7 @@ namespace Datos
 
             return huespedes;
         }
+
         private static Huesped MapearHuesped(SqlDataReader reader)
         {
             return new Huesped

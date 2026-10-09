@@ -2,6 +2,7 @@ using Entidades;
 using Logica;
 using Presentacion.Administrador.UI;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -130,21 +131,20 @@ namespace Presentacion.Recepcionista.Vistas
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             };
             EstiloGrid.Aplicar(_grilla);
+
             _grilla.Columns.Add("reserva", "Reserva");
-            _grilla.Columns.Add("dni", "DNI");
-            _grilla.Columns.Add("huesped", "Huésped");
+            _grilla.Columns.Add("dni", "DNI Huésped");
             _grilla.Columns.Add("habitacion", "Habitación");
             _grilla.Columns.Add("entrada", "Entrada");
             _grilla.Columns.Add("salida", "Salida");
-            _grilla.Columns.Add("estado", "Estado");
+            _grilla.Columns.Add("metodo", "Método Pago");
 
-            _grilla.Columns["reserva"].FillWeight = 55;
-            _grilla.Columns["dni"].FillWeight = 75;
-            _grilla.Columns["huesped"].FillWeight = 160;
-            _grilla.Columns["habitacion"].FillWeight = 65;
-            _grilla.Columns["entrada"].FillWeight = 110;
-            _grilla.Columns["salida"].FillWeight = 110;
-            _grilla.Columns["estado"].FillWeight = 75;
+            _grilla.Columns["reserva"].FillWeight = 60;
+            _grilla.Columns["dni"].FillWeight = 90;
+            _grilla.Columns["habitacion"].FillWeight = 70;
+            _grilla.Columns["entrada"].FillWeight = 120;
+            _grilla.Columns["salida"].FillWeight = 120;
+            _grilla.Columns["metodo"].FillWeight = 90;
 
             Controls.Add(lblTitulo);
             Controls.Add(lblSubtitulo);
@@ -176,22 +176,21 @@ namespace Presentacion.Recepcionista.Vistas
                 int? nroHabitacion = _numHabitacion.Value > 0 ? (int)_numHabitacion.Value : null;
                 DateTime? fecha = _chkUsarFecha.Checked ? _dtpFecha.Value.Date : null;
 
-                var resultados = _gestionHospedajes.BuscarHospedajes(
+                List<Hospedaje> resultados = _gestionHospedajes.BuscarHospedajes(
                     termino: criterio,
                     nroHabitacion: nroHabitacion,
                     fecha: fecha);
 
                 _grilla.Rows.Clear();
-                foreach (HospedajeDetalle hospedaje in resultados)
+                foreach (Hospedaje hospedaje in resultados)
                 {
                     _grilla.Rows.Add(
                         hospedaje.IdHospedaje,
                         hospedaje.DniHuesped,
-                        hospedaje.NombreHuesped,
                         hospedaje.NroHabitacion,
                         $"{hospedaje.FechaEntrada:dd/MM/yyyy} {hospedaje.HoraEntrada:hh\\:mm}",
                         $"{hospedaje.FechaSalida:dd/MM/yyyy} {hospedaje.HoraSalida:hh\\:mm}",
-                        hospedaje.Estado);
+                        hospedaje.IdMetodo);
                 }
             }
             catch (Exception ex)

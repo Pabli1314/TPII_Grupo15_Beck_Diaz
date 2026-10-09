@@ -1,7 +1,9 @@
+using Entidades;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
-using Entidades;
+using System.Data;
+using System.Text;
 
 namespace Datos
 {
@@ -74,8 +76,7 @@ namespace Datos
         }
 
         /// <summary>
-        /// Devuelve el hospedaje más reciente de la habitación (no hay una columna de "activo";
-        /// se asume que mientras la habitación esté Ocupada, el último hospedaje cargado es el vigente).
+        /// Devuelve el hospedaje más reciente de la habitación (se asume que mientras la habitación esté Ocupada, el último hospedaje es el vigente).
         /// </summary>
         public static Hospedaje? ObtenerActivoPorHabitacion(int nroHabitacion)
         {
@@ -117,8 +118,7 @@ namespace Datos
             return hospedaje;
         }
 
-        /// <summary>Hospedajes cargados durante un turno de caja, con la tarifa de la habitación
-        /// (para calcular el cobro de alojamiento por método de pago en el resumen de turno).</summary>
+        /// <summary>Hospedajes cargados durante un turno de caja, con la tarifa de la habitación.</summary>
         public static List<(Hospedaje Hospedaje, decimal TarifaBase)> ObtenerPorTurno(int idTurno)
         {
             var resultado = new List<(Hospedaje, decimal)>();
@@ -161,17 +161,15 @@ namespace Datos
             return resultado;
         }
 
-        /// <summary>Busca hospedajes con el nombre del huésped ya resuelto, para la pantalla de Reservas.
-        /// Todos los filtros son opcionales y combinables.</summary>
-        public static List<HospedajeDetalle> BuscarDetalle(string? dni = null, string? nombre = null, int? nroHabitacion = null, DateTime? fecha = null, string? termino = null)
+        /// <summary>Busca hospedajes con filtros opcionales y combinables.</summary>
+        public static List<Hospedaje> BuscarDetalle(string? dni = null, string? nombre = null, int? nroHabitacion = null, DateTime? fecha = null, string? termino = null)
         {
-            var resultado = new List<HospedajeDetalle>();
+            var resultado = new List<Hospedaje>();
 
             dni = string.IsNullOrWhiteSpace(dni) ? null : dni.Trim();
             nombre = string.IsNullOrWhiteSpace(nombre) ? null : nombre.Trim();
             termino = string.IsNullOrWhiteSpace(termino) ? null : termino.Trim();
 
-            // Si se envió el mismo valor para dni y nombre (búsqueda unificada), tratarlo como término general
             if (termino == null && dni != null && dni == nombre)
             {
                 termino = dni;
@@ -179,51 +177,83 @@ namespace Datos
                 nombre = null;
             }
 
-            string query = @"
-                SELECT h.id_hospedaje, h.id_turno, h.dni_huesped, hu.nombre_huesped, hu.apellido_huesped, h.nro_habitacion,
-                       h.fecha_entrada, h.hora_entrada, h.fecha_salida, h.hora_salida
+            var queryBuilder = new StringBuilder(@"
+                SELECT 
+                    h.id_hospedaje,
+                    h.fecha_entrada,
+                    h.hora_entrada,
+                    h.fecha_salida,
+                    h.hora_salida,
+                    h.id_metodo,
+                    h.nro_habitacion,
+                    h.id_turno,
+                    h.dni_huesped
                 FROM hospedaje h
-                INNER JOIN Huesped hu ON hu.dni_huesped = h.dni_huesped
-                WHERE (@dni IS NULL OR h.dni_huesped LIKE @dni)
-                  AND (@nombre IS NULL OR hu.nombre_huesped LIKE @nombre 
-                                       OR hu.apellido_huesped LIKE @nombre
-                                       OR (hu.nombre_huesped + ' ' + hu.apellido_huesped) LIKE @nombre
-                                       OR (hu.apellido_huesped + ' ' + hu.nombre_huesped) LIKE @nombre)
-                  AND (@termino IS NULL OR h.dni_huesped LIKE @termino
-                                        OR hu.nombre_huesped LIKE @termino 
-                                        OR hu.apellido_huesped LIKE @termino
-                                        OR (hu.nombre_huesped + ' ' + hu.apellido_huesped) LIKE @termino
-                                        OR (hu.apellido_huesped + ' ' + hu.nombre_huesped) LIKE @termino)
-                  AND (@nroHabitacion IS NULL OR h.nro_habitacion = @nroHabitacion)
-                  AND (@fecha IS NULL OR h.fecha_entrada = @fecha)
-                ORDER BY h.fecha_entrada DESC, h.hora_entrada DESC";
+                INNER JOIN Huesped hue ON h.dni_huesped = hue.dni_huesped
+                WHERE 1=1 ");
 
-            using (SqlConnection con = _conexion.ObtenerConexion())
+            using (var con = _conexion.ObtenerConexion())
+            using (var cmd = new SqlCommand())
             {
-                SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.Add("@dni", System.Data.SqlDbType.VarChar, 50).Value = (object?)(dni != null ? $"%{dni}%" : null) ?? DBNull.Value;
-                cmd.Parameters.Add("@nombre", System.Data.SqlDbType.VarChar, 100).Value = (object?)(nombre != null ? $"%{nombre}%" : null) ?? DBNull.Value;
-                cmd.Parameters.Add("@termino", System.Data.SqlDbType.VarChar, 100).Value = (object?)(termino != null ? $"%{termino}%" : null) ?? DBNull.Value;
-                cmd.Parameters.Add("@nroHabitacion", System.Data.SqlDbType.Int).Value = (object?)nroHabitacion ?? DBNull.Value;
-                cmd.Parameters.Add("@fecha", System.Data.SqlDbType.Date).Value = (object?)fecha?.Date ?? DBNull.Value;
+                if (dni != null)
+                {
+                    queryBuilder.Append(" AND h.dni_huesped = @dni ");
+                    cmd.Parameters.Add("@dni", SqlDbType.VarChar, 50).Value = dni;
+                }
+
+                if (nombre != null)
+                {
+                    queryBuilder.Append(" AND (hue.nombre_huesped LIKE @nombre OR hue.apellido_huesped LIKE @nombre) ");
+                    cmd.Parameters.Add("@nombre", SqlDbType.VarChar, 100).Value = $"%{nombre}%";
+                }
+
+                if (nroHabitacion.HasValue)
+                {
+                    queryBuilder.Append(" AND h.nro_habitacion = @nroHabitacion ");
+                    cmd.Parameters.Add("@nroHabitacion", SqlDbType.Int).Value = nroHabitacion.Value;
+                }
+
+                if (fecha.HasValue)
+                {
+                    queryBuilder.Append(" AND (h.fecha_entrada = @fecha OR h.fecha_salida = @fecha) ");
+                    cmd.Parameters.Add("@fecha", SqlDbType.Date).Value = fecha.Value.Date;
+                }
+
+                if (termino != null)
+                {
+                    queryBuilder.Append(@" AND (
+                        h.dni_huesped LIKE @termino OR 
+                        hue.nombre_huesped LIKE @termino OR 
+                        hue.apellido_huesped LIKE @termino OR 
+                        CAST(h.nro_habitacion AS VARCHAR) LIKE @termino
+                    ) ");
+                    cmd.Parameters.Add("@termino", SqlDbType.VarChar, 100).Value = $"%{termino}%";
+                }
+
+                queryBuilder.Append(" ORDER BY h.fecha_entrada DESC, h.hora_entrada DESC");
+
+                cmd.CommandText = queryBuilder.ToString();
+                cmd.Connection = con;
 
                 con.Open();
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        resultado.Add(new HospedajeDetalle
+                        var hospedaje = new Hospedaje
                         {
-                            IdHospedaje = Convert.ToInt32(reader["id_hospedaje"]),
-                            IdTurno = Convert.ToInt32(reader["id_turno"]),
-                            DniHuesped = reader["dni_huesped"].ToString() ?? string.Empty,
-                            NombreHuesped = $"{reader["nombre_huesped"]} {reader["apellido_huesped"]}".Trim(),
-                            NroHabitacion = Convert.ToInt32(reader["nro_habitacion"]),
-                            FechaEntrada = Convert.ToDateTime(reader["fecha_entrada"]),
-                            HoraEntrada = (TimeSpan)reader["hora_entrada"],
+                            IdHospedaje = reader["id_hospedaje"] != DBNull.Value ? Convert.ToInt32(reader["id_hospedaje"]) : 0,
+                            FechaEntrada = reader["fecha_entrada"] != DBNull.Value ? Convert.ToDateTime(reader["fecha_entrada"]) : DateTime.MinValue,
+                            HoraEntrada = reader["hora_entrada"] != DBNull.Value ? (TimeSpan)reader["hora_entrada"] : TimeSpan.Zero,
                             FechaSalida = reader["fecha_salida"] != DBNull.Value ? Convert.ToDateTime(reader["fecha_salida"]) : DateTime.MinValue,
-                            HoraSalida = reader["hora_salida"] != DBNull.Value ? (TimeSpan)reader["hora_salida"] : TimeSpan.Zero
-                        });
+                            HoraSalida = reader["hora_salida"] != DBNull.Value ? (TimeSpan)reader["hora_salida"] : TimeSpan.Zero,
+                            IdMetodo = reader["id_metodo"] != DBNull.Value ? Convert.ToInt32(reader["id_metodo"]) : 0,
+                            NroHabitacion = reader["nro_habitacion"] != DBNull.Value ? Convert.ToInt32(reader["nro_habitacion"]) : 0,
+                            IdTurno = reader["id_turno"] != DBNull.Value ? Convert.ToInt32(reader["id_turno"]) : 0,
+                            DniHuesped = reader["dni_huesped"] != DBNull.Value ? reader["dni_huesped"].ToString()! : string.Empty
+                        };
+
+                        resultado.Add(hospedaje);
                     }
                 }
             }
@@ -231,7 +261,7 @@ namespace Datos
             return resultado;
         }
 
-        /// <summary>Registra la salida real del huésped (check-out), pisando la fecha/hora planificadas al check-in.</summary>
+        /// <summary>Registra la salida real del huésped (check-out).</summary>
         public static void RegistrarSalida(int idHospedaje, DateTime fechaSalida, TimeSpan horaSalida)
         {
             string query = @"
