@@ -108,7 +108,6 @@ namespace Presentacion.Administrador.Modales
                 IdTipoHabitacion = tipo.IdTipoHabitacion,
                 TipoHabitacionNombre = tipo.Descripcion,
                 PrecioPorHora = _numHora.Value,
-                PrecioAdicional = _numAdicional.Value,
                 Activa = _switchEstado.Checked
             };
 

@@ -24,7 +24,23 @@ namespace Presentacion.Administrador.Vistas
             BackColor = Paleta.FondoApp;
 
             var barraSuperior = new Panel { Dock = DockStyle.Top, Height = 48 };
-            var btnNueva = EstiloBoton.Primario(new Button { Text = "+  Nueva tarifa", Size = new Size(160, 38), Dock = DockStyle.Right });
+
+            var lblTitulo = new Label
+            {
+                Text = "Gestión de Tarifas",
+                Font = Paleta.FuenteSeccion,
+                ForeColor = Paleta.TextoPrimario,
+                AutoSize = true,
+                Location = new Point(0, 8)
+            };
+            barraSuperior.Controls.Add(lblTitulo);
+
+            var btnNueva = EstiloBoton.Primario(new Button
+            {
+                Text = "+ Nueva tarifa",
+                Size = new Size(160, 38),
+                Dock = DockStyle.Right
+            });
             btnNueva.Click += (s, e) => AbrirModal(null);
             barraSuperior.Controls.Add(btnNueva);
 
@@ -38,15 +54,17 @@ namespace Presentacion.Administrador.Vistas
 
             Controls.Add(panelGrid);
             Controls.Add(barraSuperior);
+
+            Refrescar();
         }
 
         public void Refrescar() => CargarDatos();
 
         private void ConfigurarColumnas()
         {
+            _dgv.Columns.Clear();
             _dgv.Columns.Add(new DataGridViewTextBoxColumn { Name = "Tipo", HeaderText = "Tipo de habitación", Width = 220 });
-            _dgv.Columns.Add(new DataGridViewTextBoxColumn { Name = "Hora", HeaderText = "Precio por dia", Width = 150, DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleRight } });
-            _dgv.Columns.Add(new DataGridViewTextBoxColumn { Name = "Adicional", HeaderText = "Precio adicional", Width = 150, DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleRight } });
+            _dgv.Columns.Add(new DataGridViewTextBoxColumn { Name = "Hora", HeaderText = "Precio por día", Width = 150, DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleRight } });
             _dgv.Columns.Add(new DataGridViewTextBoxColumn { Name = "Estado", HeaderText = "Estado", Width = 100 });
             _dgv.Columns.Add(new DataGridViewTextBoxColumn { Name = "Modificacion", HeaderText = "Última modificación", Width = 160, AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill });
             _dgv.Columns.Add(new DataGridViewButtonColumn { Name = ColEditar, HeaderText = "", Text = "Editar", UseColumnTextForButtonValue = true, Width = 80, FlatStyle = FlatStyle.Flat });
@@ -62,8 +80,8 @@ namespace Presentacion.Administrador.Vistas
             {
                 int fila = _dgv.Rows.Add(
                     tarifa.TipoHabitacionNombre,
-                    tarifa.PrecioPorHora.ToString("C0"),
-                    tarifa.PrecioAdicional.ToString("C0"),
+                    tarifa.PrecioPorHora.ToString("C2"),
+                    tarifa.PrecioAdicional.ToString("C2"),
                     tarifa.Activa ? "Activa" : "Inactiva",
                     tarifa.UltimaModificacion.ToString("dd/MM/yyyy HH:mm"));
 
@@ -92,7 +110,7 @@ namespace Presentacion.Administrador.Vistas
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(ex.Message, "Error al cambiar estado", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -100,7 +118,7 @@ namespace Presentacion.Administrador.Vistas
         private void AbrirModal(Tarifa? tarifa)
         {
             using var modal = new FModalTarifa(tarifa);
-            if (modal.ShowDialog(this) == DialogResult.OK)
+            if (modal.ShowDialog(FindForm()) == DialogResult.OK)
             {
                 CargarDatos();
             }

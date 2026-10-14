@@ -118,16 +118,17 @@ namespace Datos
             return hospedaje;
         }
 
-        /// <summary>Hospedajes cargados durante un turno de caja, con la tarifa de la habitación.</summary>
+        /// <summary>Hospedajes cargados durante un turno de caja, con la tarifa del tipo de habitación.</summary>
         public static List<(Hospedaje Hospedaje, decimal TarifaBase)> ObtenerPorTurno(int idTurno)
         {
             var resultado = new List<(Hospedaje, decimal)>();
 
             string query = @"
                 SELECT h.id_hospedaje, h.fecha_entrada, h.hora_entrada, h.fecha_salida, h.hora_salida,
-                       h.id_metodo, h.nro_habitacion, h.id_turno, h.dni_huesped, hab.tarifa_base
+                       h.id_metodo, h.nro_habitacion, h.id_turno, h.dni_huesped, th.tarifa
                 FROM hospedaje h
                 INNER JOIN habitacion hab ON hab.nro_habitacion = h.nro_habitacion
+                INNER JOIN Tipo_habitacion th ON th.id_tipo_habitacion = hab.id_tipo_habitacion
                 WHERE h.id_turno = @idTurno";
 
             using (SqlConnection con = _conexion.ObtenerConexion())
@@ -153,7 +154,7 @@ namespace Datos
                             DniHuesped = reader["dni_huesped"].ToString() ?? string.Empty
                         };
 
-                        resultado.Add((hospedaje, Convert.ToDecimal(reader["tarifa_base"])));
+                        resultado.Add((hospedaje, Convert.ToDecimal(reader["tarifa"])));
                     }
                 }
             }

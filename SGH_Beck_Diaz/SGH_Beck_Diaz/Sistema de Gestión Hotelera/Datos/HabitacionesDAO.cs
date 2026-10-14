@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using Entidades;
@@ -47,6 +47,7 @@ namespace Datos
 
             return (total, ocupadas, disponibles, mantenimiento);
         }
+
 
         /// <summary>
         /// Obtiene la cantidad de habitaciones agrupadas por el nombre del estado (para gráficos de torta/métricas).
@@ -97,7 +98,6 @@ namespace Datos
                     nro_habitacion,
                     piso,
                     cant_camas,
-                    tarifa_base,
                     id_tipo_habitacion,
                     id_estado
                 FROM habitacion
@@ -134,7 +134,6 @@ namespace Datos
                     h.nro_habitacion,
                     h.piso,
                     h.cant_camas,
-                    h.tarifa_base,
                     h.id_tipo_habitacion,
                     h.id_estado
                 FROM habitacion h
@@ -160,6 +159,12 @@ namespace Datos
             return lista;
         }
 
+
+        /// <summary>
+        /// Actualiza la tarifa base de una habitación específica en la base de datos.
+        /// </summary>
+       
+
         /// <summary>
         /// Método auxiliar centralizado para mapear filas a la entidad Habitacion.
         /// </summary>
@@ -170,7 +175,6 @@ namespace Datos
                 NroHabitacion = dr["nro_habitacion"] != DBNull.Value ? Convert.ToInt32(dr["nro_habitacion"]) : 0,
                 Piso = dr["piso"] != DBNull.Value ? Convert.ToInt32(dr["piso"]) : 0,
                 CantCamas = dr["cant_camas"] != DBNull.Value ? Convert.ToInt32(dr["cant_camas"]) : 0,
-                TarifaBase = dr["tarifa_base"] != DBNull.Value ? Convert.ToDecimal(dr["tarifa_base"]) : 0m,
                 IdTipoHabitacion = dr["id_tipo_habitacion"] != DBNull.Value ? Convert.ToInt32(dr["id_tipo_habitacion"]) : 0,
                 IdEstado = dr["id_estado"] != DBNull.Value ? Convert.ToInt32(dr["id_estado"]) : 0
             };

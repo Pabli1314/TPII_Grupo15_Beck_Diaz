@@ -2,8 +2,8 @@
 GO
 
 USE beck_diaz_db;
-GO*/
-
+GO
+*/
 
 
 ----------------------------------------------------
@@ -13,6 +13,7 @@ GO*/
 CREATE TABLE Tipo_habitacion (
     id_tipo_habitacion INT IDENTITY(1,1),
     descripcion VARCHAR(100) NOT NULL,
+    tarifa DECIMAL(10, 2) NOT NULL,
     CONSTRAINT PK_tipo_habitacion_id PRIMARY KEY (id_tipo_habitacion)
 );
 
@@ -65,7 +66,6 @@ CREATE TABLE habitacion (
     nro_habitacion INT,
     piso INT NOT NULL,
     cant_camas INT NOT NULL,
-    tarifa_base DECIMAL(10, 2) NOT NULL,
     id_tipo_habitacion INT NOT NULL,
     id_estado INT NOT NULL,
     CONSTRAINT PK_habitacion_nro PRIMARY KEY(nro_habitacion),

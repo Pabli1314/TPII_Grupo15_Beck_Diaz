@@ -13,7 +13,7 @@ namespace Datos
         {
             var tipos = new List<TipoHabitacion>();
 
-            string query = "SELECT id_tipo_habitacion, descripcion FROM Tipo_habitacion";
+            string query = "SELECT id_tipo_habitacion, descripcion, tarifa FROM Tipo_habitacion";
 
             using (SqlConnection con = _conexion.ObtenerConexion())
             {
@@ -27,13 +27,33 @@ namespace Datos
                         tipos.Add(new TipoHabitacion
                         {
                             IdTipoHabitacion = Convert.ToInt32(reader["id_tipo_habitacion"]),
-                            Descripcion = reader["descripcion"].ToString() ?? string.Empty
+                            Descripcion = reader["descripcion"].ToString() ?? string.Empty,
+                            Tarifa = Convert.ToDecimal(reader["tarifa"])
                         });
                     }
                 }
             }
 
             return tipos;
+        }
+
+        /// <summary>Actualiza la tarifa de un tipo de habitación específico.</summary>
+        public static void ActualizarTarifa(int idTipoHabitacion, decimal nuevaTarifa)
+        {
+            string query = @"
+                UPDATE Tipo_habitacion
+                SET tarifa = @tarifa
+                WHERE id_tipo_habitacion = @idTipoHabitacion";
+
+            using (SqlConnection con = _conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@tarifa", nuevaTarifa);
+                cmd.Parameters.AddWithValue("@idTipoHabitacion", idTipoHabitacion);
+
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
         }
     }
 }

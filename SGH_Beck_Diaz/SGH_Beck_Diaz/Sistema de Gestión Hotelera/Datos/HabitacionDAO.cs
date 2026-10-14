@@ -14,7 +14,7 @@ namespace Datos
             var habitaciones = new List<Habitacion>();
 
             string query = @"
-                SELECT nro_habitacion, piso, cant_camas, tarifa_base, id_tipo_habitacion, id_estado
+                SELECT nro_habitacion, piso, cant_camas, id_tipo_habitacion, id_estado
                 FROM habitacion";
 
             using (SqlConnection con = _conexion.ObtenerConexion())
@@ -39,7 +39,7 @@ namespace Datos
             Habitacion? habitacion = null;
 
             string query = @"
-                SELECT nro_habitacion, piso, cant_camas, tarifa_base, id_tipo_habitacion, id_estado
+                SELECT nro_habitacion, piso, cant_camas, id_tipo_habitacion, id_estado
                 FROM habitacion
                 WHERE nro_habitacion = @nroHabitacion";
 
@@ -64,8 +64,8 @@ namespace Datos
         public static void Crear(Habitacion habitacion)
         {
             string query = @"
-                INSERT INTO habitacion (nro_habitacion, piso, cant_camas, tarifa_base, id_tipo_habitacion, id_estado)
-                VALUES (@nroHabitacion, @piso, @cantCamas, @tarifaBase, @idTipoHabitacion, @idEstado)";
+                INSERT INTO habitacion (nro_habitacion, piso, cant_camas, id_tipo_habitacion, id_estado)
+                VALUES (@nroHabitacion, @piso, @cantCamas, @idTipoHabitacion, @idEstado)";
 
             using (SqlConnection con = _conexion.ObtenerConexion())
             {
@@ -73,7 +73,6 @@ namespace Datos
                 cmd.Parameters.AddWithValue("@nroHabitacion", habitacion.NroHabitacion);
                 cmd.Parameters.AddWithValue("@piso", habitacion.Piso);
                 cmd.Parameters.AddWithValue("@cantCamas", habitacion.CantCamas);
-                cmd.Parameters.AddWithValue("@tarifaBase", habitacion.TarifaBase);
                 cmd.Parameters.AddWithValue("@idTipoHabitacion", habitacion.IdTipoHabitacion);
                 cmd.Parameters.AddWithValue("@idEstado", habitacion.IdEstado);
 
@@ -100,6 +99,30 @@ namespace Datos
             }
         }
 
+        /// <summary>
+        /// Actualiza la tarifa del tipo de habitación al que pertenece la habitación indicada.
+        /// La tarifa ya no está en la tabla habitacion sino en Tipo_habitacion.
+        /// </summary>
+        public static void ActualizarTarifa(int nroHabitacion, decimal nuevaTarifa)
+        {
+            string query = @"
+                UPDATE Tipo_habitacion
+                SET tarifa = @tarifa
+                WHERE id_tipo_habitacion = (
+                    SELECT id_tipo_habitacion FROM habitacion WHERE nro_habitacion = @nroHabitacion
+                )";
+
+            using (SqlConnection con = _conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@tarifa", nuevaTarifa);
+                cmd.Parameters.AddWithValue("@nroHabitacion", nroHabitacion);
+
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         private static Habitacion MapearHabitacion(SqlDataReader reader)
         {
             return new Habitacion
@@ -107,7 +130,6 @@ namespace Datos
                 NroHabitacion = Convert.ToInt32(reader["nro_habitacion"]),
                 Piso = Convert.ToInt32(reader["piso"]),
                 CantCamas = Convert.ToInt32(reader["cant_camas"]),
-                TarifaBase = Convert.ToDecimal(reader["tarifa_base"]),
                 IdTipoHabitacion = Convert.ToInt32(reader["id_tipo_habitacion"]),
                 IdEstado = Convert.ToInt32(reader["id_estado"])
             };

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -110,7 +110,6 @@ namespace Presentacion.Gerente
                     NroHabitacion = h.NroHabitacion,
                     Piso = h.Piso,
                     CantCamas = h.CantCamas,
-                    TarifaBase = h.TarifaBase,
                     TipoHabitacion = _lGerente.ObtenerNombreTipoHabitacion(h.IdTipoHabitacion)
                 }).ToList();
 
@@ -122,11 +121,6 @@ namespace Presentacion.Gerente
                     if (dgv.Columns["NroHabitacion"] != null) dgv.Columns["NroHabitacion"].HeaderText = "N° Habitación";
                     if (dgv.Columns["Piso"] != null) dgv.Columns["Piso"].HeaderText = "Piso";
                     if (dgv.Columns["CantCamas"] != null) dgv.Columns["CantCamas"].HeaderText = "Cant. Camas";
-                    if (dgv.Columns["TarifaBase"] != null)
-                    {
-                        dgv.Columns["TarifaBase"].HeaderText = "Tarifa Base";
-                        dgv.Columns["TarifaBase"].DefaultCellStyle.Format = "C2";
-                    }
                     if (dgv.Columns["TipoHabitacion"] != null) dgv.Columns["TipoHabitacion"].HeaderText = "Tipo de Habitación";
                 }
             }

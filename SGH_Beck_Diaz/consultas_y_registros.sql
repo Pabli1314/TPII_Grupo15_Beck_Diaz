@@ -1,17 +1,12 @@
-USE beck_diaz_db;
-
-
+--USE beck_diaz_db;
 
 -- Insertar roles
 INSERT INTO Rol (nom_rol) VALUES ('Administrador'), ('Gerente'), ('Recepcionista');
 SELECT * FROM Rol;
 
 
-
- 
-
--- Cargar Tipos de Habitación
-INSERT INTO Tipo_habitacion (descripcion) VALUES ('Individual'),('Doble Matrimonial'),('Suite Executive'),('Estandar');
+-- Crgar Tipos de Habitación
+INSERT INTO Tipo_habitacion (descripcion, tarifa) VALUES ('Individual', 15000.00),('Doble Matrimonial', 22000.00),('Suite Executive', 35000.00),('Estandar', 10000.00);
 
 SELECT * FROM Tipo_habitacion;
 
@@ -33,27 +28,27 @@ VALUES
 
 --Registro de habitaciones
 -- Nota: Respeta el CHECK (piso IN (1,2,3))
-INSERT INTO habitacion (nro_habitacion, piso, cant_camas, tarifa_base, id_tipo_habitacion, id_estado) VALUES 
+INSERT INTO habitacion (nro_habitacion, piso, cant_camas,  id_tipo_habitacion, id_estado) VALUES 
 -- Piso 1
-(101, 1, 1, 15000.00, 1, 1), -- Individual, Disponible
-(102, 1, 1, 15000.00, 1, 1), -- Individual, Disponible
-(103, 1, 2, 22000.00, 2, 1);-- Doble, Limpieza
+(101, 1, 1, 1, 1), -- Individual, Disponible
+(102, 1, 1, 1, 1), -- Individual, Disponible
+(103, 1, 2, 2, 1);-- Doble, Limpieza
 
-INSERT INTO habitacion (nro_habitacion, piso, cant_camas, tarifa_base, id_tipo_habitacion, id_estado) VALUES 
+INSERT INTO habitacion (nro_habitacion, piso, cant_camas,  id_tipo_habitacion, id_estado) VALUES 
 -- Piso 2
-(201, 2, 2, 22000.00, 2, 1), -- Doble, Disponible
-(202, 2, 2, 22000.00, 2, 1), -- Doble, Disponible
-(203, 2, 3, 35000.00, 3, 1); -- Suite, Limpieza
+(201, 2, 2, 2, 1), -- Doble, Disponible
+(202, 2, 2, 2, 1), -- Doble, Disponible
+(203, 2, 3, 3, 1); -- Suite, Limpieza
 
 
-INSERT INTO habitacion (nro_habitacion, piso, cant_camas, tarifa_base, id_tipo_habitacion, id_estado) VALUES
+INSERT INTO habitacion (nro_habitacion, piso, cant_camas,  id_tipo_habitacion, id_estado) VALUES
 -- Piso 3
-(301, 3, 3, 35000.00, 3, 1), -- Suite, Disponible
-(302, 3, 3, 35000.00, 3, 1); -- Suite, Disponible
+(301, 3, 3, 3, 1), -- Suite, Disponible
+(302, 3, 3, 3, 1); -- Suite, Disponible
 GO
 
-INSERT INTO habitacion (nro_habitacion, piso, cant_camas, tarifa_base, id_tipo_habitacion, id_estado) VALUES
-(303, 3, 2, 20000.00, 4, 1);
+INSERT INTO habitacion (nro_habitacion, piso, cant_camas,  id_tipo_habitacion, id_estado) VALUES
+(303, 3, 2, 4, 1);
 
 
 ---------------------------- Movimientos en caja
@@ -72,16 +67,6 @@ WHERE h.id_tipo_habitacion = 2;
 --------------------------------------------------
 -- 3. VERIFICACIÓN DE DATOS
 --------------------------------------------------
-SELECT 
-    h.nro_habitacion,
-    h.piso,
-    h.cant_camas,
-    h.tarifa_base,
-    th.descripcion AS tipo,
-    eh.nom_estado_habitacion AS estado
-FROM habitacion h
-INNER JOIN Tipo_habitacion th ON h.id_tipo_habitacion = th.id_tipo_habitacion
-INNER JOIN Estado_habitacion eh ON h.id_estado = eh.id_estado;
 
 
 ------------------- INSERTAR METODOS DE PAGO
@@ -98,8 +83,7 @@ SET id_estado = (SELECT id_estado FROM Estado_habitacion WHERE nom_estado_habita
 WHERE nro_habitacion IN (102, 302)
   AND id_estado = (SELECT id_estado FROM Estado_habitacion WHERE nom_estado_habitacion = 'Ocupada')
   AND NOT EXISTS (SELECT 1 FROM hospedaje h WHERE h.nro_habitacion = habitacion.nro_habitacion);
-<<<<<<< HEAD
+
 
 SELECT * FROM Huesped;
-=======
->>>>>>> ab4eaf996d4eaa68904b947f580c0f20de9dcb39
+

@@ -15,14 +15,13 @@ namespace Presentacion.Administrador.Modales
         private readonly NumericUpDown _numNumero;
         private readonly ComboBox _cmbPiso;
         private readonly NumericUpDown _numCamas;
-        private readonly NumericUpDown _numTarifa;
         private readonly ComboBox _cmbTipo;
         private readonly ComboBox _cmbEstado;
         private readonly Label _lblError;
 
         public FModalHabitacion()
         {
-            Size = new Size(460, 560);
+            Size = new Size(460, 500);
             EstablecerTitulo("Nueva habitación");
 
             int y = 0;
@@ -44,11 +43,6 @@ namespace Presentacion.Administrador.Modales
             _numCamas = CamposFormulario.Numerico(new Point(0, y + 22), ancho, 1, 10, 0);
             _numCamas.Value = 1;
             Contenido.Controls.Add(_numCamas);
-            y += 62;
-
-            Contenido.Controls.Add(CamposFormulario.Etiqueta("Tarifa base ($)", new Point(0, y)));
-            _numTarifa = CamposFormulario.Numerico(new Point(0, y + 22), ancho, 0, 9_999_999, 2);
-            Contenido.Controls.Add(_numTarifa);
             y += 62;
 
             Contenido.Controls.Add(CamposFormulario.Etiqueta("Tipo de habitación", new Point(0, y)));
@@ -108,7 +102,6 @@ namespace Presentacion.Administrador.Modales
                 NroHabitacion = (int)_numNumero.Value,
                 Piso = (int)(_cmbPiso.SelectedItem ?? 1),
                 CantCamas = (int)_numCamas.Value,
-                TarifaBase = _numTarifa.Value,
                 IdTipoHabitacion = tipo.IdTipoHabitacion,
                 IdEstado = estado.IdEstado
             };

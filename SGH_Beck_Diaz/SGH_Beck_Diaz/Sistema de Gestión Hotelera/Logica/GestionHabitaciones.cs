@@ -151,6 +151,27 @@ namespace Logica
             return HuespedDAO.ObtenerPorDni(hospedaje.DniHuesped);
         }
 
+        /// <summary>
+        /// Actualiza la tarifa base de una habitación con validaciones de negocio.
+        /// </summary>
+        public void ModificarTarifaHabitacion(int nroHabitacion, decimal nuevaTarifa)
+        {
+            if (nroHabitacion <= 0)
+            {
+                throw new ArgumentException("El número de habitación especificado no es válido.");
+            }
+
+            if (nuevaTarifa < 0)
+            {
+                throw new ArgumentException("La tarifa base no puede ser un valor negativo.");
+            }
+
+            Habitacion habitacion = HabitacionDAO.ObtenerPorNumero(nroHabitacion)
+                ?? throw new InvalidOperationException($"La habitación número {nroHabitacion} no existe.");
+
+            HabitacionDAO.ActualizarTarifa(nroHabitacion, nuevaTarifa);
+        }
+
         #region Métodos Privados / Auxiliares
 
         private void ValidarYCambiarEstado(int nroHabitacion, string estadoOrigen, string estadoDestino)
@@ -189,9 +210,6 @@ namespace Logica
 
             if (habitacion.CantCamas <= 0)
                 throw new ArgumentException("La cantidad de camas debe ser mayor a 0.");
-
-            if (habitacion.TarifaBase < 0)
-                throw new ArgumentException("La tarifa base no puede ser negativa.");
 
             if (habitacion.IdTipoHabitacion <= 0)
                 throw new ArgumentException("Debe seleccionar un tipo de habitación.");

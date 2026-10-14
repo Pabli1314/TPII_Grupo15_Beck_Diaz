@@ -88,7 +88,7 @@ namespace Logica
                     IdTarifa = _siguienteId++,
                     IdTipoHabitacion = tipo.IdTipoHabitacion,
                     TipoHabitacionNombre = tipo.Descripcion,
-                    PrecioPorHora = 0,
+                    PrecioPorHora = tipo.Tarifa,
                     PrecioPorFraccion = 0,
                     PrecioAdicional = 0,
                     Activa = true,

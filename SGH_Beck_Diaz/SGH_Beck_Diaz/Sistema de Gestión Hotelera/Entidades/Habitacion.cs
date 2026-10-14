@@ -11,7 +11,6 @@ namespace Entidades
         public int NroHabitacion { get; set; }
         public int Piso { get; set; }
         public int CantCamas { get; set; }
-        public decimal TarifaBase { get; set; }
         public int IdTipoHabitacion { get; set; } // Clave Foránea
         public int IdEstado { get; set; }
     }

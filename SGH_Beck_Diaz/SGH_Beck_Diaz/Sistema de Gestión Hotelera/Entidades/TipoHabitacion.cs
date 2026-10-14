@@ -4,5 +4,6 @@ namespace Entidades
     {
         public int IdTipoHabitacion { get; set; }
         public string Descripcion { get; set; }
+        public decimal Tarifa { get; set; }
     }
 }
