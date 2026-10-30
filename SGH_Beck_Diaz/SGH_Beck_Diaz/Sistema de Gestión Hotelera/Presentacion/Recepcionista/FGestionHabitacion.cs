@@ -1,4 +1,4 @@
-using Entidades;
+﻿using Entidades;
 using Logica;
 using Presentacion.Administrador.UI;
 using System;
@@ -27,6 +27,8 @@ namespace Presentacion.Recepcionista
         private readonly Label _lblHuespedValor;
         private readonly Label _lblIngresoTitulo;
         private readonly Label _lblIngresoValor;
+        private readonly Label _lblSalidaTitulo;
+        private readonly Label _lblSalidaValor;
         private readonly Label _lblMensaje;
         private readonly Button _btnAccionPrincipal;
         private readonly Button _btnAccionSecundaria;
@@ -40,7 +42,7 @@ namespace Presentacion.Recepcionista
             _habitacion = habitacion ?? throw new ArgumentNullException(nameof(habitacion));
             _usuario = usuario;
 
-            Size = new Size(440, 420);
+            Size = new Size(440, 474);
 
             const int ancho = 360;
             int y = 0;
@@ -63,6 +65,11 @@ namespace Presentacion.Recepcionista
             _lblIngresoValor = new Label { Location = new Point(0, y + 18), AutoSize = true, Font = Paleta.FuenteBase, ForeColor = Paleta.TextoPrimario };
             Contenido.Controls.Add(_lblIngresoTitulo);
             Contenido.Controls.Add(_lblIngresoValor);
+            y += 54;
+            _lblSalidaTitulo = new Label { Text = "Salida estimada", Location = new Point(0, y), AutoSize = true, Font = Paleta.FuenteChica, ForeColor = Paleta.TextoTerciario };
+            _lblSalidaValor = new Label { Location = new Point(0, y + 18), AutoSize = true, Font = Paleta.FuenteBase, ForeColor = Paleta.TextoPrimario };
+            Contenido.Controls.Add(_lblSalidaTitulo);
+            Contenido.Controls.Add(_lblSalidaValor);
             y += 54;
 
             _lblMensaje = new Label { Location = new Point(0, y), Size = new Size(ancho, 40), Font = Paleta.FuenteBase, ForeColor = Paleta.TextoSecundario };
@@ -94,6 +101,8 @@ namespace Presentacion.Recepcionista
             _lblHuespedValor.Visible = esOcupada;
             _lblIngresoTitulo.Visible = esOcupada;
             _lblIngresoValor.Visible = esOcupada;
+            _lblSalidaTitulo.Visible = esOcupada;
+            _lblSalidaValor.Visible = esOcupada;
             _lblMensaje.Visible = !esOcupada;
             _btnAccionSecundaria.Visible = esDisponible;
 
@@ -101,6 +110,7 @@ namespace Presentacion.Recepcionista
             {
                 _lblHuespedValor.Text = _habitacion.Huesped;
                 _lblIngresoValor.Text = _habitacion.HoraIngreso?.ToString("dd/MM/yyyy HH:mm") ?? "-";
+                _lblSalidaValor.Text = _habitacion.HoraSalidaEstimada?.ToString("dd/MM/yyyy HH:mm") ?? "-";
             }
             else if (esDisponible)
             {
@@ -149,6 +159,12 @@ namespace Presentacion.Recepcionista
         {
             if (!ValidarUsuarioYNumero(out int nroHabitacion))
             {
+                return;
+            }
+
+            if (new GestionTurnoCaja().ObtenerTurnoAbierto(_usuario!.DniUsuario) == null)
+            {
+                MessageBox.Show("La caja se encuentra cerrada. Debe abrir la caja antes de registrar un Check-in y realizar el cobro.", "Caja cerrada", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 

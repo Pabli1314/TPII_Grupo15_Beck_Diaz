@@ -15,7 +15,6 @@ namespace Presentacion.Recepcionista.Modales
         private readonly int _idTurno;
         private readonly ResumenTurno _resumen;
         private readonly NumericUpDown _numEfectivoContado;
-        private readonly TextBox _txtObservaciones;
         private readonly Label _lblError;
 
         public FModalCierreTurno(int idTurno)
@@ -24,7 +23,7 @@ namespace Presentacion.Recepcionista.Modales
             _gestionTurnoCaja = new GestionTurnoCaja();
             _resumen = _gestionTurnoCaja.ObtenerResumen(idTurno);
 
-            Size = new Size(460, 560);
+            Size = new Size(460, 506);
             EstablecerTitulo("Cierre de turno");
 
             const int ancho = 380;
@@ -48,11 +47,6 @@ namespace Presentacion.Recepcionista.Modales
             _numEfectivoContado.Value = _resumen.EfectivoEsperado;
             Contenido.Controls.Add(_numEfectivoContado);
             y += 62;
-
-            Contenido.Controls.Add(CamposFormulario.Etiqueta("Observaciones", new Point(0, y)));
-            _txtObservaciones = CamposFormulario.Texto(new Point(0, y + 22), ancho, esPassword: false);
-            Contenido.Controls.Add(_txtObservaciones);
-            y += 54;
 
             _lblError = CamposFormulario.Error(new Point(0, y), ancho);
             Contenido.Controls.Add(_lblError);
@@ -105,7 +99,7 @@ namespace Presentacion.Recepcionista.Modales
 
             try
             {
-                decimal diferencia = _gestionTurnoCaja.CerrarTurno(_idTurno, _numEfectivoContado.Value, _txtObservaciones.Text.Trim());
+                decimal diferencia = _gestionTurnoCaja.CerrarTurno(_idTurno, _numEfectivoContado.Value, null);
 
                 string mensaje = diferencia == 0
                     ? "Turno cerrado sin diferencias de caja."

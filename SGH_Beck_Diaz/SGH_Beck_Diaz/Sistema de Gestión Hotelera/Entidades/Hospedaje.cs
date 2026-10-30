@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +13,12 @@ namespace Entidades
         public TimeSpan HoraEntrada { get; set; }   // Tiene DEFAULT en BD
         public DateTime FechaSalida { get; set; }
         public TimeSpan HoraSalida { get; set; }
+        public float monto_total { get; set; }
+        public decimal MontoTotal
+        {
+            get => Convert.ToDecimal(monto_total);
+            set => monto_total = (float)value;
+        }
         public int IdMetodo { get; set; }
         public int NroHabitacion { get; set; }
         public int IdTurno { get; set; }

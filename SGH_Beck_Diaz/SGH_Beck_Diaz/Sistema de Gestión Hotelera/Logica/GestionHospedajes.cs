@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Entidades;
@@ -30,7 +30,7 @@ namespace Logica
         /// Requiere una habitación Disponible y una fecha/hora de salida planificada posterior al
         /// momento actual.
         /// </summary>
-        public void RegistrarCheckIn(int nroHabitacion, string dniUsuario, Huesped huesped, int idMetodo, DateTime fechaSalida, TimeSpan horaSalida)
+        public void RegistrarCheckIn(int nroHabitacion, string dniUsuario, Huesped huesped, int idMetodo, DateTime fechaSalida, TimeSpan horaSalida, decimal montoTotal = 0)
         {
             if (huesped == null) throw new ArgumentNullException(nameof(huesped));
 
@@ -79,7 +79,11 @@ namespace Logica
                 throw new InvalidOperationException($"La habitación {nroHabitacion} no está Disponible.");
             }
 
-            TurnoCaja turno = _gestionTurnoCaja.ObtenerOAbrirTurno(dniUsuario);
+            TurnoCaja? turno = _gestionTurnoCaja.ObtenerTurnoAbierto(dniUsuario);
+            if (turno == null)
+            {
+                throw new InvalidOperationException("La caja se encuentra cerrada. Debe abrir la caja antes de registrar un Check-in y realizar el cobro.");
+            }
 
             if (huespedExiste)
             {
@@ -94,6 +98,7 @@ namespace Logica
             {
                 FechaSalida = fechaSalida,
                 HoraSalida = horaSalida,
+                monto_total = (float)montoTotal,
                 IdMetodo = idMetodo,
                 NroHabitacion = nroHabitacion,
                 IdTurno = turno.IdTurno,
@@ -179,6 +184,30 @@ namespace Logica
             }
 
             return consumos;
+        }
+
+        /// <summary>
+        /// Calcula el monto estimado de la estadía según la tarifa diaria del tipo de habitación
+        /// y la cantidad de noches entre hoy y <paramref name="fechaSalida"/>.
+        /// </summary>
+        /// <returns>Monto total estimado (tarifa × noches) y la tarifa diaria utilizada.</returns>
+        public (decimal MontoTotal, decimal TarifaDiaria, int Noches, string TipoHabitacion) CalcularMontoEstadia(
+            int nroHabitacion, DateTime fechaSalida)
+        {
+            Habitacion? habitacion = HabitacionDAO.ObtenerPorNumero(nroHabitacion);
+            if (habitacion == null)
+                throw new InvalidOperationException($"No existe la habitación {nroHabitacion}.");
+
+            TipoHabitacion? tipo = TipoHabitacionDAO.ObtenerTodos()
+                .FirstOrDefault(t => t.IdTipoHabitacion == habitacion.IdTipoHabitacion);
+
+            if (tipo == null)
+                throw new InvalidOperationException("No se encontró el tipo de habitación.");
+
+            int noches = Math.Max(1, (fechaSalida.Date - DateTime.Today).Days);
+            decimal monto = tipo.Tarifa * noches;
+
+            return (monto, tipo.Tarifa, noches, tipo.Descripcion);
         }
 
         /// <summary>Actualiza los datos de contacto del huésped.</summary>

@@ -68,7 +68,8 @@ namespace Logica
                     Descripcion = $"Check-in de {nombreH} en habitación {hospedaje.NroHabitacion}",
                     Huesped = nombreH,
                     NroHabitacion = hospedaje.NroHabitacion,
-                    Usuario = NombreUsuarioDeTurno(hospedaje.IdTurno)
+                    Usuario = NombreUsuarioDeTurno(hospedaje.IdTurno),
+                    Monto = Convert.ToDecimal(hospedaje.monto_total)
                 });
 
                 // Reemplazo de la evaluación .Finalizada en memoria sin modificar la entidad Hospedaje

@@ -82,10 +82,10 @@ namespace Logica
 
             var resumen = new ResumenTurno { Turno = turno };
 
-            foreach (var (hospedaje, tarifaBase) in HospedajeDAO.ObtenerPorTurno(idTurno))
+            foreach (var (hospedaje, montoEstadia) in HospedajeDAO.ObtenerPorTurno(idTurno))
             {
-                resumen.TotalAlojamiento += tarifaBase;
-                AcumularPorMetodo(resumen, metodos.GetValueOrDefault(hospedaje.IdMetodo), tarifaBase);
+                resumen.TotalAlojamiento += montoEstadia;
+                AcumularPorMetodo(resumen, metodos.GetValueOrDefault(hospedaje.IdMetodo), montoEstadia);
             }
 
             // La tabla venta no tiene id_turno: al turno le corresponden las ventas hechas entre su
@@ -101,7 +101,7 @@ namespace Logica
 
         /// <summary>Cierra el turno comparando el efectivo contado contra el esperado (monto inicial + cobros
         /// en efectivo). La diferencia queda registrada en observaciones para que quede trazada.</summary>
-        public decimal CerrarTurno(int idTurno, decimal efectivoContado, string? observaciones)
+        public decimal CerrarTurno(int idTurno, decimal efectivoContado, string? observaciones = null)
         {
             ResumenTurno resumen = ObtenerResumen(idTurno);
 

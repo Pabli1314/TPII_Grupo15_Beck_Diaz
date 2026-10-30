@@ -24,14 +24,12 @@ namespace Presentacion.Recepcionista
         {
             ["dashboard"] = "Centro de Operaciones",
             ["habitaciones"] = "Mapa de Habitaciones",
-            ["huespedes"] = "Listado de huespedes",
-            ["reservas"] = "Gestión de Reservas",
+            ["huespedes"] = "Huéspedes",
             ["check-in"] = "Check-in",
             ["check-out"] = "Check-out",
             ["caja"] = "Gestión de Caja",
             ["ventas"] = "Ventas Adicionales",
-            ["huespedes"] = "Huéspedes",
-            ["historial"] = "Historial de Operaciones",
+            ["historial"] = "Historial de Operaciones"
         };
 
         public FRecepcionista() : this(null)
@@ -111,11 +109,6 @@ namespace Presentacion.Recepcionista
                     // en otra pantalla desde la última vez. El carrito en curso se conserva.
                     vistaVentas.Refrescar();
                     break;
-
-                case VistaReservas vistaReservas:
-                    vistaReservas.Refrescar();
-                    break;
-
             }
 
             _sidebar.EstablecerActivo(clave);
@@ -126,7 +119,6 @@ namespace Presentacion.Recepcionista
         {
             "dashboard" => new VistaDashboard(_usuario, () => Navegar("caja")),
             "habitaciones" => new VistaHabitaciones(_usuario),
-            "reservas" => new VistaReservas(),
             "check-in" => new VistaHabitaciones(_usuario, EstadoOcupacion.Disponible),
             "check-out" => new VistaHabitaciones(_usuario, EstadoOcupacion.Ocupada),
             "caja" => new VistaCaja(_usuario, () => Navegar("ventas")),

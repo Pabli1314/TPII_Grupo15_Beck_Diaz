@@ -26,6 +26,139 @@ namespace Logica
             File.WriteAllBytes(rutaArchivo, bytes);
         }
 
+        // ----------------------------------------------------------------
+        //  Ticket de Check-In / Comprobante de Hospedaje
+        // ----------------------------------------------------------------
+
+        /// <summary>
+        /// Genera un comprobante PDF de check-in con los datos del huésped, habitación,
+        /// fechas de estadía, tarifa diaria, cantidad de noches y monto total.
+        /// </summary>
+        public static byte[] GenerarBytesCheckIn(
+            string nombreHuesped,
+            string dniHuesped,
+            int nroHabitacion,
+            string tipoHabitacion,
+            DateTime fechaEntrada,
+            DateTime fechaSalida,
+            TimeSpan horaSalida,
+            decimal tarifaDiaria,
+            int noches,
+            decimal montoTotal,
+            string metodoPago,
+            string? emitidoPor = null)
+        {
+            float altoPagina = 580f;
+            var sbContent = new StringBuilder();
+            float y = altoPagina - 26f;
+
+            // --- Encabezado Hotel ---
+            EscribirCentrado(sbContent, "HOTEL SGH", 13f, esBold: true, y, AnchoPagina);
+            y -= 15f;
+            EscribirCentrado(sbContent, "Sistema de Gestion Hotelera", 8f, esBold: false, y, AnchoPagina);
+            y -= 12f;
+            EscribirCentrado(sbContent, "Av. San Martin 123 - Tel: (379) 412-3456", 7.5f, esBold: false, y, AnchoPagina);
+            y -= 11f;
+            EscribirCentrado(sbContent, "IVA Resp. Inscripto - CUIT: 30-71234567-8", 7f, esBold: false, y, AnchoPagina);
+            y -= 10f;
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: true);
+            y -= 14f;
+
+            EscribirCentrado(sbContent, "COMPROBANTE DE HOSPEDAJE", 10f, esBold: true, y, AnchoPagina);
+            y -= 15f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Fecha emision:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, DateTime.Now.ToString("dd/MM/yyyy HH:mm"), 8f, esBold: false);
+            y -= 12f;
+
+            if (!string.IsNullOrWhiteSpace(emitidoPor))
+            {
+                EscribirTexto(sbContent, MargenIzq, y, "Atendido por:", 8f, esBold: true);
+                EscribirTexto(sbContent, MargenIzq + 80f, y, Truncar(emitidoPor, 26), 8f, esBold: false);
+                y -= 12f;
+            }
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: true);
+            y -= 14f;
+
+            // --- Datos del Huesped ---
+            EscribirCentrado(sbContent, "DATOS DEL HUESPED", 8.5f, esBold: true, y, AnchoPagina);
+            y -= 14f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Nombre:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, Truncar(nombreHuesped, 26), 8f, esBold: false);
+            y -= 12f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "DNI:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, dniHuesped, 8f, esBold: false);
+            y -= 12f;
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: true);
+            y -= 14f;
+
+            // --- Datos de la Habitacion y Estadia ---
+            EscribirCentrado(sbContent, "DETALLE DE LA ESTADIA", 8.5f, esBold: true, y, AnchoPagina);
+            y -= 14f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Habitacion:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, $"Nro {nroHabitacion} - {Truncar(tipoHabitacion, 18)}", 8f, esBold: false);
+            y -= 12f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Check-in:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, fechaEntrada.ToString("dd/MM/yyyy HH:mm"), 8f, esBold: false);
+            y -= 12f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Check-out:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y,
+                $"{fechaSalida:dd/MM/yyyy} {horaSalida:hh\\:mm}", 8f, esBold: false);
+            y -= 12f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Noches:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, noches.ToString(), 8f, esBold: false);
+            y -= 12f;
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: false);
+            y -= 14f;
+
+            // --- Desglose del Costo ---
+            EscribirTexto(sbContent, MargenIzq, y, "Tarifa por noche:", 8f, esBold: true);
+            EscribirAlineadoDerecha(sbContent, MargenDer, y,
+                tarifaDiaria.ToString("C", System.Globalization.CultureInfo.CurrentCulture), 8f, esBold: false);
+            y -= 12f;
+
+            EscribirTexto(sbContent, MargenIzq, y, $"{noches} noche(s) x tarifa:", 8f, esBold: false);
+            EscribirAlineadoDerecha(sbContent, MargenDer, y,
+                montoTotal.ToString("C", System.Globalization.CultureInfo.CurrentCulture), 8f, esBold: false);
+            y -= 12f;
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: true);
+            y -= 16f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "TOTAL:", 11f, esBold: true);
+            EscribirAlineadoDerecha(sbContent, MargenDer, y,
+                montoTotal.ToString("C", System.Globalization.CultureInfo.CurrentCulture), 11f, esBold: true);
+            y -= 15f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Forma de pago:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, Truncar(metodoPago, 22), 8f, esBold: false);
+            y -= 14f;
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: false);
+            y -= 15f;
+
+            // --- Pie ---
+            EscribirCentrado(sbContent, "Bienvenido al Hotel SGH", 8f, esBold: false, y, AnchoPagina);
+            y -= 11f;
+            EscribirCentrado(sbContent, "Comprobante de hospedaje interno", 7f, esBold: false, y, AnchoPagina);
+            y -= 10f;
+            EscribirCentrado(sbContent, "No valido como factura fiscal", 7f, esBold: false, y, AnchoPagina);
+            y -= 10f;
+            EscribirCentrado(sbContent, $"Impreso el {DateTime.Now:dd/MM/yyyy HH:mm:ss}", 6.5f, esBold: false, y, AnchoPagina);
+
+            return EnsamblarDocumentoPdf(sbContent.ToString(), AnchoPagina, altoPagina);
+        }
+
         public static byte[] GenerarBytes(VentaRealizada venta, string? emitidoPor = null)
         {
             if (venta == null) throw new ArgumentNullException(nameof(venta));

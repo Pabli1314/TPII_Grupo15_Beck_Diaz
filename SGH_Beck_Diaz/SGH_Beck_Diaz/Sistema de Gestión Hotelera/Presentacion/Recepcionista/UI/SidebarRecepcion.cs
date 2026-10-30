@@ -52,7 +52,6 @@ namespace Presentacion.Recepcionista.UI
             {
                 ("dashboard", "Inicio", Icono.Home),
                 ("habitaciones", "Habitaciones", Icono.Cama),
-                ("reservas", "Reservas", Icono.Etiqueta),
                 ("check-in", "Check-in", Icono.Check),
                 ("check-out", "Check-out", Icono.Salir),
                 ("caja", "Caja", Icono.Caja),

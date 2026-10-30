@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Entidades;
@@ -172,7 +172,11 @@ namespace Logica
                 });
             }
 
-            _gestionTurnoCaja.ObtenerOAbrirTurno(dniUsuario);
+            TurnoCaja? turno = _gestionTurnoCaja.ObtenerTurnoAbierto(dniUsuario);
+            if (turno == null)
+            {
+                throw new InvalidOperationException("La caja se encuentra cerrada. Debe abrir la caja antes de registrar una venta y realizar el cobro.");
+            }
 
             Venta venta = new Venta { Total = detalles.Sum(d => d.Subtotal), IdMetodo = idMetodo, DniHuesped = dniHuesped };
             venta.IdVenta = VentaDAO.RegistrarConDetalle(venta, detalles);

@@ -5,7 +5,6 @@ USE beck_diaz_db;
 GO
 */
 
-
 ----------------------------------------------------
 -- 1. TABLAS INDEPENDIENTES
 ----------------------------------------------------
@@ -146,6 +145,7 @@ CREATE TABLE hospedaje (
     hora_entrada TIME CONSTRAINT DF_hora_entrada DEFAULT CONVERT(TIME, GETDATE()),
     fecha_salida DATE NOT NULL,
     hora_salida TIME NOT NULL,
+    monto_total FLOAT NOT NULL,
     id_metodo INT NOT NULL,
     nro_habitacion INT NOT NULL,
     id_turno INT NOT NULL,

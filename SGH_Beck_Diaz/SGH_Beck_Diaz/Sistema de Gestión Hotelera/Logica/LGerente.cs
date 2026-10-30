@@ -44,6 +44,30 @@ namespace Logica
             return UsuarioDAO.ObtenerRecepcionista() ?? new List<KeyValuePair<string, string>>();
         }
 
+        /// <summary>
+        /// Calcula las métricas ejecutivas reales (ADR y RevPAR) sobre los turnos del mes en curso.
+        /// </summary>
+        public (decimal ADR, decimal RevPAR, decimal IngresoMesActual) ObtenerMetricasKpiDashboard()
+        {
+            DateTime inicioMes = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            DateTime finMes = DateTime.Now;
+
+            List<TurnoCaja> turnosMes = TurnoCajaDAO.ObtenerHistorialFiltrado(inicioMes, finMes);
+            decimal ingresoMesActual = turnosMes.Where(t => t.MontoFinal.HasValue).Sum(t => t.MontoFinal!.Value);
+
+            List<Habitacion> habitaciones = habitacionesDAO.ListarHabitaciones() ?? new List<Habitacion>();
+            int totalHabitaciones = Math.Max(1, habitaciones.Count);
+            int ocupadas = habitaciones.Count(h => h.IdEstado == 2);
+
+            // ADR (Average Daily Rate): Ingresos Totales / Habitaciones Ocupadas
+            decimal adr = ocupadas > 0 ? ingresoMesActual / ocupadas : 0m;
+
+            // RevPAR (Revenue Per Available Room): Ingresos Totales / Habitaciones Totales Disponibles
+            decimal revPar = totalHabitaciones > 0 ? ingresoMesActual / totalHabitaciones : 0m;
+
+            return (adr, revPar, ingresoMesActual);
+        }
+
         public (List<TurnoCaja> Lista, decimal TotalRecaudado, decimal PromedioTurno, int TotalTurnosCerrados, Dictionary<string, decimal> RecaudacionPorUsuario)
         ConsultarHistorialOperativo(DateTime fechaDesde, DateTime fechaHasta, string? dniUsuario = null)
         {
@@ -65,7 +89,6 @@ namespace Logica
             int cantidadCerrados = cerrados.Count;
             decimal promedioTurno = cantidadCerrados > 0 ? totalRecaudado / cantidadCerrados : 0m;
 
-            // Agrupamos para evitar excepciones si se repiten DNI en la lista de usuarios
             var mapaUsuarios = ObtenerListaUsuarios()
                 .Where(u => !string.IsNullOrEmpty(u.Key))
                 .GroupBy(u => u.Key)

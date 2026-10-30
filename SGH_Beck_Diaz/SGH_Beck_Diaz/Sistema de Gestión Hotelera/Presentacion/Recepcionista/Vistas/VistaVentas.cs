@@ -1,4 +1,4 @@
-using Entidades;
+﻿using Entidades;
 using Logica;
 using Presentacion.Administrador.UI;
 using Presentacion.Recepcionista.UI;
@@ -560,6 +560,12 @@ namespace Presentacion.Recepcionista.Vistas
                         : "Seleccione el huésped que realiza la compra.",
                     "Falta el huésped", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 _cmbHuesped.Focus();
+                return;
+            }
+
+            if (new GestionTurnoCaja().ObtenerTurnoAbierto(_usuario.DniUsuario) == null)
+            {
+                MessageBox.Show("La caja se encuentra cerrada. Debe abrir la caja antes de registrar una venta y realizar el cobro.", "Caja cerrada", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 

@@ -1,4 +1,4 @@
---USE beck_diaz_db;
+USE beck_diaz_db;
 
 -- Insertar roles
 INSERT INTO Rol (nom_rol) VALUES ('Administrador'), ('Gerente'), ('Recepcionista');
@@ -23,9 +23,9 @@ SELECT * FROM Estado_habitacion;
 INSERT INTO Usuario (dni_usuario, nom_usuario, ape_usuario, direccion, telefono_usuario, correo_usuario, pasword, estado, id_rol) 
 VALUES 
 ('35123456', 'Carlos', 'Gómez', 'Av. San Martín 123', '3794123456', 'cgomez@hotel.com', 'hash_password_admin_123', 1, 1), -- Administrador
-('38987654', 'María', 'Fernández', 'Calle Pellegrini 456', '3794987654', 'mfernandez@hotel.com', 'hash_password_gerente_456', 1, 2), -- Gerente
+('38987654', 'María', 'Fernández', 'Calle Pellegrini 456', '3794987654', 'mfernandez@hotel.com', 'gerente1', 1, 2), -- Gerente
 ('40555666', 'Juan', 'López', 'Calle Junín 789', '3794555666', 'jlopez@hotel.com', 'hash_password_recep_789', 1, 3); -- Recepcionista
-
+SELECT * FROM usuario;
 --Registro de habitaciones
 -- Nota: Respeta el CHECK (piso IN (1,2,3))
 INSERT INTO habitacion (nro_habitacion, piso, cant_camas,  id_tipo_habitacion, id_estado) VALUES 
@@ -50,7 +50,7 @@ GO
 INSERT INTO habitacion (nro_habitacion, piso, cant_camas,  id_tipo_habitacion, id_estado) VALUES
 (303, 3, 2, 4, 1);
 
-
+SELECT * FROM habitacion;
 ---------------------------- Movimientos en caja
 INSERT INTO Turno_caja (fecha_apertura, hora_apertura, fecha_cierre, hora_cierre, monto_inicial, monto_final, observaciones, dni_usuario) VALUES 
 -- Turno cerrado por Recepcionista
@@ -86,4 +86,7 @@ WHERE nro_habitacion IN (102, 302)
 
 
 SELECT * FROM Huesped;
+SELECT * FROM hospedaje;
 
+SELECT u.nombre_huesped, u.apellido_huesped, o.monto_total FROM hospedaje O
+INNER JOIN Huesped U ON U.dni_huesped = O.dni_huesped;

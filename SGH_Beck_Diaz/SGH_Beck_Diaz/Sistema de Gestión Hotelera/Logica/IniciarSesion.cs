@@ -2,18 +2,19 @@ using Entidades;
 using Datos;
 using System;
 
+
 namespace Logica
 {
     public class IniciarSesion
     {
-        public Usuario? AutenticarUsuario(string nomUsuario, string password)
+        public Usuario? AutenticarUsuarioPorDni(string dniUsuario, string password)
         {
-            if (string.IsNullOrWhiteSpace(nomUsuario) || string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(dniUsuario) || string.IsNullOrWhiteSpace(password))
             {
                 return null;
             }
 
-            Usuario? usuario = UsuarioDAO.ObtenerPorUsername(nomUsuario.Trim());
+            Usuario? usuario = UsuarioDAO.ObtenerPorDni(dniUsuario.Trim());
 
             if (usuario == null || usuario.Pasword != password || !usuario.Estado)
             {
@@ -23,30 +24,24 @@ namespace Logica
             return usuario;
         }
 
-        public int ValidarUsuarioYRol(string nomUsuario, string password)
+        public (Usuario? Usuario, int Rol) ValidarDniYRol(string dniUsuario, string password)
         {
-            Usuario? usuario = AutenticarUsuario(nomUsuario, password);
+            Usuario? usuario = AutenticarUsuarioPorDni(dniUsuario, password);
 
             if (usuario == null)
             {
-                return 0;
+                return (null, 0);
             }
 
-            // Evaluar según el IdRol
-            switch (usuario.IdRol)
+            int idRol = usuario.IdRol switch
             {
-                case 1:
-                    return 1; // Administrador
+                1 => 1, // Administrador
+                2 => 2, // Gerente 
+                3 => 3, // Recepcionista
+                _ => 0
+            };
 
-                case 2:
-                    return 2; // Supervisor / Gerente
-
-                case 3:
-                    return 3; // Recepcionista / Empleado
-
-                default:
-                    return 0; // Rol no reconocido o sin privilegios
-            }
+            return (usuario, idRol);
         }
     }
 }

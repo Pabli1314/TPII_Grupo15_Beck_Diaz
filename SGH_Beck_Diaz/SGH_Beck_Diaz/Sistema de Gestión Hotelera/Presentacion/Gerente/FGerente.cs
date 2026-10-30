@@ -315,16 +315,21 @@ namespace Presentacion.Gerente
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
 
+            FLogin fLogin = new FLogin();
+            
             // Si responde NO o cancela, se interrumpe la ejecución sin cerrar la pantalla
             if (confirmacion != DialogResult.Yes)
             {
+                fLogin.Show();
+
                 return;
             }
 
             // Si responde SÍ: se abre la pantalla de selección de usuario y se cierra la actual
+            /*
             FSeleccionUsuario fSeleccionUsuario = new FSeleccionUsuario();
-            fSeleccionUsuario.Show();
-
+            fSeleccionUsuario.Show();*/
+           
             this.Close();
         }
     }

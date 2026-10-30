@@ -10,7 +10,7 @@ namespace Datos
         private static readonly Conexion _conexion = new Conexion();
 
         private const string Columnas = @"dni_huesped, nombre_huesped, apellido_huesped, telefono_huesped,
-                       direccion_huesped, correo_huesped, alta_huesped";
+                               direccion_huesped, correo_huesped, alta_huesped";
 
         public static List<Huesped> ObtenerTodos()
         {
@@ -35,22 +35,73 @@ namespace Datos
             return huespedes;
         }
 
-        /// <summary>Búsqueda libre por DNI, nombre, apellido o correo (coincidencia parcial).</summary>
         public static List<Huesped> Buscar(string termino)
+        {
+            return BuscarFiltrado(termino, "Todos", null);
+        }
+
+        /// <summary>
+        /// Búsqueda avanzada de huéspedes con filtros combinados por término, estado de estadía y habitación.
+        /// </summary>
+        public static List<Huesped> BuscarFiltrado(string? termino, string? estadoEstadia, int? nroHabitacion)
         {
             var huespedes = new List<Huesped>();
 
             string query = $@"
-                SELECT {Columnas}
-                FROM Huesped
-                WHERE dni_huesped LIKE @termino OR nombre_huesped LIKE @termino
-                   OR apellido_huesped LIKE @termino OR correo_huesped LIKE @termino
-                ORDER BY apellido_huesped, nombre_huesped";
+                SELECT DISTINCT h.dni_huesped, h.nombre_huesped, h.apellido_huesped, h.telefono_huesped,
+                                h.direccion_huesped, h.correo_huesped, h.alta_huesped
+                FROM Huesped h
+                LEFT JOIN hospedaje ho ON h.dni_huesped = ho.dni_huesped
+                LEFT JOIN habitacion ha ON ho.nro_habitacion = ha.nro_habitacion
+                LEFT JOIN Estado_habitacion eh ON ha.id_estado = eh.id_estado
+                WHERE 1=1";
+
+            if (!string.IsNullOrWhiteSpace(termino))
+            {
+                query += @" AND (h.dni_huesped LIKE @termino 
+                             OR h.nombre_huesped LIKE @termino 
+                             OR h.apellido_huesped LIKE @termino 
+                             OR h.correo_huesped LIKE @termino)";
+            }
+
+            if (!string.IsNullOrWhiteSpace(estadoEstadia) && estadoEstadia != "Todos")
+            {
+                if (estadoEstadia.Equals("Alojado", StringComparison.OrdinalIgnoreCase))
+                {
+                    query += " AND LOWER(TRIM(eh.nom_estado_habitacion)) = 'ocupada'";
+                }
+                else if (estadoEstadia.Equals("Sin estadía activa", StringComparison.OrdinalIgnoreCase))
+                {
+                    query += @" AND h.dni_huesped NOT IN (
+                                    SELECT ho2.dni_huesped 
+                                    FROM hospedaje ho2
+                                    INNER JOIN habitacion ha2 ON ho2.nro_habitacion = ha2.nro_habitacion
+                                    INNER JOIN Estado_habitacion eh2 ON ha2.id_estado = eh2.id_estado
+                                    WHERE LOWER(TRIM(eh2.nom_estado_habitacion)) = 'ocupada'
+                                )";
+                }
+            }
+
+            if (nroHabitacion.HasValue && nroHabitacion.Value > 0)
+            {
+                query += " AND ho.nro_habitacion = @nroHabitacion AND LOWER(TRIM(eh.nom_estado_habitacion)) = 'ocupada'";
+            }
+
+            query += " ORDER BY h.apellido_huesped, h.nombre_huesped";
 
             using (SqlConnection con = _conexion.ObtenerConexion())
             {
                 SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@termino", $"%{termino}%");
+
+                if (!string.IsNullOrWhiteSpace(termino))
+                {
+                    cmd.Parameters.AddWithValue("@termino", $"%{termino.Trim()}%");
+                }
+
+                if (nroHabitacion.HasValue && nroHabitacion.Value > 0)
+                {
+                    cmd.Parameters.AddWithValue("@nroHabitacion", nroHabitacion.Value);
+                }
 
                 con.Open();
                 using (SqlDataReader reader = cmd.ExecuteReader())
@@ -92,13 +143,11 @@ namespace Datos
             return huesped;
         }
 
-        /// <summary>True si otro huésped (distinto de <paramref name="dniExcluido"/>) ya usa ese teléfono (UQ_huesped_telefono).</summary>
         public static bool ExisteTelefono(string telefono, string? dniExcluido = null)
         {
             return ExisteValor("telefono_huesped", telefono, dniExcluido);
         }
 
-        /// <summary>True si otro huésped (distinto de <paramref name="dniExcluido"/>) ya usa ese correo (UQ_huesped_correo).</summary>
         public static bool ExisteCorreo(string correo, string? dniExcluido = null)
         {
             return ExisteValor("correo_huesped", correo, dniExcluido);
@@ -106,7 +155,6 @@ namespace Datos
 
         private static bool ExisteValor(string columna, string valor, string? dniExcluido)
         {
-            // "columna" nunca viene del usuario: solo la pasan ExisteTelefono/ExisteCorreo.
             string query = $@"
                 SELECT COUNT(1)
                 FROM Huesped
@@ -123,7 +171,6 @@ namespace Datos
             }
         }
 
-        /// <summary>Inserta el huésped. alta_huesped queda a cargo del DEFAULT de la base.</summary>
         public static void Crear(Huesped huesped)
         {
             string query = @"
@@ -140,7 +187,6 @@ namespace Datos
             }
         }
 
-        /// <summary>Actualiza nombre/apellido/teléfono/dirección/correo de un huésped ya existente (el DNI no cambia).</summary>
         public static void Actualizar(Huesped huesped)
         {
             string query = @"
@@ -169,10 +215,6 @@ namespace Datos
             cmd.Parameters.AddWithValue("@correo", huesped.Correo);
         }
 
-        /// <summary>
-        /// Obtiene únicamente los huéspedes que NO se encuentran alojados actualmente en ninguna habitación.
-        /// Excluye a aquellos cuyo hospedaje activo aún no ha finalizado.
-        /// </summary>
         public static List<Huesped> ObtenerDisponiblesParaCheckIn()
         {
             var huespedes = new List<Huesped>();
