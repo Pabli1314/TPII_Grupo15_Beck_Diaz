@@ -1,0 +1,38 @@
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\bin\Debug\net8.0-windows\Logica.deps.json
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\bin\Debug\net8.0-windows\Logica.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\bin\Debug\net8.0-windows\Logica.pdb
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\bin\Debug\net8.0-windows\Datos.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\bin\Debug\net8.0-windows\Entidades.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\bin\Debug\net8.0-windows\Datos.pdb
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\bin\Debug\net8.0-windows\Entidades.pdb
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\obj\Debug\net8.0-windows\Logica.csproj.AssemblyReference.cache
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\obj\Debug\net8.0-windows\Logica.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\obj\Debug\net8.0-windows\Logica.AssemblyInfoInputs.cache
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\obj\Debug\net8.0-windows\Logica.AssemblyInfo.cs
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\obj\Debug\net8.0-windows\Logica.csproj.CoreCompileInputs.cache
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\obj\Debug\net8.0-windows\Logica.csproj.Up2Date
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\obj\Debug\net8.0-windows\Logica.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\obj\Debug\net8.0-windows\refint\Logica.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\obj\Debug\net8.0-windows\Logica.pdb
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Logica\obj\Debug\net8.0-windows\ref\Logica.dll
+C:\Users\diaz_\AppData\Local\Temp\sghbuild\Logica.deps.json
+C:\Users\diaz_\AppData\Local\Temp\sghbuild\Logica.dll
+C:\Users\diaz_\AppData\Local\Temp\sghbuild\Logica.pdb
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\da776cf9-4486-4d31-bf94-02af3039778f\scratchpad\build\Logica.deps.json
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\da776cf9-4486-4d31-bf94-02af3039778f\scratchpad\build\Logica.dll
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\da776cf9-4486-4d31-bf94-02af3039778f\scratchpad\build\Logica.pdb
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\build\Logica.deps.json
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\build\Logica.dll
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\build\Logica.pdb
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\prueba\out\Logica.deps.json
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\prueba\out\Logica.dll
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\prueba\out\Logica.pdb
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\be02eb11-c64a-4123-9f60-0148ee162493\scratchpad\buildcheck\Debug\net8.0-windows\Logica.deps.json
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\be02eb11-c64a-4123-9f60-0148ee162493\scratchpad\buildcheck\Debug\net8.0-windows\Logica.dll
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\be02eb11-c64a-4123-9f60-0148ee162493\scratchpad\buildcheck\Debug\net8.0-windows\Logica.pdb
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\794ab997-a9eb-42be-8d3d-05f355266609\scratchpad\build\Logica.deps.json
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\794ab997-a9eb-42be-8d3d-05f355266609\scratchpad\build\Logica.dll
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\794ab997-a9eb-42be-8d3d-05f355266609\scratchpad\build\Logica.pdb
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\d6ebabb4-bacb-4e71-8d06-d6aa700496f8\scratchpad\buildcheck\Logica.deps.json
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\d6ebabb4-bacb-4e71-8d06-d6aa700496f8\scratchpad\buildcheck\Logica.dll
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\d6ebabb4-bacb-4e71-8d06-d6aa700496f8\scratchpad\buildcheck\Logica.pdb

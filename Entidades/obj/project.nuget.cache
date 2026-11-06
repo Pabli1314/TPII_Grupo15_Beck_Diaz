@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "34JAwsZDOXw=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\diaz_\\OneDrive\\Desktop\\TPII_Grupo15_Beck_Diaz\\SGH_Beck_Diaz\\SGH_Beck_Diaz\\Sistema de Gestión Hotelera\\Entidades\\Entidades.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\diaz_\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.31\\microsoft.windowsdesktop.app.ref.8.0.31.nupkg.sha512",
+    "C:\\Users\\diaz_\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.31\\microsoft.netcore.app.ref.8.0.31.nupkg.sha512",
+    "C:\\Users\\diaz_\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.31\\microsoft.aspnetcore.app.ref.8.0.31.nupkg.sha512"
+  ],
+  "logs": []
+}

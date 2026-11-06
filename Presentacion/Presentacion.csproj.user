@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup />
+  <ItemGroup>
+    <Compile Update="Administrador\FAdministrador.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Administrador\FHuespedes.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Administrador\Modales\FModalAjusteStock.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Administrador\Modales\FModalCambiarPassword.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Administrador\Modales\FModalDatosHuesped.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Administrador\Modales\FModalDetalleHabitacion.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Administrador\Modales\FModalHabitacion.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Administrador\Modales\FModalPerfil.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Administrador\Modales\FModalProducto.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Administrador\Modales\FModalTarifa.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Administrador\Modales\FModalUsuario.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Administrador\UI\ComponentesReporteAdmin.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Administrador\UI\FormModalBase.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Administrador\UI\HeaderAdmin.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Administrador\UI\PanelNotificaciones.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Administrador\UI\SidebarAdmin.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Administrador\UI\TarjetaEstadistica.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Administrador\UI\TarjetaHabitacionAdmin.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Administrador\UI\ToggleSwitch.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Administrador\Vistas\VistaDashboard.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Administrador\Vistas\VistaHistorico.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Administrador\Vistas\VistaInventario.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Administrador\Vistas\VistaReportes.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Administrador\Vistas\VistaSupervisionHabitaciones.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Administrador\Vistas\VistaTarifas.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Administrador\Vistas\VistaUsuarios.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="FLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="FSeleccionUsuario.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Gerente\FGerente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Gerente\FormAnalisisFinanciero.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Gerente\FormAnalisisHabitaciones.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Gerente\FormDashboardEjecutivo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Gerente\FormHistoricos.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Gerente\FormModalHabitaciones.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\FCheckIn.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\FCheckOut.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\FGestionHabitacion.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\FRecepcionista.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\Modales\FModalAperturaTurno.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\Modales\FModalCierreTurno.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\Modales\FModalRegistrarHuesped.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\UC_Habitacion.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\UI\HeaderRecepcion.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\UI\SidebarRecepcion.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\UI\TarjetaProducto.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\Vistas\VistaCaja.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\Vistas\VistaDashboard.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\Vistas\VistaHabitaciones.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\Vistas\VistaHistorial.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\Vistas\VistaHuespedes.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\Vistas\VistaReportes.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\Vistas\VistaReservas.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Recepcionista\Vistas\VistaVentas.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>

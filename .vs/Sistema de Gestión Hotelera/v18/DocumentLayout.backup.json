@@ -1,0 +1,69 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\diaz_\\OneDrive\\Desktop\\TPII_Grupo15_Beck_Diaz\\SGH_Beck_Diaz\\SGH_Beck_Diaz\\Sistema de Gesti\u00F3n Hotelera\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{C99C5D65-A0D9-4D6E-A401-AF5075F7DD33}|Presentacion\\Presentacion.csproj|c:\\users\\diaz_\\onedrive\\desktop\\tpii_grupo15_beck_diaz\\sgh_beck_diaz\\sgh_beck_diaz\\sistema de gesti\u00F3n hotelera\\presentacion\\administrador\\vistas\\vistareportes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C99C5D65-A0D9-4D6E-A401-AF5075F7DD33}|Presentacion\\Presentacion.csproj|solutionrelative:presentacion\\administrador\\vistas\\vistareportes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C99C5D65-A0D9-4D6E-A401-AF5075F7DD33}|Presentacion\\Presentacion.csproj|c:\\users\\diaz_\\onedrive\\desktop\\tpii_grupo15_beck_diaz\\sgh_beck_diaz\\sgh_beck_diaz\\sistema de gesti\u00F3n hotelera\\presentacion\\administrador\\vistas\\vistatarifas.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C99C5D65-A0D9-4D6E-A401-AF5075F7DD33}|Presentacion\\Presentacion.csproj|solutionrelative:presentacion\\administrador\\vistas\\vistatarifas.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EE2421A3-6D9A-4CEC-99BB-DB9DD52F72D7}|Datos\\Datos.csproj|c:\\users\\diaz_\\onedrive\\desktop\\tpii_grupo15_beck_diaz\\sgh_beck_diaz\\sgh_beck_diaz\\sistema de gesti\u00F3n hotelera\\datos\\conexion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EE2421A3-6D9A-4CEC-99BB-DB9DD52F72D7}|Datos\\Datos.csproj|solutionrelative:datos\\conexion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "VistaReportes.cs",
+              "DocumentMoniker": "C:\\Users\\diaz_\\OneDrive\\Desktop\\TPII_Grupo15_Beck_Diaz\\SGH_Beck_Diaz\\SGH_Beck_Diaz\\Sistema de Gesti\u00F3n Hotelera\\Presentacion\\Administrador\\Vistas\\VistaReportes.cs",
+              "RelativeDocumentMoniker": "Presentacion\\Administrador\\Vistas\\VistaReportes.cs",
+              "ToolTip": "C:\\Users\\diaz_\\OneDrive\\Desktop\\TPII_Grupo15_Beck_Diaz\\SGH_Beck_Diaz\\SGH_Beck_Diaz\\Sistema de Gesti\u00F3n Hotelera\\Presentacion\\Administrador\\Vistas\\VistaReportes.cs",
+              "RelativeToolTip": "Presentacion\\Administrador\\Vistas\\VistaReportes.cs",
+              "ViewState": "AgIAANwCAAAAAAAAAAAAAPMCAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-26T23:58:59.407Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "VistaTarifas.cs",
+              "DocumentMoniker": "C:\\Users\\diaz_\\OneDrive\\Desktop\\TPII_Grupo15_Beck_Diaz\\SGH_Beck_Diaz\\SGH_Beck_Diaz\\Sistema de Gesti\u00F3n Hotelera\\Presentacion\\Administrador\\Vistas\\VistaTarifas.cs",
+              "RelativeDocumentMoniker": "Presentacion\\Administrador\\Vistas\\VistaTarifas.cs",
+              "ToolTip": "C:\\Users\\diaz_\\OneDrive\\Desktop\\TPII_Grupo15_Beck_Diaz\\SGH_Beck_Diaz\\SGH_Beck_Diaz\\Sistema de Gesti\u00F3n Hotelera\\Presentacion\\Administrador\\Vistas\\VistaTarifas.cs",
+              "RelativeToolTip": "Presentacion\\Administrador\\Vistas\\VistaTarifas.cs",
+              "ViewState": "AgIAAGsAAAAAAAAAAAAUwH8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-18T18:54:40.798Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Conexion.cs",
+              "DocumentMoniker": "C:\\Users\\diaz_\\OneDrive\\Desktop\\TPII_Grupo15_Beck_Diaz\\SGH_Beck_Diaz\\SGH_Beck_Diaz\\Sistema de Gesti\u00F3n Hotelera\\Datos\\Conexion.cs",
+              "RelativeDocumentMoniker": "Datos\\Conexion.cs",
+              "ToolTip": "C:\\Users\\diaz_\\OneDrive\\Desktop\\TPII_Grupo15_Beck_Diaz\\SGH_Beck_Diaz\\SGH_Beck_Diaz\\Sistema de Gesti\u00F3n Hotelera\\Datos\\Conexion.cs",
+              "RelativeToolTip": "Datos\\Conexion.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAQwB0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-14T22:17:29.324Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

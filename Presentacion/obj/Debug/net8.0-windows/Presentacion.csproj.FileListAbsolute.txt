@@ -1,0 +1,156 @@
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Presentacion.exe
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Presentacion.dll.config
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Presentacion.deps.json
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Presentacion.runtimeconfig.json
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Presentacion.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Presentacion.pdb
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\HarfBuzzSharp.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\LiveChartsCore.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\LiveChartsCore.SkiaSharpView.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\LiveChartsCore.SkiaSharpView.WinForms.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.Bcl.Cryptography.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.Data.SqlClient.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.Data.SqlClient.Extensions.Abstractions.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.Data.SqlClient.Internal.Logging.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.Extensions.Caching.Abstractions.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.Extensions.Caching.Memory.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.Extensions.Options.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.Extensions.Primitives.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.IdentityModel.Logging.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.IdentityModel.Protocols.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.IdentityModel.Tokens.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Microsoft.SqlServer.Server.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\OpenTK.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\OpenTK.GLControl.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\SkiaSharp.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\SkiaSharp.HarfBuzz.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\SkiaSharp.Views.Desktop.Common.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\SkiaSharp.Views.WindowsForms.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\System.Configuration.ConfigurationManager.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\System.Diagnostics.EventLog.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\System.Security.Cryptography.Pkcs.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\WinForms.DataVisualization.Utilities.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\WinForms.DataVisualization.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\cs\Microsoft.Data.SqlClient.resources.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\de\Microsoft.Data.SqlClient.resources.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\es\Microsoft.Data.SqlClient.resources.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\fr\Microsoft.Data.SqlClient.resources.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\it\Microsoft.Data.SqlClient.resources.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\ja\Microsoft.Data.SqlClient.resources.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\ko\Microsoft.Data.SqlClient.resources.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\pl\Microsoft.Data.SqlClient.resources.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\pt-BR\Microsoft.Data.SqlClient.resources.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\ru\Microsoft.Data.SqlClient.resources.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\tr\Microsoft.Data.SqlClient.resources.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\zh-Hans\Microsoft.Data.SqlClient.resources.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\zh-Hant\Microsoft.Data.SqlClient.resources.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\runtimes\osx\native\libHarfBuzzSharp.dylib
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\runtimes\win-arm64\native\libHarfBuzzSharp.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\runtimes\win-x64\native\libHarfBuzzSharp.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\runtimes\win-x86\native\libHarfBuzzSharp.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\runtimes\unix\lib\net8.0\Microsoft.Data.SqlClient.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\runtimes\win\lib\net8.0\Microsoft.Data.SqlClient.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\runtimes\osx\native\libSkiaSharp.dylib
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\runtimes\win-arm64\native\libSkiaSharp.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\runtimes\win-x64\native\libSkiaSharp.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\runtimes\win-x86\native\libSkiaSharp.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Datos.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Entidades.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Logica.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Logica.pdb
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Datos.pdb
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\bin\Debug\net8.0-windows\Entidades.pdb
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.csproj.AssemblyReference.cache
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Administrador.FAdministrador.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Administrador.FHuespedes.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Administrador.FMainAdministrador.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Administrador.FReportes.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Administrador.FUsuarios.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Administrador.Modales.FModalAjusteStock.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Administrador.Modales.FModalCambiarPassword.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Administrador.Modales.FModalHabitacion.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Administrador.Modales.FModalProducto.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Administrador.Modales.FModalTarifa.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Administrador.Modales.FModalUsuario.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Administrador.Vistas.VistaDashboard.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Administrador.Vistas.VistaSupervisionHabitaciones.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Administrador.Vistas.VistaUsuarios.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Sistema_de_Gestión_Hotelera.FLogin.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Sistema_de_Gestión_Hotelera.FSeleccionUsuario.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Gerente.FGerente.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Gerente.FormAnalisisFinanciero.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Gerente.FormAnalisisHabitaciones.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Gerente.FormDashboardEjecutivo.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Gerente.FormHistoricos.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Properties.Resources.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Recepcionista.FCheckIn.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Recepcionista.FGestionHabitacion.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Recepcionista.FRecepcionista.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Recepcionista.Modales.FModalCierreTurno.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Recepcionista.Modales.FModalRegistrarHuesped.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Recepcionista.Vistas.VistaDashboard.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Recepcionista.Vistas.VistaHuespedes.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Recepcionista.Vistas.VistaReservas.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.Recepcionista.Vistas.VistaVentas.resources
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.csproj.GenerateResource.cache
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.csproj.CoreCompileInputs.cache
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presenta.BC77CD05.Up2Date
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\refint\Presentacion.dll
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.pdb
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\Presentacion.genruntimeconfig.cache
+C:\Users\diaz_\OneDrive\Desktop\TPII_Grupo15_Beck_Diaz\SGH_Beck_Diaz\SGH_Beck_Diaz\Sistema de Gestión Hotelera\Presentacion\obj\Debug\net8.0-windows\ref\Presentacion.dll
+C:\Users\diaz_\AppData\Local\Temp\sghbuild\Presentacion.exe
+C:\Users\diaz_\AppData\Local\Temp\sghbuild\Presentacion.dll.config
+C:\Users\diaz_\AppData\Local\Temp\sghbuild\Presentacion.deps.json
+C:\Users\diaz_\AppData\Local\Temp\sghbuild\Presentacion.runtimeconfig.json
+C:\Users\diaz_\AppData\Local\Temp\sghbuild\Presentacion.dll
+C:\Users\diaz_\AppData\Local\Temp\sghbuild\Presentacion.pdb
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\da776cf9-4486-4d31-bf94-02af3039778f\scratchpad\build\Presentacion.exe
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\da776cf9-4486-4d31-bf94-02af3039778f\scratchpad\build\Presentacion.dll.config
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\da776cf9-4486-4d31-bf94-02af3039778f\scratchpad\build\Presentacion.deps.json
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\da776cf9-4486-4d31-bf94-02af3039778f\scratchpad\build\Presentacion.runtimeconfig.json
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\da776cf9-4486-4d31-bf94-02af3039778f\scratchpad\build\Presentacion.dll
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\da776cf9-4486-4d31-bf94-02af3039778f\scratchpad\build\Presentacion.pdb
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\build\Presentacion.exe
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\build\Presentacion.dll.config
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\build\Presentacion.deps.json
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\build\Presentacion.runtimeconfig.json
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\build\Presentacion.dll
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\build\Presentacion.pdb
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\prueba\out\Presentacion.exe
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\prueba\out\Presentacion.dll.config
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\prueba\out\Presentacion.deps.json
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\prueba\out\Presentacion.runtimeconfig.json
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\prueba\out\Presentacion.dll
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\2d3dd5ed-ead2-4e04-879c-ab0f8f7a7f0a\scratchpad\prueba\out\Presentacion.pdb
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\be02eb11-c64a-4123-9f60-0148ee162493\scratchpad\buildcheck\Debug\net8.0-windows\Presentacion.exe
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\be02eb11-c64a-4123-9f60-0148ee162493\scratchpad\buildcheck\Debug\net8.0-windows\Presentacion.dll.config
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\be02eb11-c64a-4123-9f60-0148ee162493\scratchpad\buildcheck\Debug\net8.0-windows\Presentacion.deps.json
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\be02eb11-c64a-4123-9f60-0148ee162493\scratchpad\buildcheck\Debug\net8.0-windows\Presentacion.runtimeconfig.json
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\be02eb11-c64a-4123-9f60-0148ee162493\scratchpad\buildcheck\Debug\net8.0-windows\Presentacion.dll
+C:\Users\diaz_\AppData\Local\Temp\claude\C--Users-diaz--OneDrive-Desktop-TPII-Grupo15-Beck-Diaz-SGH-Beck-Diaz-SGH-Beck-Diaz-Sistema-de-Gesti-n-Hotelera\be02eb11-c64a-4123-9f60-0148ee162493\scratchpad\buildcheck\Debug\net8.0-windows\Presentacion.pdb
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\794ab997-a9eb-42be-8d3d-05f355266609\scratchpad\build\Presentacion.exe
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\794ab997-a9eb-42be-8d3d-05f355266609\scratchpad\build\Presentacion.dll.config
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\794ab997-a9eb-42be-8d3d-05f355266609\scratchpad\build\Presentacion.deps.json
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\794ab997-a9eb-42be-8d3d-05f355266609\scratchpad\build\Presentacion.runtimeconfig.json
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\794ab997-a9eb-42be-8d3d-05f355266609\scratchpad\build\Presentacion.dll
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\794ab997-a9eb-42be-8d3d-05f355266609\scratchpad\build\Presentacion.pdb
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\d6ebabb4-bacb-4e71-8d06-d6aa700496f8\scratchpad\buildcheck\Presentacion.exe
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\d6ebabb4-bacb-4e71-8d06-d6aa700496f8\scratchpad\buildcheck\Presentacion.dll.config
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\d6ebabb4-bacb-4e71-8d06-d6aa700496f8\scratchpad\buildcheck\Presentacion.deps.json
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\d6ebabb4-bacb-4e71-8d06-d6aa700496f8\scratchpad\buildcheck\Presentacion.runtimeconfig.json
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\d6ebabb4-bacb-4e71-8d06-d6aa700496f8\scratchpad\buildcheck\Presentacion.dll
+C:\Users\diaz_\AppData\Local\Temp\claude\bcac4668280b4c52\d6ebabb4-bacb-4e71-8d06-d6aa700496f8\scratchpad\buildcheck\Presentacion.pdb
