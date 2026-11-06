@@ -3,7 +3,7 @@ using System;
 namespace Entidades
 {
     /// <summary>
-    /// DTO de solo lectura para las pantallas de Dashboard y Supervisión del Administrador.
+    /// DTO de solo lectura para las pantallas de Dashboard, Supervisión y Recepción.
     /// Combina Habitacion + EstadoHabitacion + TipoHabitacion + Hospedaje/Huesped vigente +
     /// último RegistroLimpieza. Lo arma Logica.GestionHabitaciones.ObtenerResumenHabitaciones().
     /// </summary>
@@ -11,6 +11,8 @@ namespace Entidades
     {
         public int NroHabitacion { get; set; }
         public int Piso { get; set; }
+        public int CantCamas { get; set; }
+        public decimal Tarifa { get; set; }
         public string TipoHabitacion { get; set; } = string.Empty;
         public int IdEstado { get; set; }
         public string Estado { get; set; } = string.Empty;

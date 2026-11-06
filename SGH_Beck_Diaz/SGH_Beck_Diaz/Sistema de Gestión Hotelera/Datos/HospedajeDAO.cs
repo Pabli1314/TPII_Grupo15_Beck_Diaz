@@ -290,5 +290,55 @@ namespace Datos
                 cmd.ExecuteNonQuery();
             }
         }
+
+        /// <summary>
+        /// Actualiza la fecha y hora de salida pactadas y el monto total acumulado de la estadía (Prórroga).
+        /// </summary>
+        public static void ActualizarEstadia(int idHospedaje, DateTime nuevaFechaSalida, TimeSpan nuevaHoraSalida, decimal nuevoMontoTotal)
+        {
+            string query = @"
+                UPDATE hospedaje
+                SET fecha_salida = @fechaSalida,
+                    hora_salida = @horaSalida,
+                    monto_total = @montoTotal
+                WHERE id_hospedaje = @idHospedaje";
+
+            using (SqlConnection con = _conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@fechaSalida", nuevaFechaSalida.Date);
+                cmd.Parameters.AddWithValue("@horaSalida", nuevaHoraSalida);
+                cmd.Parameters.AddWithValue("@montoTotal", (float)nuevoMontoTotal);
+                cmd.Parameters.AddWithValue("@idHospedaje", idHospedaje);
+
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        /// <summary>
+        /// Registra la salida real del huésped actualizando la fecha, hora y el monto final liquidado (incluyendo días extras).
+        /// </summary>
+        public static void RegistrarSalidaConMonto(int idHospedaje, DateTime fechaSalida, TimeSpan horaSalida, decimal montoTotalFinal)
+        {
+            string query = @"
+                UPDATE hospedaje
+                SET fecha_salida = @fechaSalida,
+                    hora_salida = @horaSalida,
+                    monto_total = @montoTotal
+                WHERE id_hospedaje = @idHospedaje";
+
+            using (SqlConnection con = _conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@fechaSalida", fechaSalida.Date);
+                cmd.Parameters.AddWithValue("@horaSalida", horaSalida);
+                cmd.Parameters.AddWithValue("@montoTotal", (float)montoTotalFinal);
+                cmd.Parameters.AddWithValue("@idHospedaje", idHospedaje);
+
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
     }
 }

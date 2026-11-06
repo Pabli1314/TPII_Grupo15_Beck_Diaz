@@ -19,7 +19,7 @@ namespace Logica
 
         /// <summary>
         /// Genera la lista resumida para vistas Grid/Tarjetas unificando entidad Habitacion,
-        /// su Hospedaje activo si está ocupada y el último RegistroLimpieza.
+        /// características técnicas/comerciales, su Hospedaje activo si está ocupada y el último RegistroLimpieza.
         /// </summary>
         public List<HabitacionResumen> ObtenerResumenHabitaciones()
         {
@@ -44,6 +44,8 @@ namespace Logica
                 {
                     NroHabitacion = habitacion.NroHabitacion,
                     Piso = habitacion.Piso,
+                    CantCamas = habitacion.CantCamas,
+                    Tarifa = tipo?.Tarifa ?? 0m,
                     TipoHabitacion = tipo?.Descripcion ?? "-",
                     IdEstado = habitacion.IdEstado,
                     Estado = estado?.NomEstadoHabitacion ?? "-"
@@ -73,6 +75,55 @@ namespace Logica
             }
 
             return resumen;
+        }
+
+        /// <summary>
+        /// Obtiene el detalle técnico y comercial completo de una habitación específica por su número.
+        /// Proporciona acceso directo a sus características (piso, tipo, camas, tarifa y estado actual).
+        /// </summary>
+        public HabitacionResumen? ObtenerDetalleHabitacion(int nroHabitacion)
+        {
+            Habitacion? habitacion = HabitacionDAO.ObtenerPorNumero(nroHabitacion);
+            if (habitacion == null)
+            {
+                return null;
+            }
+
+            var tipo = TipoHabitacionDAO.ObtenerTodos().FirstOrDefault(t => t.IdTipoHabitacion == habitacion.IdTipoHabitacion);
+            var estado = EstadoHabitacionDAO.ObtenerTodos().FirstOrDefault(e => e.IdEstado == habitacion.IdEstado);
+
+            var detalle = new HabitacionResumen
+            {
+                NroHabitacion = habitacion.NroHabitacion,
+                Piso = habitacion.Piso,
+                CantCamas = habitacion.CantCamas,
+                TipoHabitacion = tipo?.Descripcion ?? "-",
+                Tarifa = tipo?.Tarifa ?? 0m,
+                IdEstado = habitacion.IdEstado,
+                Estado = estado?.NomEstadoHabitacion ?? "-"
+            };
+
+            if (string.Equals(detalle.Estado, ESTADO_OCUPADA, StringComparison.OrdinalIgnoreCase))
+            {
+                Hospedaje? hospedaje = HospedajeDAO.ObtenerActivoPorHabitacion(habitacion.NroHabitacion);
+                if (hospedaje != null)
+                {
+                    Huesped? huesped = HuespedDAO.ObtenerPorDni(hospedaje.DniHuesped);
+                    detalle.DniHuesped = hospedaje.DniHuesped;
+                    detalle.Huesped = huesped != null ? $"{huesped.Nombre} {huesped.Apellido}" : hospedaje.DniHuesped;
+                    detalle.HoraEntrada = hospedaje.FechaEntrada.Date + hospedaje.HoraEntrada;
+                    detalle.HoraSalidaEstimada = hospedaje.FechaSalida.Date + hospedaje.HoraSalida;
+                }
+            }
+
+            RegistroLimpieza? ultimaLimpieza = RegistroLimpiezaDAO.ObtenerUltimaPorHabitacion(habitacion.NroHabitacion);
+            if (ultimaLimpieza != null)
+            {
+                detalle.UltimaLimpieza = ultimaLimpieza.FechaLimpieza.Date + ultimaLimpieza.HoraFin;
+                detalle.DuracionUltimaLimpieza = ultimaLimpieza.HoraFin - ultimaLimpieza.HoraInicio;
+            }
+
+            return detalle;
         }
 
         /// <summary>

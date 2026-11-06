@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Presentacion.Recepcionista.Vistas
 {
-    /// <summary>Historial unificado de check-in/check-out y ventas adicionales, con filtros.</summary>
+    /// <summary>Historial unificado de check-in, check-out, prórrogas y ventas adicionales, con filtros.</summary>
     internal class VistaHistorial : UserControl
     {
         private readonly GestionHistorialRecepcion _gestionHistorial = new();
@@ -54,16 +54,16 @@ namespace Presentacion.Recepcionista.Vistas
 
             // 1. Selector de Tipo de Operación
             _cmbTipo = CamposFormulario.Combo(Point.Empty, 130);
-            _cmbTipo.Items.AddRange(new object[] { "Todas", "Check-in", "Check-out", "Venta" });
+            _cmbTipo.Items.AddRange(new object[] { "Todas", "Check-in", "Check-out", "Prórroga", "Venta" });
             _cmbTipo.SelectedIndex = 0;
             _cmbTipo.Margin = new Padding(0, 0, 10, 0);
 
-            // 2. Filtro por Huésped
+            // 2. Filtro por Huésped / DNI
             _txtHuesped = CamposFormulario.Texto(Point.Empty, 170);
             _txtHuesped.Margin = new Padding(0, 0, 4, 0);
             var lblHuesped = new Label
             {
-                Text = "Huésped",
+                Text = "Huésped / DNI",
                 Font = Paleta.FuenteChica,
                 ForeColor = Paleta.TextoTerciario,
                 AutoSize = true,
@@ -128,7 +128,9 @@ namespace Presentacion.Recepcionista.Vistas
             btnLimpiar.Click += (s, e) => LimpiarFiltros();
 
             // Eventos para auto-filtrar de forma inmediata
+            _txtHuesped.TextChanged += (s, e) => Refrescar();
             _txtHuesped.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) Refrescar(); };
+            _txtUsuario.TextChanged += (s, e) => Refrescar();
             _txtUsuario.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) Refrescar(); };
             _cmbTipo.SelectedIndexChanged += (s, e) => Refrescar();
             _numHabitacion.ValueChanged += (s, e) => Refrescar();

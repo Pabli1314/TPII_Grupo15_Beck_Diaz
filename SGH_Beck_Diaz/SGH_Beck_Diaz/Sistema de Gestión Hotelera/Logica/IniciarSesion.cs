@@ -2,7 +2,6 @@ using Entidades;
 using Datos;
 using System;
 
-
 namespace Logica
 {
     public class IniciarSesion
@@ -31,6 +30,17 @@ namespace Logica
             if (usuario == null)
             {
                 return (null, 0);
+            }
+
+            // Detección reactiva en el inicio/login: verificar si existe un turno previo sin cerrar
+            // cuya fecha sea anterior a hoy o haya superado las 23:59:59 para forzar su cierre automático.
+            try
+            {
+                new GestionTurnoCaja().VerificarYCerrarTurnosVencidos();
+            }
+            catch
+            {
+                // Resguardo de seguridad ante contingencias transitorias para asegurar el acceso al sistema
             }
 
             int idRol = usuario.IdRol switch

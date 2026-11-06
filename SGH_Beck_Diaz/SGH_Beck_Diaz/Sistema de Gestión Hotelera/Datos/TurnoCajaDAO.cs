@@ -84,6 +84,84 @@ namespace Datos
             return turno;
         }
 
+        /// <summary>
+        /// Obtiene todos los turnos que actualmente se encuentran abiertos (fecha_cierre IS NULL).
+        /// Requerido para la detección y forzado del cierre automático a nivel global.
+        /// </summary>
+        public static List<TurnoCaja> ObtenerTodosAbiertos()
+        {
+            List<TurnoCaja> lista = new List<TurnoCaja>();
+
+            string query = @"
+                SELECT id_turno, fecha_apertura, hora_apertura, fecha_cierre, hora_cierre,
+                       monto_inicial, monto_final, observaciones, dni_usuario
+                FROM Turno_caja
+                WHERE fecha_cierre IS NULL
+                ORDER BY id_turno ASC";
+
+            using (SqlConnection con = _conexion.ObtenerConexion())
+            {
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    con.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(MapearTurno(reader));
+                        }
+                    }
+                }
+            }
+
+            return lista;
+        }
+
+        /// <summary>
+        /// Obtiene el último turno cerrado en el sistema o para un usuario específico.
+        /// Permite a la interfaz conocer los detalles del último turno liquidado.
+        /// </summary>
+        public static TurnoCaja? ObtenerUltimoCerrado(string? dniUsuario = null)
+        {
+            TurnoCaja? turno = null;
+            string? dniFiltro = string.IsNullOrWhiteSpace(dniUsuario) ? null : dniUsuario.Trim();
+
+            string query = @"
+                SELECT TOP 1 id_turno, fecha_apertura, hora_apertura, fecha_cierre, hora_cierre,
+                             monto_inicial, monto_final, observaciones, dni_usuario
+                FROM Turno_caja
+                WHERE fecha_cierre IS NOT NULL";
+
+            if (dniFiltro != null)
+            {
+                query += " AND dni_usuario = @dniUsuario";
+            }
+
+            query += " ORDER BY id_turno DESC";
+
+            using (SqlConnection con = _conexion.ObtenerConexion())
+            {
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    if (dniFiltro != null)
+                    {
+                        cmd.Parameters.Add("@dniUsuario", SqlDbType.VarChar, 8).Value = dniFiltro;
+                    }
+
+                    con.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            turno = MapearTurno(reader);
+                        }
+                    }
+                }
+            }
+
+            return turno;
+        }
+
         public static TurnoCaja Abrir(string dniUsuario, decimal montoInicial)
         {
             if (string.IsNullOrWhiteSpace(dniUsuario))

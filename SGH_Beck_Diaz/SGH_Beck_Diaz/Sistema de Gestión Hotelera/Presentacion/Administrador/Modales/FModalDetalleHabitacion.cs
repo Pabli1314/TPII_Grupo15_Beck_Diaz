@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using Entidades;
@@ -15,7 +15,7 @@ namespace Presentacion.Administrador.Modales
             if (hab == null) throw new ArgumentNullException(nameof(hab));
 
             Text = $"Detalle de Habitación N° {hab.NroHabitacion}";
-            Size = new Size(420, 390);
+            Size = new Size(420, 420);
             StartPosition = FormStartPosition.CenterParent;
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
@@ -50,7 +50,7 @@ namespace Presentacion.Administrador.Modales
             {
                 Text = estaOcupada ? "Información del Huésped" : "Información de la Habitación",
                 Location = new Point(20, 75),
-                Size = new Size(365, 210),
+                Size = new Size(365, 240),
                 Font = new Font("Segoe UI", 9, FontStyle.Bold)
             };
 
@@ -58,7 +58,6 @@ namespace Presentacion.Administrador.Modales
 
             if (estaOcupada)
             {
-                // Obtenemos la entidad Huesped directamente mediante la Capa de Lógica
                 Huesped? h = _gestionHabitaciones.ObtenerHuespedOcupante(hab.NroHabitacion);
 
                 if (h != null)
@@ -82,6 +81,8 @@ namespace Presentacion.Administrador.Modales
             else
             {
                 AgregarFila(panelDetalle, "Piso:", hab.Piso.ToString(), ref top);
+                AgregarFila(panelDetalle, "Camas:", hab.CantCamas > 0 ? hab.CantCamas.ToString() : "-", ref top);
+                AgregarFila(panelDetalle, "Tarifa diaria:", hab.Tarifa.ToString("C"), ref top);
                 AgregarFila(panelDetalle, "Última Limpieza:", hab.UltimaLimpieza?.ToString("dd/MM/yyyy HH:mm") ?? "Sin registro", ref top);
             }
 
@@ -89,7 +90,7 @@ namespace Presentacion.Administrador.Modales
             {
                 Text = "Cerrar",
                 DialogResult = DialogResult.OK,
-                Location = new Point(285, 300),
+                Location = new Point(285, 330),
                 Size = new Size(100, 32),
                 Font = new Font("Segoe UI", 9, FontStyle.Regular),
                 FlatStyle = FlatStyle.System
@@ -101,28 +102,29 @@ namespace Presentacion.Administrador.Modales
             Controls.Add(btnCerrar);
         }
 
-        private void AgregarFila(Control contenedor, string titulo, string valor, ref int top)
+        private void AgregarFila(GroupBox panel, string etiqueta, string valor, ref int top)
         {
-            var lblTag = new Label
+            var lblEtiqueta = new Label
             {
-                Text = titulo,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                Text = etiqueta,
+                Font = new Font("Segoe UI", 8.5f, FontStyle.Regular),
+                ForeColor = Color.FromArgb(75, 85, 99),
                 Location = new Point(15, top),
-                AutoSize = true,
-                ForeColor = Color.DimGray
+                AutoSize = true
             };
 
-            var lblVal = new Label
+            var lblValor = new Label
             {
                 Text = valor,
-                Font = new Font("Segoe UI", 9, FontStyle.Regular),
-                Location = new Point(110, top),
-                AutoSize = true,
-                ForeColor = Color.Black
+                Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
+                ForeColor = Color.FromArgb(17, 24, 39),
+                Location = new Point(125, top),
+                AutoSize = true
             };
 
-            contenedor.Controls.Add(lblTag);
-            contenedor.Controls.Add(lblVal);
+            panel.Controls.Add(lblEtiqueta);
+            panel.Controls.Add(lblValor);
+
             top += 26;
         }
     }

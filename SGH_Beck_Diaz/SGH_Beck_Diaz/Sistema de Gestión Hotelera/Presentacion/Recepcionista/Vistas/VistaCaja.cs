@@ -5,7 +5,9 @@ using Presentacion.Recepcionista.Modales;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using Datos;
 
 namespace Presentacion.Recepcionista.Vistas
 {
@@ -27,6 +29,12 @@ namespace Presentacion.Recepcionista.Vistas
         private readonly Panel _panelTarjetas;
         private readonly FlowLayoutPanel _panelAcciones;
         private readonly Panel _panelSinTurno;
+        private readonly Label _lblSinTurno;
+        private readonly Label _lblInfoCierreAuto;
+
+        // Timer silencioso para verificación periódica en segundo plano
+        private System.Windows.Forms.Timer? _timerVerificacion;
+        private bool _verificandoCierre = false;
 
         public VistaCaja(Usuario usuario, Action navegarAVentas)
         {
@@ -51,11 +59,21 @@ namespace Presentacion.Recepcionista.Vistas
                 AutoSize = true
             };
 
-            _panelSinTurno = new Panel { Location = new Point(0, 60), Size = new Size(500, 120), Visible = false };
-            var lblSinTurno = new Label { Text = "No hay un turno de caja abierto.", Font = Paleta.FuenteBase, ForeColor = Paleta.TextoSecundario, AutoSize = true, Location = new Point(0, 0) };
-            var btnAbrirGrande = EstiloBoton.Primario(new Button { Text = "Abrir turno", Size = new Size(200, 44), Location = new Point(0, 36) });
+            _panelSinTurno = new Panel { Location = new Point(0, 60), Size = new Size(700, 160), Visible = false };
+            _lblSinTurno = new Label { Text = "No hay un turno de caja abierto.", Font = Paleta.FuenteBase, ForeColor = Paleta.TextoSecundario, AutoSize = true, Location = new Point(0, 0) };
+            _lblInfoCierreAuto = new Label
+            {
+                Text = string.Empty,
+                Font = Paleta.FuenteChica,
+                ForeColor = Color.FromArgb(217, 119, 6), // Color de alerta/atención informativo
+                AutoSize = true,
+                Location = new Point(0, 26),
+                Visible = false
+            };
+            var btnAbrirGrande = EstiloBoton.Primario(new Button { Text = "Abrir turno", Size = new Size(200, 44), Location = new Point(0, 75) });
             btnAbrirGrande.Click += (s, e) => AbrirTurno();
-            _panelSinTurno.Controls.Add(lblSinTurno);
+            _panelSinTurno.Controls.Add(_lblSinTurno);
+            _panelSinTurno.Controls.Add(_lblInfoCierreAuto);
             _panelSinTurno.Controls.Add(btnAbrirGrande);
 
             Controls.Add(lblTitulo);
@@ -64,12 +82,56 @@ namespace Presentacion.Recepcionista.Vistas
             Controls.Add(_panelAcciones);
             Controls.Add(_panelSinTurno);
 
+            // Inicializar timer de verificación periódica en segundo plano (cada 30 segundos)
+            ConfigurarTimerSegundoPlano();
+
             Refrescar();
+        }
+
+        private void ConfigurarTimerSegundoPlano()
+        {
+            _timerVerificacion = new System.Windows.Forms.Timer
+            {
+                Interval = 30000 // 30 segundos
+            };
+            _timerVerificacion.Tick += TimerVerificacion_Tick;
+            _timerVerificacion.Start();
+        }
+
+        private async void TimerVerificacion_Tick(object? sender, EventArgs e)
+        {
+            if (_verificandoCierre)
+                return;
+
+            _verificandoCierre = true;
+
+            try
+            {
+                // Procesamiento asíncrono en segundo plano para no bloquear el hilo de la UI
+                int turnosCerrados = await Task.Run(() => _gestionTurnoCaja.VerificarYCerrarTurnosVencidos());
+
+                // Si se detectó y ejecutó un cierre automático, refrescar el estado visual de la vista
+                if (turnosCerrados > 0 && !IsDisposed && IsHandleCreated)
+                {
+                    Refrescar();
+                }
+            }
+            catch
+            {
+                // Verificación silenciosa para mantener la resiliencia de la interfaz
+            }
+            finally
+            {
+                _verificandoCierre = false;
+            }
         }
 
         public void Refrescar()
         {
-            TurnoCaja? turno = _gestionTurnoCaja.ObtenerTurnoAbierto(_usuario.DniUsuario);
+            // Verificación reactiva complementaria al momento de consultar el estado de caja
+            _gestionTurnoCaja.VerificarYCerrarTurnosVencidos();
+
+            TurnoCaja? turno = _gestionTurnoCaja.ObtenerTurnoAbierto(_usuario.DniUsuario, autoAbrirSiExpiro: false);
 
             _panelTarjetas.Visible = turno != null;
             _panelAcciones.Visible = turno != null;
@@ -77,7 +139,23 @@ namespace Presentacion.Recepcionista.Vistas
 
             if (turno == null)
             {
-                _lblSubtitulo.Text = string.Empty;
+                TurnoCaja? ultimoCerrado = TurnoCajaDAO.ObtenerUltimoCerrado(_usuario.DniUsuario);
+                if (ultimoCerrado != null &&
+                    !string.IsNullOrEmpty(ultimoCerrado.Observaciones) &&
+                    ultimoCerrado.Observaciones.Contains(GestionTurnoCaja.OBSERVACION_CIERRE_AUTOMATICO))
+                {
+                    _lblSubtitulo.Text = "Caja cerrada · Fin de jornada";
+                    _lblSinTurno.Text = "El turno de la jornada anterior fue cerrado automáticamente por el sistema (23:59).";
+                    _lblInfoCierreAuto.Text = $"Turno #{ultimoCerrado.IdTurno} liquidado el {ultimoCerrado.FechaCierre:dd/MM/yyyy} a las {ultimoCerrado.HoraCierre:hh\\:mm\\:ss} · Total final: {ultimoCerrado.MontoFinal:C}\nInicie un nuevo turno para operar en la jornada de hoy ingresando el monto inicial correspondiente.";
+                    _lblInfoCierreAuto.Visible = true;
+                }
+                else
+                {
+                    _lblSubtitulo.Text = "Caja cerrada";
+                    _lblSinTurno.Text = "No hay un turno de caja abierto.";
+                    _lblInfoCierreAuto.Visible = false;
+                }
+
                 return;
             }
 
@@ -102,18 +180,12 @@ namespace Presentacion.Recepcionista.Vistas
 
             _panelAcciones.Controls.Clear();
 
-            var btnCobro = EstiloBoton.Secundario(new Button { Text = "Registrar cobro", Size = new Size(190, 40), Margin = new Padding(0, 0, 12, 0) });
-            btnCobro.Click += (s, e) => MessageBox.Show(
-                "Los cobros de alojamiento se registran automáticamente al hacer el Check-in del huésped, eligiendo ahí el método de pago.",
-                "Registrar cobro", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
             var btnVenta = EstiloBoton.Secundario(new Button { Text = "Registrar venta adicional", Size = new Size(220, 40), Margin = new Padding(0, 0, 12, 0) });
             btnVenta.Click += (s, e) => _navegarAVentas();
 
             var btnCerrar = EstiloBoton.Primario(new Button { Text = "Cerrar turno", Size = new Size(160, 40) });
             btnCerrar.Click += (s, e) => CerrarTurno(turno.IdTurno);
 
-            _panelAcciones.Controls.Add(btnCobro);
             _panelAcciones.Controls.Add(btnVenta);
             _panelAcciones.Controls.Add(btnCerrar);
         }
@@ -172,7 +244,20 @@ namespace Presentacion.Recepcionista.Vistas
                 Refrescar();
             }
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_timerVerificacion != null)
+                {
+                    _timerVerificacion.Stop();
+                    _timerVerificacion.Tick -= TimerVerificacion_Tick;
+                    _timerVerificacion.Dispose();
+                    _timerVerificacion = null;
+                }
+            }
+            base.Dispose(disposing);
+        }
     }
 }
-
-

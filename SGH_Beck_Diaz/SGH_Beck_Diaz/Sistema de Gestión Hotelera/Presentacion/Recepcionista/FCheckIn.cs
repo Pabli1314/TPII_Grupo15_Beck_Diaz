@@ -1,4 +1,4 @@
-﻿using Entidades;
+using Entidades;
 using Logica;
 using Presentacion.Administrador.UI;
 using System;
@@ -264,7 +264,9 @@ namespace Presentacion.Recepcionista
                 _noches = noches;
                 _tipoHabitacion = tipo;
 
-                _lblResumenTipo.Text = $"Habitación {_nroHabitacion}  —  Tipo: {tipo}";
+                var hab = Datos.HabitacionDAO.ObtenerPorNumero(_nroHabitacion);
+                string detalleHab = hab != null ? $"  ·  Piso {hab.Piso}  ·  {hab.CantCamas} {(hab.CantCamas == 1 ? "cama" : "camas")}" : string.Empty;
+                _lblResumenTipo.Text = $"Habitación {_nroHabitacion}  —  Tipo: {tipo}{detalleHab}";
                 _lblResumenNoches.Text = $"Noches: {noches}  (entrada hoy → salida {_dtpFechaSalida.Value:dd/MM/yyyy})";
                 _lblResumenTarifa.Text = $"Tarifa diaria: {tarifa:C}";
                 _lblResumenTotal.Text = $"Total estimado: {monto:C}";

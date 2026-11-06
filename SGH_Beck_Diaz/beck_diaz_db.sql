@@ -170,7 +170,6 @@ CREATE TABLE venta(
     CONSTRAINT CK_venta_dniHuesped CHECK (dni_huesped NOT LIKE '%[^0-9]%')
 );
 
--- Tabla: detalle_venta (Cambiado a DECIMAL y agregada restricción CHECK de cantidad)
 CREATE TABLE detalle_venta(
     id_venta INT NOT NULL,
     cod_producto VARCHAR(15) NOT NULL,
@@ -181,4 +180,25 @@ CREATE TABLE detalle_venta(
     CONSTRAINT FK_detalle_venta FOREIGN KEY(id_venta) REFERENCES venta(id_venta) ON DELETE CASCADE,
     CONSTRAINT FK_detalle_producto FOREIGN KEY(cod_producto) REFERENCES producto(cod_producto),
     CONSTRAINT CK_detalle_cantidad CHECK (cantidad > 0)
+);
+
+
+-- Tabla: prorroga_estadia (Extensión de estadía de habitaciones ocupadas)
+CREATE TABLE prorroga_estadia (
+    id_prorroga INT IDENTITY(1,1),
+    id_hospedaje INT NOT NULL,
+    fecha_prorroga DATE NOT NULL DEFAULT CONVERT(DATE, GETDATE()),
+    hora_prorroga TIME NOT NULL DEFAULT CONVERT(TIME, GETDATE()),
+    fecha_salida_anterior DATE NOT NULL,
+    hora_salida_anterior TIME NOT NULL,
+    nueva_fecha_salida DATE NOT NULL,
+    nueva_hora_salida TIME NOT NULL,
+    dias_adicionales INT NOT NULL,
+    monto_adicional DECIMAL(10, 2) NOT NULL,
+    id_metodo INT NOT NULL,
+    id_turno INT NOT NULL,
+    CONSTRAINT PK_prorroga_estadia PRIMARY KEY (id_prorroga),
+    CONSTRAINT FK_prorroga_hospedaje FOREIGN KEY (id_hospedaje) REFERENCES hospedaje(id_hospedaje),
+    CONSTRAINT FK_prorroga_metodo FOREIGN KEY (id_metodo) REFERENCES metodo_pago(id_metodo),
+    CONSTRAINT FK_prorroga_turno FOREIGN KEY (id_turno) REFERENCES Turno_caja(id_turno)
 );

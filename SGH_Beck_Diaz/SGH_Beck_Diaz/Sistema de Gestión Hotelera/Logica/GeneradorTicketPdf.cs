@@ -124,12 +124,12 @@ namespace Logica
             // --- Desglose del Costo ---
             EscribirTexto(sbContent, MargenIzq, y, "Tarifa por noche:", 8f, esBold: true);
             EscribirAlineadoDerecha(sbContent, MargenDer, y,
-                tarifaDiaria.ToString("C", System.Globalization.CultureInfo.CurrentCulture), 8f, esBold: false);
+                tarifaDiaria.ToString("C", CultureInfo.CurrentCulture), 8f, esBold: false);
             y -= 12f;
 
             EscribirTexto(sbContent, MargenIzq, y, $"{noches} noche(s) x tarifa:", 8f, esBold: false);
             EscribirAlineadoDerecha(sbContent, MargenDer, y,
-                montoTotal.ToString("C", System.Globalization.CultureInfo.CurrentCulture), 8f, esBold: false);
+                montoTotal.ToString("C", CultureInfo.CurrentCulture), 8f, esBold: false);
             y -= 12f;
 
             DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: true);
@@ -137,7 +137,7 @@ namespace Logica
 
             EscribirTexto(sbContent, MargenIzq, y, "TOTAL:", 11f, esBold: true);
             EscribirAlineadoDerecha(sbContent, MargenDer, y,
-                montoTotal.ToString("C", System.Globalization.CultureInfo.CurrentCulture), 11f, esBold: true);
+                montoTotal.ToString("C", CultureInfo.CurrentCulture), 11f, esBold: true);
             y -= 15f;
 
             EscribirTexto(sbContent, MargenIzq, y, "Forma de pago:", 8f, esBold: true);
@@ -158,6 +158,335 @@ namespace Logica
 
             return EnsamblarDocumentoPdf(sbContent.ToString(), AnchoPagina, altoPagina);
         }
+
+        // ----------------------------------------------------------------
+        //  Ticket de Prórroga / Extensión de Estadía
+        // ----------------------------------------------------------------
+
+        /// <summary>
+        /// Genera el ticket comprobante de prórroga de estadía con los datos de salida anterior,
+        /// nueva fecha/hora de salida, noches adicionales e importe abonado.
+        /// </summary>
+        public static byte[] GenerarBytesProrrogaEstadia(
+            string nombreHuesped,
+            string dniHuesped,
+            int nroHabitacion,
+            string tipoHabitacion,
+            DateTime fechaSalidaAnterior,
+            TimeSpan horaSalidaAnterior,
+            DateTime nuevaFechaSalida,
+            TimeSpan nuevaHoraSalida,
+            int diasAdicionales,
+            decimal tarifaDiaria,
+            decimal montoAdicional,
+            decimal montoTotalAcumulado,
+            string metodoPago,
+            string? emitidoPor = null)
+        {
+            float altoPagina = 620f;
+            var sbContent = new StringBuilder();
+            float y = altoPagina - 26f;
+
+            // --- Encabezado Hotel ---
+            EscribirCentrado(sbContent, "HOTEL SGH", 13f, esBold: true, y, AnchoPagina);
+            y -= 15f;
+            EscribirCentrado(sbContent, "Sistema de Gestion Hotelera", 8f, esBold: false, y, AnchoPagina);
+            y -= 12f;
+            EscribirCentrado(sbContent, "Av. San Martin 123 - Tel: (379) 412-3456", 7.5f, esBold: false, y, AnchoPagina);
+            y -= 11f;
+            EscribirCentrado(sbContent, "IVA Resp. Inscripto - CUIT: 30-71234567-8", 7f, esBold: false, y, AnchoPagina);
+            y -= 10f;
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: true);
+            y -= 14f;
+
+            EscribirCentrado(sbContent, "PRORROGA DE ESTADIA", 10.5f, esBold: true, y, AnchoPagina);
+            y -= 12f;
+            EscribirCentrado(sbContent, "Comprobante de Extension de Hospedaje", 7.5f, esBold: false, y, AnchoPagina);
+            y -= 14f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Fecha emision:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, DateTime.Now.ToString("dd/MM/yyyy HH:mm"), 8f, esBold: false);
+            y -= 12f;
+
+            if (!string.IsNullOrWhiteSpace(emitidoPor))
+            {
+                EscribirTexto(sbContent, MargenIzq, y, "Atendido por:", 8f, esBold: true);
+                EscribirTexto(sbContent, MargenIzq + 80f, y, Truncar(emitidoPor, 26), 8f, esBold: false);
+                y -= 12f;
+            }
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: true);
+            y -= 14f;
+
+            // --- Datos del Huésped ---
+            EscribirCentrado(sbContent, "DATOS DEL HUESPED", 8.5f, esBold: true, y, AnchoPagina);
+            y -= 14f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Huesped:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, Truncar(nombreHuesped, 26), 8f, esBold: false);
+            y -= 12f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "DNI:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, dniHuesped, 8f, esBold: false);
+            y -= 12f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Habitacion:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, $"Hab. {nroHabitacion} - {Truncar(tipoHabitacion, 18)}", 8f, esBold: false);
+            y -= 14f;
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: false);
+            y -= 14f;
+
+            // --- Detalle de la Prórroga ---
+            EscribirCentrado(sbContent, "DETALLE DE LA PRORROGA", 8.5f, esBold: true, y, AnchoPagina);
+            y -= 14f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Salida pactada anterior:", 7.5f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 110f, y, $"{fechaSalidaAnterior:dd/MM/yyyy} {horaSalidaAnterior:hh\\:mm}", 7.5f, esBold: false);
+            y -= 12f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Nueva salida acordada:", 7.5f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 110f, y, $"{nuevaFechaSalida:dd/MM/yyyy} {nuevaHoraSalida:hh\\:mm}", 7.5f, esBold: false);
+            y -= 12f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Noches adicionales:", 7.5f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 110f, y, $"{diasAdicionales} noche(s)", 7.5f, esBold: false);
+            y -= 12f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Tarifa diaria:", 7.5f, esBold: true);
+            EscribirAlineadoDerecha(sbContent, MargenDer, y, tarifaDiaria.ToString("C", CultureInfo.CurrentCulture), 7.5f, esBold: false);
+            y -= 14f;
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: true);
+            y -= 14f;
+
+            // --- Liquidación de la prórroga ---
+            EscribirTexto(sbContent, MargenIzq, y, $"{diasAdicionales} noche(s) x {tarifaDiaria:C}:", 8f, esBold: false);
+            EscribirAlineadoDerecha(sbContent, MargenDer, y, montoAdicional.ToString("C", CultureInfo.CurrentCulture), 8f, esBold: false);
+            y -= 14f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "TOTAL ABONADO:", 10.5f, esBold: true);
+            EscribirAlineadoDerecha(sbContent, MargenDer, y, montoAdicional.ToString("C", CultureInfo.CurrentCulture), 10.5f, esBold: true);
+            y -= 14f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Metodo de pago:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, Truncar(metodoPago, 22), 8f, esBold: false);
+            y -= 12f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Total acumulado estadia:", 7.5f, esBold: false);
+            EscribirAlineadoDerecha(sbContent, MargenDer, y, montoTotalAcumulado.ToString("C", CultureInfo.CurrentCulture), 7.5f, esBold: true);
+            y -= 15f;
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: false);
+            y -= 15f;
+
+            // --- Pie ---
+            EscribirCentrado(sbContent, "Gracias por continuar su estadia con nosotros", 7.5f, esBold: false, y, AnchoPagina);
+            y -= 11f;
+            EscribirCentrado(sbContent, "Comprobante de prorroga interno", 7f, esBold: false, y, AnchoPagina);
+            y -= 10f;
+            EscribirCentrado(sbContent, "No valido como factura fiscal", 7f, esBold: false, y, AnchoPagina);
+            y -= 10f;
+            EscribirCentrado(sbContent, $"Impreso el {DateTime.Now:dd/MM/yyyy HH:mm:ss}", 6.5f, esBold: false, y, AnchoPagina);
+
+            return EnsamblarDocumentoPdf(sbContent.ToString(), AnchoPagina, altoPagina);
+        }
+
+        // ----------------------------------------------------------------
+        //  Ticket Final de Liquidación / Check-Out
+        // ----------------------------------------------------------------
+
+        /// <summary>
+        /// Genera el ticket final de liquidación al finalizar el check-out detallando:
+        /// días pactados originales, días extras cobrados por vencimiento (tolerancia 2 hs),
+        /// consumos/ventas adicionales y el importe total cancelado.
+        /// </summary>
+        public static byte[] GenerarBytesLiquidacionCheckOut(
+            LiquidacionCheckOut liquidacion,
+            string? emitidoPor = null,
+            string? metodoPagoExtras = null)
+        {
+            if (liquidacion == null) throw new ArgumentNullException(nameof(liquidacion));
+
+            int cantidadConsumos = Math.Max(0, liquidacion.Consumos.Count);
+            float altoPagina = Math.Max(660f, 620f + (cantidadConsumos * 14f));
+            var sbContent = new StringBuilder();
+            float y = altoPagina - 26f;
+
+            // --- Encabezado Hotel ---
+            EscribirCentrado(sbContent, "HOTEL SGH", 13f, esBold: true, y, AnchoPagina);
+            y -= 15f;
+            EscribirCentrado(sbContent, "Sistema de Gestion Hotelera", 8f, esBold: false, y, AnchoPagina);
+            y -= 12f;
+            EscribirCentrado(sbContent, "Av. San Martin 123 - Tel: (379) 412-3456", 7.5f, esBold: false, y, AnchoPagina);
+            y -= 11f;
+            EscribirCentrado(sbContent, "IVA Resp. Inscripto - CUIT: 30-71234567-8", 7f, esBold: false, y, AnchoPagina);
+            y -= 10f;
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: true);
+            y -= 14f;
+
+            EscribirCentrado(sbContent, "TICKET FINAL DE LIQUIDACION", 10.5f, esBold: true, y, AnchoPagina);
+            y -= 12f;
+            EscribirCentrado(sbContent, "Check-Out y Cierre de Estadia", 7.5f, esBold: false, y, AnchoPagina);
+            y -= 14f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Fecha liquidacion:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 85f, y, DateTime.Now.ToString("dd/MM/yyyy HH:mm"), 8f, esBold: false);
+            y -= 12f;
+
+            if (!string.IsNullOrWhiteSpace(emitidoPor))
+            {
+                EscribirTexto(sbContent, MargenIzq, y, "Atendido por:", 8f, esBold: true);
+                EscribirTexto(sbContent, MargenIzq + 85f, y, Truncar(emitidoPor, 26), 8f, esBold: false);
+                y -= 12f;
+            }
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: true);
+            y -= 14f;
+
+            // --- Datos del Huésped y Habitación ---
+            EscribirCentrado(sbContent, "DATOS DE LA ESTADIA", 8.5f, esBold: true, y, AnchoPagina);
+            y -= 14f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Huesped:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, Truncar(liquidacion.NombreHuesped, 26), 8f, esBold: false);
+            y -= 12f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "DNI:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, liquidacion.DniHuesped, 8f, esBold: false);
+            y -= 12f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Habitacion:", 8f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, $"Hab. {liquidacion.NroHabitacion} ({Truncar(liquidacion.TipoHabitacion, 16)})", 8f, esBold: false);
+            y -= 12f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Tarifa diaria:", 8f, esBold: true);
+            EscribirAlineadoDerecha(sbContent, MargenDer, y, liquidacion.TarifaDiaria.ToString("C", CultureInfo.CurrentCulture), 8f, esBold: false);
+            y -= 14f;
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: false);
+            y -= 14f;
+
+            // --- Cronograma de Estadía ---
+            EscribirTexto(sbContent, MargenIzq, y, "Ingreso:", 7.5f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, (liquidacion.FechaIngreso.Date + liquidacion.HoraIngreso).ToString("dd/MM/yyyy HH:mm"), 7.5f, esBold: false);
+            y -= 12f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Salida pactada:", 7.5f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, (liquidacion.FechaSalidaPactada.Date + liquidacion.HoraSalidaPactada).ToString("dd/MM/yyyy HH:mm"), 7.5f, esBold: false);
+            y -= 12f;
+
+            EscribirTexto(sbContent, MargenIzq, y, "Salida real:", 7.5f, esBold: true);
+            EscribirTexto(sbContent, MargenIzq + 80f, y, (liquidacion.FechaSalidaReal.Date + liquidacion.HoraSalidaReal).ToString("dd/MM/yyyy HH:mm"), 7.5f, esBold: false);
+            y -= 12f;
+
+            // Evaluación de tolerancia y retraso
+            if (liquidacion.Retraso <= TimeSpan.Zero)
+            {
+                EscribirTexto(sbContent, MargenIzq, y, "Puntualidad:", 7.5f, esBold: true);
+                EscribirTexto(sbContent, MargenIzq + 80f, y, "Salida a tiempo (sin retraso)", 7.5f, esBold: false);
+                y -= 12f;
+            }
+            else if (!liquidacion.SuperaTolerancia)
+            {
+                EscribirTexto(sbContent, MargenIzq, y, "Tolerancia:", 7.5f, esBold: true);
+                EscribirTexto(sbContent, MargenIzq + 80f, y, $"Retraso de {liquidacion.Retraso:hh\\:mm} (<= 2 hs tolerancia)", 7.5f, esBold: false);
+                y -= 12f;
+            }
+            else
+            {
+                EscribirTexto(sbContent, MargenIzq, y, "Vencimiento:", 7.5f, esBold: true);
+                int horasTotales = (int)liquidacion.Retraso.TotalHours;
+                int minutos = liquidacion.Retraso.Minutes;
+                EscribirTexto(sbContent, MargenIzq + 80f, y, $"Retraso de {horasTotales}h {minutos}m (> 2 hs)", 7.5f, esBold: false);
+                y -= 12f;
+            }
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: true);
+            y -= 14f;
+
+            // --- Liquidación de Días y Hospedaje ---
+            EscribirCentrado(sbContent, "DESGLOSE DE HOSPEDAJE", 8.5f, esBold: true, y, AnchoPagina);
+            y -= 14f;
+
+            EscribirTexto(sbContent, MargenIzq, y, $"Dias pactados ({liquidacion.DiasPactadosOriginales} d):", 7.5f, esBold: false);
+            EscribirAlineadoDerecha(sbContent, MargenDer, y, liquidacion.MontoHospedajeOriginal.ToString("C", CultureInfo.CurrentCulture), 7.5f, esBold: false);
+            y -= 12f;
+
+            if (liquidacion.DiasExtras > 0)
+            {
+                EscribirTexto(sbContent, MargenIzq, y, $"Dias extras vencimiento ({liquidacion.DiasExtras} d):", 7.5f, esBold: true);
+                EscribirAlineadoDerecha(sbContent, MargenDer, y, liquidacion.MontoDiasExtras.ToString("C", CultureInfo.CurrentCulture), 7.5f, esBold: true);
+                y -= 12f;
+            }
+            else
+            {
+                EscribirTexto(sbContent, MargenIzq, y, "Dias extras por retraso:", 7.5f, esBold: false);
+                EscribirAlineadoDerecha(sbContent, MargenDer, y, "$0,00", 7.5f, esBold: false);
+                y -= 12f;
+            }
+
+            // --- Consumos / Ventas Adicionales ---
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: true);
+            y -= 14f;
+            EscribirCentrado(sbContent, "CONSUMOS DURANTE LA ESTADIA", 8.5f, esBold: true, y, AnchoPagina);
+            y -= 14f;
+
+            if (liquidacion.Consumos.Count == 0)
+            {
+                EscribirTexto(sbContent, MargenIzq, y, "Sin consumos adicionales registrados.", 7.5f, esBold: false);
+                y -= 12f;
+            }
+            else
+            {
+                foreach (VentaRealizada venta in liquidacion.Consumos)
+                {
+                    string resumen = $"{venta.Momento:dd/MM HH:mm} - {Truncar(venta.ResumenProductos, 22)}";
+                    EscribirTexto(sbContent, MargenIzq, y, resumen, 7f, esBold: false);
+                    EscribirAlineadoDerecha(sbContent, MargenDer, y, venta.Total.ToString("C", CultureInfo.CurrentCulture), 7f, esBold: false);
+                    y -= 11f;
+                }
+            }
+
+            EscribirTexto(sbContent, MargenIzq, y, "Subtotal consumos:", 7.5f, esBold: true);
+            EscribirAlineadoDerecha(sbContent, MargenDer, y, liquidacion.TotalConsumos.ToString("C", CultureInfo.CurrentCulture), 7.5f, esBold: true);
+            y -= 14f;
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: false);
+            y -= 15f;
+
+            // --- Total Liquidado ---
+            EscribirTexto(sbContent, MargenIzq, y, "TOTAL CANCELADO:", 11f, esBold: true);
+            EscribirAlineadoDerecha(sbContent, MargenDer, y, liquidacion.TotalLiquidacion.ToString("C", CultureInfo.CurrentCulture), 11f, esBold: true);
+            y -= 14f;
+
+            if (liquidacion.DiasExtras > 0 && !string.IsNullOrWhiteSpace(metodoPagoExtras))
+            {
+                EscribirTexto(sbContent, MargenIzq, y, "Pago recargo dias extras:", 7.5f, esBold: true);
+                EscribirTexto(sbContent, MargenIzq + 110f, y, Truncar(metodoPagoExtras, 20), 7.5f, esBold: false);
+                y -= 12f;
+            }
+
+            DibujarLinea(sbContent, MargenIzq, MargenDer, y, esPunteada: false);
+            y -= 15f;
+
+            // --- Pie ---
+            EscribirCentrado(sbContent, "Esperamos que haya disfrutado de su estadia", 7.5f, esBold: false, y, AnchoPagina);
+            y -= 11f;
+            EscribirCentrado(sbContent, "Hotel SGH - Siempre a su servicio", 7f, esBold: false, y, AnchoPagina);
+            y -= 10f;
+            EscribirCentrado(sbContent, "Comprobante de check-out y liquidacion interna", 6.5f, esBold: false, y, AnchoPagina);
+            y -= 10f;
+            EscribirCentrado(sbContent, $"Impreso el {DateTime.Now:dd/MM/yyyy HH:mm:ss}", 6.5f, esBold: false, y, AnchoPagina);
+
+            return EnsamblarDocumentoPdf(sbContent.ToString(), AnchoPagina, altoPagina);
+        }
+
+        // ----------------------------------------------------------------
+        //  Ticket de Venta
+        // ----------------------------------------------------------------
 
         public static byte[] GenerarBytes(VentaRealizada venta, string? emitidoPor = null)
         {

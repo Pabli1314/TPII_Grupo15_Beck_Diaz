@@ -86,7 +86,34 @@ WHERE nro_habitacion IN (102, 302)
 
 
 SELECT * FROM Huesped;
-SELECT * FROM hospedaje;
+SELECT * FROM hospedaje WHERE dni_huesped = '40981234';
 
-SELECT u.nombre_huesped, u.apellido_huesped, o.monto_total FROM hospedaje O
-INNER JOIN Huesped U ON U.dni_huesped = O.dni_huesped;
+SELECT u.nombre_huesped, u.apellido_huesped, o.monto_total, O.fecha_entrada, O.fecha_salida FROM hospedaje O
+INNER JOIN Huesped U ON U.dni_huesped = O.dni_huesped ORDER BY O.fecha_salida DESC;
+
+UPDATE hospedaje SET fecha_salida = '2026-11-03' WHERE dni_huesped = '45765102';
+
+INSERT INTO hospedaje (
+    fecha_entrada,
+    hora_entrada,
+    fecha_salida,
+    hora_salida,
+    monto_total,
+    id_metodo,
+    nro_habitacion,
+    id_turno,
+    dni_huesped
+)
+VALUES (
+    CONVERT(DATE, DATEADD(DAY, -5, GETDATE())),
+    '14:00:00',
+    CONVERT(DATE, DATEADD(DAY, -2, GETDATE())),
+    '10:00:00',
+    45000.0,
+    (SELECT TOP 1 id_metodo FROM metodo_pago ORDER BY id_metodo),
+    (SELECT TOP 1 nro_habitacion FROM habitacion ORDER BY nro_habitacion),
+    (SELECT TOP 1 id_turno FROM Turno_caja ORDER BY id_turno DESC),
+    '40981234'
+);
+
+SELECT * FROM Turno_caja where id_turno= 1013

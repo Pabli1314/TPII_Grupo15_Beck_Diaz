@@ -8,10 +8,13 @@ namespace Presentacion.Recepcionista
     /// </summary>
     public class HabitacionInfo
     {
-        public string NroHabitacion { get; set; }
-        public string Tipo { get; set; }
+        public string NroHabitacion { get; set; } = string.Empty;
+        public int Piso { get; set; }
+        public int CantCamas { get; set; }
+        public decimal Tarifa { get; set; }
+        public string Tipo { get; set; } = string.Empty;
         public EstadoOcupacion Estado { get; set; }
-        public string Huesped { get; set; }
+        public string Huesped { get; set; } = string.Empty;
         public DateTime? HoraIngreso { get; set; }
         public DateTime? HoraSalidaEstimada { get; set; }
     }
