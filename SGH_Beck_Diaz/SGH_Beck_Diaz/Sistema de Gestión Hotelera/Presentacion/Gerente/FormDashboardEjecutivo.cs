@@ -1,222 +1,394 @@
-﻿using System;
+﻿using LiveChartsCore;
+using LiveChartsCore.Measure;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
+using LiveChartsCore.SkiaSharpView.WinForms;
+using Logica;
+using Presentacion.Administrador.UI;
+using Presentacion.Recepcionista;
+using Presentacion.Recepcionista.UI;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
-using System.Windows.Forms.DataVisualization.Charting;
-using Logica;
+using static Presentacion.Gerente.ComponentesGerencia;
 
 namespace Presentacion.Gerente
 {
+    /// <summary>
+    /// Dashboard Ejecutivo: KPIs hoteleros del mes en curso (ocupación, ADR, RevPAR e ingresos) con
+    /// comparativas automáticas mes contra mes e interanual, la meta de ocupación frente a lo real y la
+    /// tendencia de los últimos 12 meses.
+    /// </summary>
     public class FormDashboardEjecutivo : Form
     {
-        private readonly GestionGerente _lGerente;
-        private Chart chartIngresos;
-        private Chart chartHabitaciones;
+        private static readonly Color ColorVentas = Color.FromArgb(13, 148, 136);
+        private static readonly Color ColorOcupacion = Color.FromArgb(217, 119, 6);
+
+        private readonly GestionGerente _gestionGerente = new();
+        private readonly ToolTip _toolTip = EstiloReporte.CrearToolTip();
+        private readonly List<Control> _anchoCompleto = new();
+
+        private readonly FlowLayoutPanel _raiz;
+        private readonly Label _lblPeriodo;
+        private readonly Label _lblComparacion;
+
+        private readonly FlowLayoutPanel _filaKpis;
+        private readonly TarjetaKpi _kpiOcupacion;
+        private readonly TarjetaKpi _kpiAdr;
+        private readonly TarjetaKpi _kpiRevPar;
+        private readonly TarjetaKpi _kpiIngresos;
+
+        private readonly FlowLayoutPanel _filaComparativas;
+        private readonly DataGridView _dgvComparativa;
+        private readonly PanelReporte _panelComparativa;
+        private readonly MetaVsReal _metaVsReal;
+        private readonly PanelReporte _panelMeta;
+
+        private readonly CartesianChart _chartTendencia;
+        private readonly PanelReporte _panelTendencia;
 
         public FormDashboardEjecutivo()
         {
-            _lGerente = new GestionGerente();
-            InitializeComponentes();
-            this.Load += (s, e) => CargarDatosGraficos();
+            BackColor = Paleta.FondoApp;
+            _raiz = CrearRaiz();
+
+            // ================= Encabezado =================
+            (Panel encabezado, _lblPeriodo, _lblComparacion) = CrearEncabezado();
+            _anchoCompleto.Add(encabezado);
+
+            // ================= KPIs =================
+            _kpiOcupacion = new TarjetaKpi(_toolTip);
+            _kpiAdr = new TarjetaKpi(_toolTip);
+            _kpiRevPar = new TarjetaKpi(_toolTip);
+            _kpiIngresos = new TarjetaKpi(_toolTip);
+            _filaKpis = CrearFila(_kpiOcupacion, _kpiAdr, _kpiRevPar, _kpiIngresos);
+
+            // ================= Comparativas y meta =================
+            _dgvComparativa = CrearGrilla();
+            _dgvComparativa.Columns.Add("indicador", "Indicador");
+            _dgvComparativa.Columns.Add("actual", "Actual");
+            _dgvComparativa.Columns.Add("mesAnterior", "Mes ant.");
+            _dgvComparativa.Columns.Add("varMes", "Var. mes");
+            _dgvComparativa.Columns.Add("anioAnterior", "Año ant.");
+            _dgvComparativa.Columns.Add("varAnio", "Var. año");
+            PesosColumnas(_dgvComparativa, ("indicador", 160));
+            AlinearDerecha(_dgvComparativa, "actual", "mesAnterior", "varMes", "anioAnterior", "varAnio");
+            _dgvComparativa.CellFormatting += (s, e) => ColorearVariacion(_dgvComparativa, e, "varMes", "varAnio");
+
+            _panelComparativa = new PanelReporte(_toolTip, "Comparativa automática",
+                "Cada indicador del mes en curso frente a los mismos días del mes anterior (mensual) y del mismo mes del año pasado (interanual). Verde: mejoró. Rojo: empeoró.",
+                _dgvComparativa, new Size(800, 400)) { TextoPie = "Se comparan siempre los mismos días, así un mes recién empezado no queda en desventaja." };
+
+            _metaVsReal = new MetaVsReal();
+            _panelMeta = new PanelReporte(_toolTip, "Meta vs. real",
+                $"El hotel no tiene un presupuesto cargado: la referencia es la meta de ocupación del {GestionGerente.MetaOcupacionPorcentaje:0}% que usan también los Reportes del Administrador. El ingreso a la meta se calcula con el ADR del mes.",
+                _metaVsReal, new Size(400, 400)) { TextoPie = "La barra se llena con la ocupación real. La línea marca la meta." };
+
+            _filaComparativas = CrearFila(_panelComparativa, _panelMeta);
+
+            // ================= Tendencia =================
+            _chartTendencia = new CartesianChart { LegendPosition = LegendPosition.Bottom, BackColor = Paleta.FondoTarjeta };
+            _panelTendencia = new PanelReporte(_toolTip, "Tendencia de los últimos 12 meses",
+                "Columnas: ingresos de alojamiento y de ventas de cada mes (eje izquierdo). Línea: ocupación del mes (eje derecho). El último mes está en curso.",
+                _chartTendencia, new Size(1200, 380)) { TextoPie = "Pasá el mouse sobre una columna para ver el detalle del mes." };
+            _anchoCompleto.Add(_panelTendencia);
+
+            Panel tituloKpis = TituloSeccion("Indicadores clave", "Ocupación, tarifa promedio, ingreso por habitación disponible e ingresos del mes en curso.");
+            Panel tituloComparativas = TituloSeccion("Comparativas", "Mes contra mes, interanual y meta contra lo real.");
+            Panel tituloTendencia = TituloSeccion("Evolución", "Cómo vienen los ingresos y la ocupación mes a mes.");
+            _anchoCompleto.AddRange(new Control[] { tituloKpis, tituloComparativas, tituloTendencia });
+
+            _raiz.Controls.AddRange(new Control[] { encabezado, tituloKpis, _filaKpis, tituloComparativas, _filaComparativas, tituloTendencia, _panelTendencia });
+            Controls.Add(_raiz);
+
+            _raiz.Resize += (s, e) => Acomodar();
+            Load += (s, e) => CargarDatos();
         }
 
-        private void InitializeComponentes()
-        {
-            this.BackColor = Color.FromArgb(240, 243, 246);
+        // =====================================================================
+        // Datos
+        // =====================================================================
 
-            // --- 1. PANEL SUPERIOR (KPIs) ---
-            TableLayoutPanel tlpKpis = new TableLayoutPanel
-            {
-                Dock = DockStyle.Top,
-                Height = 120,
-                ColumnCount = 4,
-                RowCount = 1,
-                Padding = new Padding(10)
-            };
-
-            tlpKpis.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tlpKpis.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tlpKpis.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tlpKpis.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-
-            tlpKpis.Controls.Add(CrearCardKPI("TASA OCUPACIÓN", "78.5%", "⬆ +4.2% vs mes anterior", Color.FromArgb(16, 185, 129)), 0, 0);
-            tlpKpis.Controls.Add(CrearCardKPI("REVPAR (Ingreso/Hab)", "$35.400", "Tarifa por Hab. Disponible", Color.FromArgb(59, 130, 246)), 1, 0);
-            tlpKpis.Controls.Add(CrearCardKPI("ADR (Tarifa Promed.)", "$45.100", "Promedio diario venta", Color.FromArgb(139, 92, 246)), 2, 0);
-            tlpKpis.Controls.Add(CrearCardKPI("INGRESOS MES", "$12.450.000", "Meta proyectada: 85%", Color.FromArgb(245, 158, 11)), 3, 0);
-
-            // --- 2. CONTENEDOR DE GRÁFICOS ---
-            TableLayoutPanel tlpGraficos = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 2,
-                RowCount = 1,
-                Padding = new Padding(10)
-            };
-            tlpGraficos.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tlpGraficos.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-
-            // A) GRÁFICO DE BARRAS (INGRESOS POR MES)
-            chartIngresos = new Chart
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.White,
-                Margin = new Padding(5)
-            };
-            ChartArea areaIngresos = new ChartArea("AreaIngresos");
-            areaIngresos.AxisX.MajorGrid.LineColor = Color.LightGray;
-            areaIngresos.AxisY.MajorGrid.LineColor = Color.LightGray;
-            areaIngresos.AxisY.LabelStyle.Format = "C0";
-            areaIngresos.AxisX.Interval = 1;
-            chartIngresos.ChartAreas.Add(areaIngresos);
-
-            Series serieIngresos = new Series("IngresosMensuales")
-            {
-                ChartType = SeriesChartType.Column,
-                Color = Color.FromArgb(13, 202, 240),
-                IsValueShownAsLabel = true,
-                LabelFormat = "{0:C0}",
-                // X es texto (mes): sin esto todas las barras caen en la misma posición y se superponen.
-                IsXValueIndexed = true,
-                Font = new Font("Segoe UI", 8.5F, FontStyle.Bold)
-            };
-            chartIngresos.Series.Add(serieIngresos);
-            chartIngresos.Titles.Add(new Title("📊 Recaudación Mensual (Cajas)", Docking.Top, new Font("Segoe UI", 11F, FontStyle.Bold), Color.FromArgb(30, 41, 59)));
-
-            // B) GRÁFICO DE TORTA (ESTADO DE HABITACIONES)
-            chartHabitaciones = new Chart
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.White,
-                Margin = new Padding(5)
-            };
-            ChartArea areaHabitaciones = new ChartArea("AreaHabitaciones");
-            chartHabitaciones.ChartAreas.Add(areaHabitaciones);
-
-            Series serieHabitaciones = new Series("EstadoHabitaciones")
-            {
-                ChartType = SeriesChartType.Pie,
-                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-                IsValueShownAsLabel = true,
-                Label = "#VALX: #PERCENT{P1}"
-            };
-
-            serieHabitaciones["PieLabelStyle"] = "Outside";
-            chartHabitaciones.Series.Add(serieHabitaciones);
-
-            Legend leyenda = new Legend("LeyendaHabitaciones")
-            {
-                Docking = Docking.Bottom,
-                Font = new Font("Segoe UI", 8.5F, FontStyle.Regular)
-            };
-            chartHabitaciones.Legends.Add(leyenda);
-            chartHabitaciones.Titles.Add(new Title("🏨 Estado Actual de Habitaciones", Docking.Top, new Font("Segoe UI", 11F, FontStyle.Bold), Color.FromArgb(30, 41, 59)));
-
-            tlpGraficos.Controls.Add(chartIngresos, 0, 0);
-            tlpGraficos.Controls.Add(chartHabitaciones, 1, 0);
-
-            this.Controls.Add(tlpGraficos);
-            this.Controls.Add(tlpKpis);
-        }
-
-        private void CargarDatosGraficos()
+        private void CargarDatos()
         {
             try
             {
-                // 1. Cargar gráfico de Ingresos (corregido _lGer por _lGerente)
-                Dictionary<string, decimal> datosIngresos = _lGerente.ObtenerEstadisticasIngresosMensuales();
-                chartIngresos.Series["IngresosMensuales"].Points.Clear();
+                IndicadoresGerencia ind = _gestionGerente.ObtenerIndicadoresMes();
+                MetricasPeriodo act = ind.Actual, mes = ind.MesAnterior, anio = ind.AnioAnterior;
 
-                foreach (var item in datosIngresos)
-                {
-                    chartIngresos.Series["IngresosMensuales"].Points.AddXY(item.Key, item.Value);
-                }
+                _lblPeriodo.Text = $"Mes en curso: {act.Desde:dd/MM} al {act.Hasta:dd/MM/yyyy}";
+                _lblComparacion.Text = $"Comparado con los mismos días de {NombreMes(mes.Desde)} (mensual) y de {NombreMes(anio.Desde)} (interanual) · {act.Habitaciones} habitaciones";
 
-                // 2. Cargar gráfico de Estado de Habitaciones
-                Dictionary<string, int> datosHabitaciones = _lGerente.ObtenerEstadisticasHabitacionesDashboard();
-                chartHabitaciones.Series["EstadoHabitaciones"].Points.Clear();
+                string interanual = $"Interanual ({NombreMes(anio.Desde)}):";
 
-                foreach (var item in datosHabitaciones)
-                {
-                    int index = chartHabitaciones.Series["EstadoHabitaciones"].Points.AddXY(item.Key, item.Value);
-                    DataPoint p = chartHabitaciones.Series["EstadoHabitaciones"].Points[index];
+                _kpiOcupacion.Configurar("Ocupación (Occupancy Rate)", Porcentaje(act.Ocupacion),
+                    "Noches vendidas sobre noches disponibles (habitaciones × días del período).",
+                    Icono.Cama, Paleta.Primario,
+                    Comparativa.EnPuntos(act.Ocupacion, mes.Ocupacion, "el mes pasado"),
+                    $"{interanual} {VariacionPuntos(act.Ocupacion, anio.Ocupacion).Texto} · Meta {ind.MetaOcupacion:0}%",
+                    alerta: act.NochesVendidas > 0 && act.Ocupacion < ind.MetaOcupacion);
 
-                    switch (item.Key.ToLower().Trim())
-                    {
-                        case "libre":
-                        case "disponible":
-                            p.Color = Color.FromArgb(25, 135, 84);
-                            break;
-                        case "ocupada":
-                        case "ocupado":
-                            p.Color = Color.FromArgb(220, 53, 69);
-                            break;
-                        case "limpieza":
-                            p.Color = Color.FromArgb(255, 193, 7);
-                            break;
-                        case "mantenimiento":
-                            p.Color = Color.FromArgb(13, 110, 253);
-                            break;
-                        default:
-                            p.Color = Color.FromArgb(59, 130, 246);
-                            break;
-                    }
-                }
+                _kpiAdr.Configurar("ADR (tarifa promedio diaria)", Moneda(act.Adr),
+                    "Average Daily Rate: ingreso de alojamiento dividido por las noches vendidas. Indica a qué precio promedio se vendió cada noche.",
+                    Icono.Etiqueta, Color.FromArgb(124, 58, 237),
+                    Comparativa.Porcentual((double)act.Adr, (double)mes.Adr, "el mes pasado"),
+                    $"{interanual} {Variacion((double)act.Adr, (double)anio.Adr).Texto} · {act.NochesVendidas} noches vendidas");
+
+                _kpiRevPar.Configurar("RevPAR (ingreso por hab. disponible)", Moneda(act.RevPar),
+                    "Revenue Per Available Room: ingreso de alojamiento dividido por las noches disponibles. Es el ADR multiplicado por la ocupación: combina precio y ocupación en un solo número.",
+                    Icono.Grafico, ColorVentas,
+                    Comparativa.Porcentual((double)act.RevPar, (double)mes.RevPar, "el mes pasado"),
+                    $"{interanual} {Variacion((double)act.RevPar, (double)anio.RevPar).Texto}");
+
+                _kpiIngresos.Configurar("Ingresos del mes", Moneda(act.IngresosTotales),
+                    "Alojamiento (noches ocupadas × tarifa del tipo de habitación) más las ventas de productos y servicios registradas en el mes.",
+                    Icono.Caja, ColorOcupacion,
+                    Comparativa.Porcentual((double)act.IngresosTotales, (double)mes.IngresosTotales, "el mes pasado"),
+                    $"Alojamiento {Moneda(act.IngresosAlojamiento)} · Ventas {Moneda(act.IngresosVentas)} · {interanual} {Variacion((double)act.IngresosTotales, (double)anio.IngresosTotales).Texto}");
+
+                CargarComparativa(act, mes, anio);
+                CargarMeta(act, ind.MetaOcupacion);
+                CargarTendencia(ind.Tendencia);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al cargar datos estadísticos: {ex.Message}", "Error de Renderizado", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"No se pudieron cargar los indicadores: {ex.Message}", "Dashboard Ejecutivo", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
+            Acomodar();
         }
 
-        private Panel CrearCardKPI(string titulo, string valor, string subtitulo, Color colorBorde)
+        private void CargarComparativa(MetricasPeriodo act, MetricasPeriodo mes, MetricasPeriodo anio)
         {
-            Panel card = new Panel
+            _dgvComparativa.Rows.Clear();
+
+            void Fila(string nombre, double a, double m, double y, Func<double, string> formato, bool enPuntos = false)
             {
-                Dock = DockStyle.Fill,
-                BackColor = Color.White,
-                Margin = new Padding(5),
-                Padding = new Padding(10)
+                var vm = enPuntos ? VariacionPuntos(a, m) : Variacion(a, m);
+                var vy = enPuntos ? VariacionPuntos(a, y) : Variacion(a, y);
+                int i = _dgvComparativa.Rows.Add(nombre, formato(a), formato(m), vm.Texto, formato(y), vy.Texto);
+                _dgvComparativa.Rows[i].Cells["varMes"].Tag = vm.Signo;
+                _dgvComparativa.Rows[i].Cells["varAnio"].Tag = vy.Signo;
+            }
+
+            string M(double v) => Moneda((decimal)v);
+
+            Fila("Ocupación", act.Ocupacion, mes.Ocupacion, anio.Ocupacion, Porcentaje, enPuntos: true);
+            Fila("ADR", (double)act.Adr, (double)mes.Adr, (double)anio.Adr, M);
+            Fila("RevPAR", (double)act.RevPar, (double)mes.RevPar, (double)anio.RevPar, M);
+            Fila("Noches vendidas", act.NochesVendidas, mes.NochesVendidas, anio.NochesVendidas, v => v.ToString("0", CulturaAr));
+            Fila("Alojamiento", (double)act.IngresosAlojamiento, (double)mes.IngresosAlojamiento, (double)anio.IngresosAlojamiento, M);
+            Fila("Ventas",(double)act.IngresosVentas, (double)mes.IngresosVentas, (double)anio.IngresosVentas, M);
+            Fila("Ingresos totales", (double)act.IngresosTotales, (double)mes.IngresosTotales, (double)anio.IngresosTotales, M);
+
+            _dgvComparativa.Rows[^1].DefaultCellStyle.Font = Paleta.FuenteBaseNegrita;
+            _dgvComparativa.ClearSelection();
+        }
+
+        private void CargarMeta(MetricasPeriodo act, double meta)
+        {
+            int diasMes = DateTime.DaysInMonth(act.Desde.Year, act.Desde.Month);
+            double nochesMeta = Math.Ceiling(meta / 100 * act.Habitaciones * diasMes);
+            int faltan = (int)Math.Max(0, nochesMeta - act.NochesVendidas);
+
+            var lineas = new List<string>
+            {
+                $"Ocupación real: {Porcentaje(act.Ocupacion)} · Meta: {meta:0}%"
             };
 
-            Panel pnlAcento = new Panel
+            if (act.Habitaciones == 0)
             {
-                Dock = DockStyle.Left,
-                Width = 5,
-                BackColor = colorBorde
+                lineas.Add("No hay habitaciones cargadas para calcular la meta.");
+            }
+            else if (faltan == 0)
+            {
+                lineas.Add($"Las noches vendidas del mes ({act.NochesVendidas}) ya cubren la meta del mes completo ({nochesMeta:0}).");
+            }
+            else
+            {
+                lineas.Add($"Para cerrar {NombreMes(act.Desde)} en la meta faltan {faltan} noches vendidas de {nochesMeta:0} (quedan {diasMes - act.Dias} días).");
+            }
+
+            if (act.Adr > 0)
+            {
+                decimal ingresoMeta = (decimal)nochesMeta * act.Adr;
+                double avance = ingresoMeta > 0 ? (double)(act.IngresosAlojamiento / ingresoMeta * 100) : 0;
+                lineas.Add($"Ingreso de alojamiento a la meta: {Moneda(ingresoMeta)}. Real a la fecha: {Moneda(act.IngresosAlojamiento)} ({Porcentaje(avance)} de la meta).");
+            }
+            else
+            {
+                lineas.Add("Todavía no hay noches vendidas en el mes para estimar el ingreso a la meta.");
+            }
+
+            _metaVsReal.Cargar(act.Ocupacion, meta, lineas);
+        }
+
+        private void CargarTendencia(List<PuntoMensual> tendencia)
+        {
+            var etiquetas = tendencia.Select(p => p.EnCurso ? p.Etiqueta + " *" : p.Etiqueta).ToList();
+
+            _chartTendencia.Series = new ISeries[]
+            {
+                new StackedColumnSeries<double>
+                {
+                    Name = "Alojamiento",
+                    Values = tendencia.Select(p => (double)p.Alojamiento).ToArray(),
+                    Fill = new SolidColorPaint(Skia(Paleta.Primario)),
+                    MaxBarWidth = 38,
+                    YToolTipLabelFormatter = p => Moneda((decimal)p.Coordinate.PrimaryValue)
+                },
+                new StackedColumnSeries<double>
+                {
+                    Name = "Ventas",
+                    Values = tendencia.Select(p => (double)p.Ventas).ToArray(),
+                    Fill = new SolidColorPaint(Skia(ColorVentas)),
+                    MaxBarWidth = 38,
+                    YToolTipLabelFormatter = p => Moneda((decimal)p.Coordinate.PrimaryValue)
+                },
+                new LineSeries<double>
+                {
+                    Name = "Ocupación",
+                    Values = tendencia.Select(p => Math.Round(p.Ocupacion, 1)).ToArray(),
+                    ScalesYAt = 1,
+                    Fill = null,
+                    Stroke = new SolidColorPaint(Skia(ColorOcupacion)) { StrokeThickness = 3 },
+                    GeometrySize = 8,
+                    GeometryStroke = new SolidColorPaint(Skia(ColorOcupacion)) { StrokeThickness = 3 },
+                    GeometryFill = new SolidColorPaint(Skia(Color.White)),
+                    LineSmoothness = 0,
+                    YToolTipLabelFormatter = p => Porcentaje(p.Coordinate.PrimaryValue)
+                }
             };
 
-            Label lblTitle = new Label
+            _chartTendencia.XAxes = new[] { EjeCategorias(etiquetas) };
+            Axis ejeOcupacion = EjeValores(v => $"{v:0}%", 100);
+            ejeOcupacion.Position = AxisPosition.End;
+            ejeOcupacion.SeparatorsPaint = null;
+            _chartTendencia.YAxes = new[] { EjeValores(MonedaCorta), ejeOcupacion };
+
+            _panelTendencia.TextoPie = "* Mes en curso (hasta hoy). Pasá el mouse sobre una columna para ver el detalle del mes.";
+        }
+
+        // =====================================================================
+        // Layout responsivo
+        // =====================================================================
+
+        private void Acomodar()
+        {
+            if (_raiz == null) return;
+
+            int ancho = AnchoUtil(_raiz);
+            _raiz.SuspendLayout();
+
+            foreach (Control c in _anchoCompleto) c.Width = ancho;
+
+            DistribuirEnFila(_filaKpis, ancho, ancho >= 1100 ? 4 : 2, 158);
+
+            int altoComparativa = AltoTabla(_dgvComparativa, 8);
+            if (ancho >= 1000)
             {
-                Text = titulo,
-                Font = new Font("Segoe UI", 8F, FontStyle.Bold),
-                ForeColor = Color.Gray,
-                Dock = DockStyle.Top,
-                Height = 20
-            };
-
-            Label lblValue = new Label
+                int anchoMeta = Math.Max(320, ancho * 30 / 100);
+                _panelComparativa.Size = new Size(ancho - anchoMeta - Separacion, altoComparativa);
+                _panelComparativa.Margin = new Padding(0, 0, Separacion, Separacion);
+                _panelMeta.Size = new Size(anchoMeta, altoComparativa);
+                _panelMeta.Margin = new Padding(0, 0, 0, Separacion);
+                _filaComparativas.Size = new Size(ancho, altoComparativa + Separacion);
+            }
+            else
             {
-                Text = valor,
-                Font = new Font("Segoe UI", 16F, FontStyle.Bold),
-                ForeColor = Color.FromArgb(30, 41, 59),
-                Dock = DockStyle.Top,
-                Height = 35
-            };
+                _panelComparativa.Size = new Size(ancho, altoComparativa);
+                _panelComparativa.Margin = new Padding(0, 0, 0, Separacion);
+                _panelMeta.Size = new Size(ancho, 300);
+                _panelMeta.Margin = new Padding(0, 0, 0, Separacion);
+                _filaComparativas.Size = new Size(ancho, altoComparativa + 300 + Separacion * 2);
+            }
 
-            Label lblSub = new Label
+            _raiz.ResumeLayout(true);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing) _toolTip.Dispose();
+            base.Dispose(disposing);
+        }
+
+        /// <summary>Barra de ocupación real con la marca de la meta y las conclusiones debajo.</summary>
+        private sealed class MetaVsReal : Control
+        {
+            private double _real;
+            private double _meta;
+            private List<string> _lineas = new();
+
+            public MetaVsReal()
             {
-                Text = subtitulo,
-                Font = new Font("Segoe UI", 7.5F, FontStyle.Regular),
-                ForeColor = Color.DimGray,
-                Dock = DockStyle.Fill
-            };
+                SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer |
+                         ControlStyles.ResizeRedraw | ControlStyles.SupportsTransparentBackColor, true);
+                BackColor = Color.Transparent;
+            }
 
-            card.Controls.Add(lblSub);
-            card.Controls.Add(lblValue);
-            card.Controls.Add(lblTitle);
-            card.Controls.Add(pnlAcento);
+            public void Cargar(double real, double meta, List<string> lineas)
+            {
+                _real = Math.Max(0, Math.Min(100, real));
+                _meta = meta;
+                _lineas = lineas;
+                AccessibleName = string.Join(" ", lineas);
+                Invalidate();
+            }
 
-            return card;
+            protected override void OnPaint(PaintEventArgs e)
+            {
+                Graphics g = e.Graphics;
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+                bool alcanza = _real >= _meta;
+                Color colorReal = alcanza ? Paleta.Exito : EstiloReporte.Advertencia;
+
+                using var fuenteValor = new Font("Segoe UI Semibold", 26f);
+                using var fuenteChica = Paleta.FuenteChica;
+                using var fuente = Paleta.FuenteBase;
+
+                TextRenderer.DrawText(g, Porcentaje(_real), fuenteValor, new Point(0, 4), colorReal);
+                Size medida = TextRenderer.MeasureText(Porcentaje(_real), fuenteValor);
+                TextRenderer.DrawText(g, alcanza ? "en la meta o por encima" : $"{(_meta - _real).ToString("0", CulturaAr)} pts por debajo de la meta",
+                    fuente, new Rectangle(medida.Width + 4, 4, Math.Max(10, Width - medida.Width - 4), medida.Height), Paleta.TextoSecundario, TextFormatFlags.VerticalCenter | TextFormatFlags.WordBreak);
+
+                // Barra 0–100 %
+                var pista = new RectangleF(0, medida.Height + 22, Width - 1, 18);
+                using (var ruta = DibujoUtil.RutaRedondeada(pista, 9))
+                using (var fondo = new SolidBrush(Paleta.BordeSuave))
+                {
+                    g.FillPath(fondo, ruta);
+                }
+
+                float anchoReal = (float)(pista.Width * _real / 100);
+                if (anchoReal > 0)
+                {
+                    using var ruta = DibujoUtil.RutaRedondeada(new RectangleF(pista.X, pista.Y, Math.Max(anchoReal, 18), pista.Height), 9);
+                    using var brocha = new SolidBrush(colorReal);
+                    g.FillPath(brocha, ruta);
+                }
+
+                float xMeta = pista.X + (float)(pista.Width * _meta / 100);
+                using (var lapiz = new Pen(Paleta.TextoPrimario, 2))
+                {
+                    g.DrawLine(lapiz, xMeta, pista.Y - 6, xMeta, pista.Bottom + 6);
+                }
+                string textoMeta = $"Meta {_meta:0}%";
+                int anchoTextoMeta = TextRenderer.MeasureText(textoMeta, fuenteChica).Width;
+                int xTexto = (int)Math.Min(Math.Max(0, xMeta - anchoTextoMeta / 2f), Width - anchoTextoMeta);
+                TextRenderer.DrawText(g, textoMeta, fuenteChica, new Point(xTexto, (int)pista.Bottom + 8), Paleta.TextoSecundario);
+
+                // Conclusiones
+                int y = (int)pista.Bottom + 34;
+                foreach (string linea in _lineas)
+                {
+                    int alto = TextRenderer.MeasureText(linea, fuente, new Size(Width, int.MaxValue), TextFormatFlags.WordBreak).Height;
+                    TextRenderer.DrawText(g, linea, fuente, new Rectangle(0, y, Width, alto), Paleta.TextoPrimario, TextFormatFlags.WordBreak);
+                    y += alto + 8;
+                }
+            }
         }
     }
 }

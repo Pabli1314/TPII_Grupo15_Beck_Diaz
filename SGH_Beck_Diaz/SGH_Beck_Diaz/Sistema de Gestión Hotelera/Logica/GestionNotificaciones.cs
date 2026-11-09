@@ -8,7 +8,7 @@ namespace Logica
     /// <summary>
     /// Genera las notificaciones del Administrador combinando datos reales (habitaciones
     /// próximas a vencer según la tolerancia configurada, habitaciones en limpieza) con los
-    /// módulos que todavía viven en memoria (stock bajo, último backup).
+    /// módulos que todavía viven en memoria (stock bajo).
     /// </summary>
     public class GestionNotificaciones
     {
@@ -17,7 +17,6 @@ namespace Logica
         private readonly GestionHabitaciones _gestionHabitaciones = new();
         private readonly GestionConfiguracion _gestionConfiguracion = new();
         private readonly GestionInventario _gestionInventario = new();
-        private readonly GestionBackups _gestionBackups = new();
 
         public List<NotificacionItem> ObtenerActivas()
         {
@@ -64,13 +63,6 @@ namespace Logica
             catch (Exception)
             {
                 // Sin tabla "producto" todavía: no hay notificaciones de stock que mostrar.
-            }
-
-            BackupInfo? ultimoBackup = _gestionBackups.ObtenerUltimo();
-            if (ultimoBackup != null && ultimoBackup.FechaHora.Date == DateTime.Today)
-            {
-                Agregar(notificaciones, ref id, $"backup-{ultimoBackup.Id}", "Copia de seguridad",
-                    "Se realizó una copia de seguridad correctamente.", TipoNotificacion.Exito);
             }
 
             return notificaciones.OrderByDescending(n => n.Fecha).ToList();

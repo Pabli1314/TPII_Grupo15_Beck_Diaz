@@ -48,7 +48,6 @@ namespace Presentacion.Administrador.UI
 
         public event EventHandler? MiPerfilClick;
         public event EventHandler? CambiarPasswordClick;
-        public event EventHandler? ConfiguracionClick;
         public event EventHandler? CerrarSesionClick;
 
         public HeaderAdmin()
@@ -77,7 +76,6 @@ namespace Presentacion.Administrador.UI
             var menu = new ContextMenuStrip { Font = Paleta.FuenteBase };
             menu.Items.Add("Mi perfil", null, (s, e) => MiPerfilClick?.Invoke(this, EventArgs.Empty));
             menu.Items.Add("Cambiar contraseña", null, (s, e) => CambiarPasswordClick?.Invoke(this, EventArgs.Empty));
-            menu.Items.Add("Configuración", null, (s, e) => ConfiguracionClick?.Invoke(this, EventArgs.Empty));
             menu.Items.Add(new ToolStripSeparator());
             menu.Items.Add("Cerrar sesión", null, (s, e) => CerrarSesionClick?.Invoke(this, EventArgs.Empty));
 

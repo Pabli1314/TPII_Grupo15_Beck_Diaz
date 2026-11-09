@@ -8,8 +8,8 @@
 
 -- 1. Columnas nuevas que usa el módulo Administrador
 ALTER TABLE Usuario ADD id_usuario INT IDENTITY(1,1) NOT NULL;
-ALTER TABLE Usuario ADD nombre NVARCHAR(50) NOT NULL DEFAULT('');
-ALTER TABLE Usuario ADD apellido NVARCHAR(50) NOT NULL DEFAULT('');
+ALTER TABLE Usuario ADD nombre NVARCHAR(20) NOT NULL DEFAULT('');
+ALTER TABLE Usuario ADD apellido NVARCHAR(20) NOT NULL DEFAULT('');
 ALTER TABLE Usuario ADD dni VARCHAR(8) NOT NULL DEFAULT('');
 ALTER TABLE Usuario ADD telefono VARCHAR(20) NOT NULL DEFAULT('');
 ALTER TABLE Usuario ADD ultimo_acceso DATETIME NULL;

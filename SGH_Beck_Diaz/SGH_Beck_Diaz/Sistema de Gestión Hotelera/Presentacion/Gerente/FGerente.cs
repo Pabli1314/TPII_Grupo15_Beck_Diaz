@@ -91,9 +91,21 @@ namespace Presentacion.Gerente
                 Padding = new Padding(15, 10, 15, 10)
             };
 
+            // Sin login: se muestra el primer Gerente activo de la base (mismo criterio que FAdministrador).
+            Usuario? gerente = null;
+            try
+            {
+                gerente = new Logica.GestionUsuarios().ObtenerUsuarioActivoPorRol("Gerente");
+            }
+            catch (Exception)
+            {
+                // Sin conexión a la base: se deja el texto genérico.
+            }
+            string nombreGerente = gerente != null ? $"{gerente.NomUsuario} {gerente.ApeUsuario}".Trim() : "Gerente";
+
             Label lblUser = new Label
             {
-                Text = "👤 Usuario: Gerente",
+                Text = $"👤 Usuario: {nombreGerente}",
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point),
                 ForeColor = Color.White,
                 Location = new Point(15, 15),
@@ -140,7 +152,7 @@ namespace Presentacion.Gerente
             // Botones de Navegación
             Button btnDashboard = CrearBotonNavegacion("📊  Dashboard", "Dashboard Ejecutivo");
             Button btnHabitaciones = CrearBotonNavegacion("🛏️  Habitaciones", "Estado General de Habitaciones");
-            Button btnIngresos = CrearBotonNavegacion("💰  Ingresos", "Análisis Financiero e Ingresos");
+            Button btnIngresos = CrearBotonNavegacion("💰  Finanzas", "Panel Financiero y Flujo de Caja");
             Button btnHistoricos = CrearBotonNavegacion("🕒  Históricos", "Auditoría e Históricos Operativos");
 
             // Añadir botones (al usar Dock = Top, se agregan en orden inverso)
@@ -194,7 +206,7 @@ namespace Presentacion.Gerente
             pnlContentContainer = new Panel
             {
                 Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(240, 243, 246)
+                BackColor = Presentacion.Administrador.UI.Paleta.FondoApp
             };
 
             // ----------------------------------------------------
@@ -262,8 +274,14 @@ namespace Presentacion.Gerente
 
         private void AbrirFormularioEnContenedor(Form formHijo)
         {
-            if (pnlContentContainer.Controls.Count > 0)
-                pnlContentContainer.Controls.RemoveAt(0);
+            // Se libera el módulo anterior: si solo se quita del panel, cada navegación deja un
+            // formulario (con sus gráficos) vivo en memoria.
+            if (pnlContentContainer.Tag is Form formAnterior)
+            {
+                pnlContentContainer.Controls.Remove(formAnterior);
+                formAnterior.Dispose();
+                pnlContentContainer.Tag = null;
+            }
 
             if (formHijo == null) return;
 
@@ -283,7 +301,7 @@ namespace Presentacion.Gerente
                     return new FormDashboardEjecutivo();
                 case "Estado General de Habitaciones":
                     return new FormAnalisisHabitaciones();
-                case "Análisis Financiero e Ingresos":
+                case "Panel Financiero y Flujo de Caja":
                     return new FormAnalisisFinanciero();
                 case "Auditoría e Históricos Operativos":
                     return new FormHistoricos();
@@ -321,10 +339,8 @@ namespace Presentacion.Gerente
                 return;
             }
 
-            // Si responde SÍ: se abre la pantalla de selección de usuario y se cierra la actual
-            FSeleccionUsuario fSeleccionUsuario = new FSeleccionUsuario();
-            fSeleccionUsuario.Show();
-
+            // Si responde SÍ: se cierra la pantalla actual; FLogin, que abrió este módulo,
+            // se vuelve a mostrar al cerrarse (FormClosed).
             this.Close();
         }
     }

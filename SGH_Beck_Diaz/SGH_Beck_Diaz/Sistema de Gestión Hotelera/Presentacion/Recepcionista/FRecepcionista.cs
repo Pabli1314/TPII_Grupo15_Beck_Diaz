@@ -24,14 +24,13 @@ namespace Presentacion.Recepcionista
         {
             ["dashboard"] = "Centro de Operaciones",
             ["habitaciones"] = "Mapa de Habitaciones",
-            ["huespedes"] = "Listado de huespedes",
-            ["reservas"] = "Gestión de Reservas",
+            ["huespedes"] = "Huéspedes",
             ["check-in"] = "Check-in",
             ["check-out"] = "Check-out",
             ["caja"] = "Gestión de Caja",
             ["ventas"] = "Ventas Adicionales",
-            ["huespedes"] = "Huéspedes",
             ["historial"] = "Historial de Operaciones",
+            ["reportes"] = "Reportes de Recepción",
         };
 
         public FRecepcionista() : this(null)
@@ -112,8 +111,9 @@ namespace Presentacion.Recepcionista
                     vistaVentas.Refrescar();
                     break;
 
-                case VistaReservas vistaReservas:
-                    vistaReservas.Refrescar();
+                case VistaReportes vistaReportes:
+                    // Pudo haber check-ins, check-outs o cobros desde la última vez que se abrió.
+                    vistaReportes.Refrescar();
                     break;
 
             }
@@ -126,13 +126,13 @@ namespace Presentacion.Recepcionista
         {
             "dashboard" => new VistaDashboard(_usuario, () => Navegar("caja")),
             "habitaciones" => new VistaHabitaciones(_usuario),
-            "reservas" => new VistaReservas(),
             "check-in" => new VistaHabitaciones(_usuario, EstadoOcupacion.Disponible),
             "check-out" => new VistaHabitaciones(_usuario, EstadoOcupacion.Ocupada),
             "caja" => new VistaCaja(_usuario, () => Navegar("ventas")),
             "ventas" => new VistaVentas(_usuario),
             "huespedes" => new VistaHuespedes(),
             "historial" => new VistaHistorial(),
+            "reportes" => new VistaReportes(_usuario, () => Navegar("check-out"), () => Navegar("caja")),
             _ => new VistaDashboard(_usuario, () => Navegar("caja"))
         };
 
@@ -161,8 +161,8 @@ namespace Presentacion.Recepcionista
                 return;
             }
 
-            new Sistema_de_Gestión_Hotelera.FSeleccionUsuario(_usuario).Show();
+            // FLogin, que abrió este módulo, se vuelve a mostrar al cerrarse (FormClosed).
             Close();
         }
     }
-}
+}

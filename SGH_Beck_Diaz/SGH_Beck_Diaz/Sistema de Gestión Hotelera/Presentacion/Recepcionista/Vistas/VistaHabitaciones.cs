@@ -14,13 +14,15 @@ namespace Presentacion.Recepcionista.Vistas
     /// (Logica.GestionHabitaciones.ObtenerResumenHabitaciones — huésped, horarios y estado ya
     /// resueltos). Al hacer click en una habitación se abre FGestionHabitacion, que decide la
     /// acción disponible (check-in, check-out, limpieza, mantenimiento) según su estado.
+    /// Para habitaciones ocupadas, cada tarjeta incluye un botón directo "Extender estadía"
+    /// que abre FModalExtenderEstadia.
     /// Con <see cref="_filtro"/> se reutiliza esta misma grilla para las secciones "Check-in"
     /// (solo Disponibles) y "Check-out" (solo Ocupadas) del sidebar.
     /// </summary>
     internal class VistaHabitaciones : UserControl
     {
         private const int AnchoTarjeta = 180;
-        private const int AltoTarjeta = 130;
+        private const int AltoTarjeta = 170;
         private const int Separacion = 20;
 
         private readonly Usuario _usuario;
@@ -85,10 +87,15 @@ namespace Presentacion.Recepcionista.Vistas
                     {
                         NroHabitacion = r.NroHabitacion.ToString(),
                         Tipo = r.TipoHabitacion,
+                        Piso = r.Piso,
+                        CantCamas = r.CantCamas,
+                        TarifaPorDia = r.TarifaPorDia,
                         Estado = DibujoUtil.EstadoDesdeTexto(r.Estado),
                         Huesped = r.Huesped ?? string.Empty,
                         HoraIngreso = r.HoraEntrada,
-                        HoraSalidaEstimada = r.HoraSalidaEstimada
+                        HoraSalidaEstimada = r.HoraSalidaEstimada,
+                        Noches = r.Noches,
+                        CostoHospedaje = r.CostoHospedaje
                     })
                     .Where(h => _filtro == null || h.Estado == _filtro)
                     .OrderBy(h => h.NroHabitacion)
@@ -153,8 +160,9 @@ namespace Presentacion.Recepcionista.Vistas
                 foreach (HabitacionInfo habitacion in fila)
                 {
                     var tarjeta = new UC_Habitacion { Location = new Point(x, top) };
-                    tarjeta.ConfigurarTarjeta(habitacion.NroHabitacion, habitacion.Tipo, habitacion.Estado, habitacion.Huesped, habitacion.HoraIngreso, habitacion.HoraSalidaEstimada);
+                    tarjeta.ConfigurarTarjeta(habitacion);
                     tarjeta.Click += (s, e) => GestionarHabitacion(habitacion);
+                    tarjeta.ExtenderEstadiaClick += (s, e) => AbrirModalExtenderEstadia(habitacion);
                     _panelGrilla.Controls.Add(tarjeta);
                     x += AnchoTarjeta + Separacion;
                 }
@@ -173,6 +181,15 @@ namespace Presentacion.Recepcionista.Vistas
             }
 
             CargarDesdeBaseDeDatos();
+        }
+
+        private void AbrirModalExtenderEstadia(HabitacionInfo habitacion)
+        {
+            using var fExtender = new Modales.FModalExtenderEstadia(habitacion.NroHabitacion, _usuario.DniUsuario);
+            if (fExtender.ShowDialog(FindForm()) == DialogResult.OK)
+            {
+                CargarDesdeBaseDeDatos();
+            }
         }
     }
 }

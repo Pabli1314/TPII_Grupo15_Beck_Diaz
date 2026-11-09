@@ -7,15 +7,14 @@ using System.Windows.Forms;
 
 namespace Presentacion.Recepcionista.Modales
 {
-    /// <summary>Cierre de turno: muestra los totales calculados y compara el efectivo contado
-    /// contra el esperado (monto inicial + cobros en efectivo).</summary>
+    /// <summary>Cierre de turno: muestra los totales calculados y permite registrar el Monto Final
+    /// (precargado automáticamente como monto inicial + total general de operaciones).</summary>
     internal class FModalCierreTurno : FormModalBase
     {
         private readonly GestionTurnoCaja _gestionTurnoCaja = new();
         private readonly int _idTurno;
         private readonly ResumenTurno _resumen;
-        private readonly NumericUpDown _numEfectivoContado;
-        private readonly TextBox _txtObservaciones;
+        private readonly NumericUpDown _numMontoFinal;
         private readonly Label _lblError;
 
         public FModalCierreTurno(int idTurno)
@@ -24,8 +23,12 @@ namespace Presentacion.Recepcionista.Modales
             _gestionTurnoCaja = new GestionTurnoCaja();
             _resumen = _gestionTurnoCaja.ObtenerResumen(idTurno);
 
-            Size = new Size(460, 560);
-            EstablecerTitulo("Cierre de turno");
+            Size = new Size(460, 506);
+            // Un turno vencido (de un día anterior) se identifica en el título para que el usuario sepa
+            // que está arqueando la caja de esa jornada y no la de hoy.
+            EstablecerTitulo(GestionTurnoCaja.EsTurnoVencido(_resumen.Turno)
+                ? $"Cierre de turno pendiente · {_resumen.Turno.FechaApertura:dd/MM/yyyy}"
+                : "Cierre de turno");
 
             const int ancho = 380;
             int y = 0;
@@ -43,16 +46,12 @@ namespace Presentacion.Recepcionista.Modales
             AgregarFila("Total general", _resumen.TotalGeneral, ref y, ancho, negrita: true);
             y += 14;
 
-            Contenido.Controls.Add(CamposFormulario.Etiqueta("Efectivo contado", new Point(0, y)));
-            _numEfectivoContado = CamposFormulario.Numerico(new Point(0, y + 22), ancho, 0, 10_000_000, 2);
-            _numEfectivoContado.Value = _resumen.EfectivoEsperado;
-            Contenido.Controls.Add(_numEfectivoContado);
+            Contenido.Controls.Add(CamposFormulario.Etiqueta("Monto Final", new Point(0, y)));
+            decimal montoFinalCalculado = _resumen.Turno.MontoInicial + _resumen.TotalGeneral;
+            _numMontoFinal = CamposFormulario.Numerico(new Point(0, y + 22), ancho, 0, 10_000_000, 2);
+            _numMontoFinal.Value = Math.Max(_numMontoFinal.Minimum, Math.Min(_numMontoFinal.Maximum, montoFinalCalculado));
+            Contenido.Controls.Add(_numMontoFinal);
             y += 62;
-
-            Contenido.Controls.Add(CamposFormulario.Etiqueta("Observaciones", new Point(0, y)));
-            _txtObservaciones = CamposFormulario.Texto(new Point(0, y + 22), ancho, esPassword: false);
-            Contenido.Controls.Add(_txtObservaciones);
-            y += 54;
 
             _lblError = CamposFormulario.Error(new Point(0, y), ancho);
             Contenido.Controls.Add(_lblError);
@@ -105,7 +104,7 @@ namespace Presentacion.Recepcionista.Modales
 
             try
             {
-                decimal diferencia = _gestionTurnoCaja.CerrarTurno(_idTurno, _numEfectivoContado.Value, _txtObservaciones.Text.Trim());
+                decimal diferencia = _gestionTurnoCaja.CerrarTurno(_idTurno, _numMontoFinal.Value, null);
 
                 string mensaje = diferencia == 0
                     ? "Turno cerrado sin diferencias de caja."

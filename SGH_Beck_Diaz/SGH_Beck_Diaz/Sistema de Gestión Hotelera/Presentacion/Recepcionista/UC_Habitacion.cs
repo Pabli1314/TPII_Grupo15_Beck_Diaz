@@ -17,8 +17,13 @@ namespace Presentacion.Recepcionista
         private bool _vencida;
         private bool _avisoSonoroReproducido;
 
-        public string NumeroHabitacion { get; private set; }
+        public string NumeroHabitacion { get; private set; } = string.Empty;
         public EstadoOcupacion Estado { get; private set; }
+
+        /// <summary>
+        /// Se dispara al hacer clic en el botón "Extender estadía" disponible en habitaciones ocupadas.
+        /// </summary>
+        public event EventHandler? ExtenderEstadiaClick;
 
         public UC_Habitacion()
         {
@@ -28,28 +33,48 @@ namespace Presentacion.Recepcionista
             Cursor = Cursors.Hand;
             badgeEstado.BackColor = BackColor;
 
+            btnExtender.Click += (s, e) => ExtenderEstadiaClick?.Invoke(this, EventArgs.Empty);
+
+            // Efecto hover sobre el botón extender
+            btnExtender.MouseEnter += (s, e) => btnExtender.BackColor = Color.FromArgb(200, 220, 250);
+            btnExtender.MouseLeave += (s, e) => btnExtender.BackColor = Color.FromArgb(224, 234, 253);
+
             Region = new Region(DibujoUtil.RutaRedondeada(new RectangleF(0, 0, Width, Height), Radio));
 
             PropagarClick(this);
         }
 
-        /// <summary>Configura el contenido y el estado visual de la tarjeta de habitación. Si la
-        /// habitación está ocupada y se conoce la hora estimada de salida, muestra una cuenta
-        /// regresiva y resalta la tarjeta cuando se acerca o supera la tolerancia configurada.</summary>
-        public void ConfigurarTarjeta(string numero, string tipo, EstadoOcupacion estado, string huesped = null, DateTime? horaIngreso = null, DateTime? horaSalidaEstimada = null)
+        /// <summary>Configura el contenido y el estado visual de la tarjeta de habitación: características
+        /// (tipo, camas, piso) y tarifa por día; si está ocupada, el huésped, la fecha de salida y el
+        /// costo del hospedaje, más una cuenta regresiva que resalta la tarjeta cuando se acerca o
+        /// supera la tolerancia configurada, y el botón "Extender estadía".</summary>
+        public void ConfigurarTarjeta(HabitacionInfo habitacion)
         {
-            NumeroHabitacion = numero;
-            Estado = estado;
-            _horaSalidaEstimada = horaSalidaEstimada;
+            if (habitacion == null) throw new ArgumentNullException(nameof(habitacion));
+
+            NumeroHabitacion = habitacion.NroHabitacion;
+            Estado = habitacion.Estado;
+            _horaSalidaEstimada = habitacion.HoraSalidaEstimada;
             _vencida = false;
             _avisoSonoroReproducido = false;
 
-            lblNumero.Text = numero;
-            lblTipo.Text = tipo;
+            EstadoOcupacion estado = habitacion.Estado;
+            string huesped = habitacion.Huesped;
+            DateTime? horaSalidaEstimada = habitacion.HoraSalidaEstimada;
+
+            lblNumero.Text = habitacion.NroHabitacion;
+            lblTipo.Text = habitacion.Caracteristicas;
+
+            lblSalida.Visible = estado == EstadoOcupacion.Ocupada && horaSalidaEstimada.HasValue;
+            lblSalida.Text = horaSalidaEstimada.HasValue ? $"Salida: {horaSalidaEstimada.Value:dd/MM/yyyy HH:mm}" : string.Empty;
+
+            lblPie.Text = estado == EstadoOcupacion.Ocupada && habitacion.CostoHospedaje.HasValue
+                ? $"Hospedaje: {habitacion.CostoHospedaje.Value:C0} ({habitacion.Noches} noche{(habitacion.Noches == 1 ? string.Empty : "s")})"
+                : $"Tarifa: {habitacion.TarifaPorDia:C0} por día";
 
             Color colorEstado = DibujoUtil.ColorPorEstado(estado);
             badgeEstado.FijarEstado(DibujoUtil.TextoPorEstado(estado), colorEstado);
-            badgeEstado.Location = new Point(Width - badgeEstado.Width - 10, 10);
+            badgeEstado.Location = new Point(Width - badgeEstado.Width - 10, 8);
 
             bool esOcupada = estado == EstadoOcupacion.Ocupada;
 
@@ -57,6 +82,9 @@ namespace Presentacion.Recepcionista
             lblHuesped.Visible = esOcupada && !string.IsNullOrWhiteSpace(huesped);
 
             lblTemporizador.Visible = esOcupada && horaSalidaEstimada.HasValue;
+
+            // Botón extender estadía visible solo en habitaciones ocupadas
+            btnExtender.Visible = esOcupada;
 
             if (esOcupada && horaSalidaEstimada.HasValue)
             {
@@ -111,15 +139,20 @@ namespace Presentacion.Recepcionista
 
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             using var ruta = DibujoUtil.RutaRedondeada(new RectangleF(0.5F, 0.5F, Width - 1, Height - 1), Radio - 1);
-            using var lapiz = new Pen(_vencida ? DibujoUtil.ColorPorEstado(EstadoOcupacion.Ocupada) : Color.FromArgb(33, 37, 41), _vencida ? 2.5f : 1f);
+            using var lapiz = new Pen(_vencida ? DibujoUtil.ColorPorEstado(EstadoOcupacion.Ocupada) : Color.FromArgb(220, 224, 230), _vencida ? 2.5f : 1f);
             e.Graphics.DrawPath(lapiz, ruta);
         }
 
-        /// <summary>Permite hacer click en cualquier parte de la tarjeta, no solo en el fondo.</summary>
+        /// <summary>
+        /// Permite hacer click en cualquier parte de la tarjeta para abrir la gestión general,
+        /// pero excluye el botón btnExtender para que su acción sea independiente.
+        /// </summary>
         private void PropagarClick(Control contenedor)
         {
             foreach (Control hijo in contenedor.Controls)
             {
+                if (hijo == btnExtender) continue;
+
                 hijo.Cursor = Cursors.Hand;
                 hijo.Click += (s, e) => OnClick(EventArgs.Empty);
 

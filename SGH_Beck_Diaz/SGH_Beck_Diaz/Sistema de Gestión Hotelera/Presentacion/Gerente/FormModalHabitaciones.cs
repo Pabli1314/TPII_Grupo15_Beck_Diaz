@@ -103,6 +103,7 @@ namespace Presentacion.Gerente
             {
                 List<Habitacion> lista = _lGerente.ConsultarHabitacionesPorEstado(estado);
                 DataGridView dgv = (DataGridView)this.Controls["dgvModalHabitaciones"];
+                Dictionary<int, string> nombresTipos = _lGerente.ObtenerNombresTiposHabitacion();
 
                 // Proyección a objeto anónimo para omitir IdEstado y formatear Tipo
                 var listaVista = lista.Select(h => new
@@ -110,7 +111,7 @@ namespace Presentacion.Gerente
                     NroHabitacion = h.NroHabitacion,
                     Piso = h.Piso,
                     CantCamas = h.CantCamas,
-                    TipoHabitacion = _lGerente.ObtenerNombreTipoHabitacion(h.IdTipoHabitacion)
+                    TipoHabitacion = nombresTipos.TryGetValue(h.IdTipoHabitacion, out string? nombre) ? nombre : "Sin Definir"
                 }).ToList();
 
                 dgv.DataSource = null;

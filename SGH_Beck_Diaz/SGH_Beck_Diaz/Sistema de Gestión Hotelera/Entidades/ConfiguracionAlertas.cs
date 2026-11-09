@@ -10,7 +10,5 @@ namespace Entidades
         public int MinutosTolerancia { get; set; } = 30;
         public bool AlertasVisualesActivas { get; set; } = true;
         public bool AlertasSonorasActivas { get; set; } = false;
-        public bool BackupAutomaticoActivo { get; set; } = false;
-        public int BackupAutomaticoHora { get; set; } = 3; // 0-23
     }
 }

@@ -20,19 +20,22 @@ CREATE TABLE Tipo_habitacion (
 CREATE TABLE Estado_habitacion (
     id_estado INT IDENTITY(1,1),
     nom_estado_habitacion VARCHAR(50) NOT NULL,
-    CONSTRAINT PK_estado_habitacion_id PRIMARY KEY (id_estado)
+    CONSTRAINT PK_estado_habitacion_id PRIMARY KEY (id_estado),
+    CONSTRAINT UQ_Estado_habitacion_nom UNIQUE (nom_estado_habitacion)
 );
 
 CREATE TABLE Rol (
     id_rol INT IDENTITY(1,1),
     nom_rol VARCHAR(50) NOT NULL,
-    CONSTRAINT PK_rol_id PRIMARY KEY (id_rol)
+    CONSTRAINT PK_rol_id PRIMARY KEY (id_rol),
+    CONSTRAINT UQ_Rol_nom UNIQUE (nom_rol)
 );
 
 CREATE TABLE metodo_pago (
     id_metodo INT IDENTITY(1,1),
     nom_metodo_pago VARCHAR(50) NOT NULL,
-    CONSTRAINT PK_metodo_pago_id PRIMARY KEY (id_metodo)
+    CONSTRAINT PK_metodo_pago_id PRIMARY KEY (id_metodo),
+    CONSTRAINT UQ_metodo_pago_nom UNIQUE (nom_metodo_pago)
 );
 
 CREATE TABLE Huesped (
@@ -54,7 +57,8 @@ CREATE TABLE Huesped (
 CREATE TABLE categoria_producto(
     id_categoria INT IDENTITY(1,1),
     descripcion_cat VARCHAR(15) NOT NULL,
-    CONSTRAINT PK_categoria_id PRIMARY KEY(id_categoria)
+    CONSTRAINT PK_categoria_id PRIMARY KEY(id_categoria),
+    CONSTRAINT UQ_categoria_descripcion UNIQUE (descripcion_cat)
 );
 
 ----------------------------------------------------
@@ -77,22 +81,34 @@ CREATE TABLE habitacion (
 -- Tabla: Usuario
 CREATE TABLE Usuario (
     dni_usuario VARCHAR(8),
-    nom_usuario VARCHAR(20) NOT NULL,
-    ape_usuario VARCHAR(20) NOT NULL,
+    nom_usuario VARCHAR(30) NOT NULL,
+    ape_usuario VARCHAR(30) NOT NULL,
     direccion VARCHAR(50) NOT NULL,
     telefono_usuario VARCHAR(10) NOT NULL,
-    correo_usuario VARCHAR(20) NOT NULL,
+    correo_usuario VARCHAR(50) NOT NULL,
     pasword VARCHAR(256) NOT NULL,
     estado BIT NOT NULL DEFAULT 1,
     id_rol INT NOT NULL,
     alta_usuario DATE DEFAULT CONVERT(DATE, GETDATE()),
     CONSTRAINT PK_usuario_id PRIMARY KEY(dni_usuario),
     CONSTRAINT CK_usuario_dni CHECK (dni_usuario NOT LIKE '%[^0-9]%'),
+    CONSTRAINT CK_usuario_dni_largo CHECK (LEN(dni_usuario) = 8),
     CONSTRAINT CK_usuario_telefono CHECK (telefono_usuario NOT LIKE '%[^0-9]%'),
+    CONSTRAINT CK_usuario_telefono_largo CHECK (LEN(telefono_usuario) = 10),
+    CONSTRAINT CK_usuario_nom_largo CHECK (LEN(nom_usuario) >= 2),
+    CONSTRAINT CK_usuario_nom_sin_digitos CHECK (nom_usuario NOT LIKE '%[0-9]%'),
+    CONSTRAINT CK_usuario_ape_largo CHECK (LEN(ape_usuario) >= 2),
+    CONSTRAINT CK_usuario_ape_sin_digitos CHECK (ape_usuario NOT LIKE '%[0-9]%'),
+    CONSTRAINT CK_usuario_direccion_largo CHECK (LEN(direccion) >= 5),
+    CONSTRAINT CK_usuario_correo_formato CHECK (correo_usuario LIKE '%_@_%._%' AND correo_usuario NOT LIKE '% %'),
     CONSTRAINT UQ_usuario_telefono UNIQUE (telefono_usuario),
     CONSTRAINT UQ_usuario_correo UNIQUE (correo_usuario),
     CONSTRAINT FK_Usuario_Rol FOREIGN KEY (id_rol) REFERENCES Rol(id_rol)
 );
+/*
+ALTER TABLE Usuario
+ALTER COLUMN nom_usuario VARCHAR(20) NOT NULL;
+*/
 
 -- Tabla: Turno_caja
 CREATE TABLE Turno_caja (
@@ -146,6 +162,7 @@ CREATE TABLE hospedaje (
     hora_entrada TIME CONSTRAINT DF_hora_entrada DEFAULT CONVERT(TIME, GETDATE()),
     fecha_salida DATE NOT NULL,
     hora_salida TIME NOT NULL,
+    monto_total FLOAT NOT NULL,
     id_metodo INT NOT NULL,
     nro_habitacion INT NOT NULL,
     id_turno INT NOT NULL,
@@ -181,4 +198,24 @@ CREATE TABLE detalle_venta(
     CONSTRAINT FK_detalle_venta FOREIGN KEY(id_venta) REFERENCES venta(id_venta) ON DELETE CASCADE,
     CONSTRAINT FK_detalle_producto FOREIGN KEY(cod_producto) REFERENCES producto(cod_producto),
     CONSTRAINT CK_detalle_cantidad CHECK (cantidad > 0)
+);
+
+-- Tabla: prorroga_estadia (Extensión de estadía de habitaciones ocupadas)
+CREATE TABLE prorroga_estadia (
+    id_prorroga INT IDENTITY(1,1),
+    id_hospedaje INT NOT NULL,
+    fecha_prorroga DATE NOT NULL DEFAULT CONVERT(DATE, GETDATE()),
+    hora_prorroga TIME NOT NULL DEFAULT CONVERT(TIME, GETDATE()),
+    fecha_salida_anterior DATE NOT NULL,
+    hora_salida_anterior TIME NOT NULL,
+    nueva_fecha_salida DATE NOT NULL,
+    nueva_hora_salida TIME NOT NULL,
+    dias_adicionales INT NOT NULL,
+    monto_adicional DECIMAL(10, 2) NOT NULL,
+    id_metodo INT NOT NULL,
+    id_turno INT NOT NULL,
+    CONSTRAINT PK_prorroga_estadia PRIMARY KEY (id_prorroga),
+    CONSTRAINT FK_prorroga_hospedaje FOREIGN KEY (id_hospedaje) REFERENCES hospedaje(id_hospedaje),
+    CONSTRAINT FK_prorroga_metodo FOREIGN KEY (id_metodo) REFERENCES metodo_pago(id_metodo),
+    CONSTRAINT FK_prorroga_turno FOREIGN KEY (id_turno) REFERENCES Turno_caja(id_turno)
 );

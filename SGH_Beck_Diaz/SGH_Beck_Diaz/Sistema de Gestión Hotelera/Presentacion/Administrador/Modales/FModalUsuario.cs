@@ -45,51 +45,60 @@ namespace Presentacion.Administrador.Modales
             }
             else
             {
-                _txtDni.KeyPress += (s, e) =>
-                {
-                    // Permitir solo dígitos y control de retroceso
-                    if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
-                    {
-                        e.Handled = true;
-                    }
-                };
+                _txtDni.MaxLength = GestionUsuarios.LargoDni;
+                _txtDni.KeyPress += SoloDigitos;
             }
             Contenido.Controls.Add(_txtDni);
             y += alto;
 
             Contenido.Controls.Add(CamposFormulario.Etiqueta("Nombre", new Point(0, y)));
             _txtNombre = CamposFormulario.Texto(new Point(0, y + 22), ancho);
+            _txtNombre.MaxLength = GestionUsuarios.LargoNombre;
+            _txtNombre.KeyPress += SoloLetras;
             Contenido.Controls.Add(_txtNombre);
             y += alto;
 
             Contenido.Controls.Add(CamposFormulario.Etiqueta("Apellido", new Point(0, y)));
             _txtApellido = CamposFormulario.Texto(new Point(0, y + 22), ancho);
+            _txtApellido.MaxLength = GestionUsuarios.LargoApellido;
+            _txtApellido.KeyPress += SoloLetras;
             Contenido.Controls.Add(_txtApellido);
             y += alto;
 
             Contenido.Controls.Add(CamposFormulario.Etiqueta("Dirección", new Point(0, y)));
             _txtDireccion = CamposFormulario.Texto(new Point(0, y + 22), ancho);
+            _txtDireccion.MaxLength = GestionUsuarios.LargoDireccion;
             Contenido.Controls.Add(_txtDireccion);
             y += alto;
 
             Contenido.Controls.Add(CamposFormulario.Etiqueta("Teléfono", new Point(0, y)));
             _txtTelefono = CamposFormulario.Texto(new Point(0, y + 22), ancho);
+            _txtTelefono.MaxLength = GestionUsuarios.LargoTelefono;
+            _txtTelefono.KeyPress += SoloDigitos;
             Contenido.Controls.Add(_txtTelefono);
             y += alto;
 
             Contenido.Controls.Add(CamposFormulario.Etiqueta("Correo", new Point(0, y)));
             _txtCorreo = CamposFormulario.Texto(new Point(0, y + 22), ancho);
+            _txtCorreo.MaxLength = GestionUsuarios.LargoCorreo;
+            _txtCorreo.KeyPress += (s, e) =>
+            {
+                // El correo no lleva espacios
+                if (e.KeyChar == ' ') e.Handled = true;
+            };
             Contenido.Controls.Add(_txtCorreo);
             y += alto;
 
             string etiquetaPassword = usuario == null ? "Contraseña" : "Nueva contraseña (dejar vacío para no cambiarla)";
             Contenido.Controls.Add(CamposFormulario.Etiqueta(etiquetaPassword, new Point(0, y)));
             _txtPassword = CamposFormulario.Texto(new Point(0, y + 22), ancho, esPassword: true);
+            _txtPassword.MaxLength = GestionUsuarios.LargoPasswordMaximo;
             Contenido.Controls.Add(_txtPassword);
             y += alto;
 
             Contenido.Controls.Add(CamposFormulario.Etiqueta("Confirmar contraseña", new Point(0, y)));
             _txtConfirmar = CamposFormulario.Texto(new Point(0, y + 22), ancho, esPassword: true);
+            _txtConfirmar.MaxLength = GestionUsuarios.LargoPasswordMaximo;
             Contenido.Controls.Add(_txtConfirmar);
             y += alto;
 
@@ -129,6 +138,24 @@ namespace Presentacion.Administrador.Modales
             Contenido.Controls.Add(btnGuardar);
 
             CargarDatosIniciales();
+        }
+
+        // Permitir solo dígitos y control de retroceso
+        private static void SoloDigitos(object? sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        // Permitir solo letras (con tildes y ñ), espacios y control de retroceso
+        private static void SoloLetras(object? sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsLetter(e.KeyChar) && e.KeyChar != ' ')
+            {
+                e.Handled = true;
+            }
         }
 
         private void CargarDatosIniciales()
@@ -173,11 +200,6 @@ namespace Presentacion.Administrador.Modales
                     _cmbRol.SelectedItem == null)
                 {
                     throw new ArgumentException("Todos los campos son obligatorios.");
-                }
-
-                if (_txtDni.Text.Trim().Length > 8)
-                {
-                    throw new ArgumentException("El DNI no puede superar los 8 caracteres.");
                 }
 
                 // Si es un usuario nuevo, la contraseña y confirmación son obligatorias

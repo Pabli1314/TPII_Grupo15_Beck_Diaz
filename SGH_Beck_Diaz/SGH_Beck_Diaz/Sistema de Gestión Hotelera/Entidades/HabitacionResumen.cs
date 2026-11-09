@@ -3,7 +3,7 @@ using System;
 namespace Entidades
 {
     /// <summary>
-    /// DTO de solo lectura para las pantallas de Dashboard y Supervisión del Administrador.
+    /// DTO de solo lectura para las pantallas de Dashboard, Supervisión y Recepción.
     /// Combina Habitacion + EstadoHabitacion + TipoHabitacion + Hospedaje/Huesped vigente +
     /// último RegistroLimpieza. Lo arma Logica.GestionHabitaciones.ObtenerResumenHabitaciones().
     /// </summary>
@@ -11,7 +11,10 @@ namespace Entidades
     {
         public int NroHabitacion { get; set; }
         public int Piso { get; set; }
+        public int CantCamas { get; set; }
         public string TipoHabitacion { get; set; } = string.Empty;
+        /// <summary>Tarifa por día del tipo de habitación (Tipo_habitacion.tarifa).</summary>
+        public decimal TarifaPorDia { get; set; }
         public int IdEstado { get; set; }
         public string Estado { get; set; } = string.Empty;
 
@@ -19,6 +22,10 @@ namespace Entidades
         public string? DniHuesped { get; set; }
         public DateTime? HoraEntrada { get; set; }
         public DateTime? HoraSalidaEstimada { get; set; }
+
+        /// <summary>Solo si está ocupada: noches y costo del hospedaje vigente (tarifa por día × noches).</summary>
+        public int? Noches { get; set; }
+        public decimal? CostoHospedaje { get; set; }
 
         public DateTime? UltimaLimpieza { get; set; }
         public TimeSpan? DuracionUltimaLimpieza { get; set; }

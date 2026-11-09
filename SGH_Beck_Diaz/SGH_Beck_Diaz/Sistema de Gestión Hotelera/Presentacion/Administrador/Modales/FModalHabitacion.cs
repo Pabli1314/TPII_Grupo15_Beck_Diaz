@@ -7,10 +7,11 @@ using System.Windows.Forms;
 
 namespace Presentacion.Administrador.Modales
 {
-    /// <summary>Alta de una habitación nueva. Por ahora solo se usa para crear (no editar).</summary>
+    /// <summary>Alta de una habitación nueva o edición de una existente (el número no se edita).</summary>
     internal class FModalHabitacion : FormModalBase
     {
         private readonly GestionHabitaciones _gestionHabitaciones = new();
+        private readonly bool _esEdicion;
 
         private readonly NumericUpDown _numNumero;
         private readonly ComboBox _cmbPiso;
@@ -19,10 +20,12 @@ namespace Presentacion.Administrador.Modales
         private readonly ComboBox _cmbEstado;
         private readonly Label _lblError;
 
-        public FModalHabitacion()
+        public FModalHabitacion(Habitacion? habitacionAEditar = null)
         {
+            _esEdicion = habitacionAEditar != null;
+
             Size = new Size(460, 500);
-            EstablecerTitulo("Nueva habitación");
+            EstablecerTitulo(_esEdicion ? $"Editar habitación {habitacionAEditar!.NroHabitacion}" : "Nueva habitación");
 
             int y = 0;
             const int ancho = 380;
@@ -81,6 +84,41 @@ namespace Presentacion.Administrador.Modales
 
             Contenido.Controls.Add(btnCancelar);
             Contenido.Controls.Add(btnGuardar);
+
+            if (_esEdicion)
+            {
+                CargarDatos(habitacionAEditar!);
+            }
+        }
+
+        private void CargarDatos(Habitacion habitacion)
+        {
+            // El número es la clave de la habitación: en edición queda fijo.
+            _numNumero.Value = Math.Min(_numNumero.Maximum, Math.Max(_numNumero.Minimum, habitacion.NroHabitacion));
+            _numNumero.Enabled = false;
+
+            int indicePiso = _cmbPiso.Items.IndexOf(habitacion.Piso);
+            if (indicePiso >= 0) _cmbPiso.SelectedIndex = indicePiso;
+
+            _numCamas.Value = Math.Min(_numCamas.Maximum, Math.Max(_numCamas.Minimum, habitacion.CantCamas));
+
+            for (int i = 0; i < _cmbTipo.Items.Count; i++)
+            {
+                if (_cmbTipo.Items[i] is TipoHabitacion tipo && tipo.IdTipoHabitacion == habitacion.IdTipoHabitacion)
+                {
+                    _cmbTipo.SelectedIndex = i;
+                    break;
+                }
+            }
+
+            for (int i = 0; i < _cmbEstado.Items.Count; i++)
+            {
+                if (_cmbEstado.Items[i] is EstadoHabitacion estado && estado.IdEstado == habitacion.IdEstado)
+                {
+                    _cmbEstado.SelectedIndex = i;
+                    break;
+                }
+            }
         }
 
         private void Guardar()
@@ -108,7 +146,15 @@ namespace Presentacion.Administrador.Modales
 
             try
             {
-                _gestionHabitaciones.CrearHabitacion(habitacion);
+                if (_esEdicion)
+                {
+                    _gestionHabitaciones.ModificarHabitacion(habitacion);
+                }
+                else
+                {
+                    _gestionHabitaciones.CrearHabitacion(habitacion);
+                }
+
                 DialogResult = DialogResult.OK;
                 Close();
             }

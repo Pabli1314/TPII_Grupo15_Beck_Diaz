@@ -109,7 +109,7 @@ namespace Presentacion.Administrador.UI
             var panelNav = new FlowLayoutPanel
             {
                 Location = new Point(0, 184),
-                Size = new Size(260, 380),
+                Size = new Size(260, 430),
                 FlowDirection = FlowDirection.TopDown,
                 WrapContents = false,
                 BackColor = Color.Transparent
@@ -123,8 +123,7 @@ namespace Presentacion.Administrador.UI
                 ("tarifas", "Tarifas", Icono.Etiqueta),
                 ("inventario", "Inventario", Icono.Caja),
                 ("reportes", "Reportes", Icono.Grafico),
-                ("configuracion", "Configuración", Icono.Engranaje),
-                ("backups", "Copias de seguridad", Icono.Disco),
+                ("historico", "Histórico", Icono.Reloj),
             };
 
             foreach (var (clave, texto, icono) in navegacion)

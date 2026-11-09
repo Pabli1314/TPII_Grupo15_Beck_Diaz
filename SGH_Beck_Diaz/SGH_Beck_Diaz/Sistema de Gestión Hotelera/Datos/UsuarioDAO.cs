@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using Microsoft.Data.SqlClient;
@@ -30,7 +30,7 @@ namespace Datos
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
                     cmd.CommandType = CommandType.Text;
-                    cmd.Parameters.Add("@nomUsuario", SqlDbType.VarChar, 20).Value = nomUsuario.Trim();
+                    cmd.Parameters.Add("@nomUsuario", SqlDbType.VarChar, 30).Value = nomUsuario.Trim();
 
                     con.Open();
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -160,7 +160,7 @@ namespace Datos
             {
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
-                    cmd.Parameters.Add("@nomUsuario", SqlDbType.VarChar, 20).Value = nomUsuario.Trim();
+                    cmd.Parameters.Add("@nomUsuario", SqlDbType.VarChar, 30).Value = nomUsuario.Trim();
                     cmd.Parameters.Add("@dniExcluir", SqlDbType.VarChar, 8).Value = dniExcluir.Trim();
 
                     con.Open();
@@ -183,7 +183,7 @@ namespace Datos
             {
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
-                    cmd.Parameters.Add("@correoUsuario", SqlDbType.VarChar, 20).Value = correoUsuario.Trim();
+                    cmd.Parameters.Add("@correoUsuario", SqlDbType.VarChar, 50).Value = correoUsuario.Trim();
                     cmd.Parameters.Add("@dniExcluir", SqlDbType.VarChar, 8).Value = dniExcluir.Trim();
 
                     con.Open();
@@ -227,11 +227,11 @@ namespace Datos
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.Add("@dniUsuario", SqlDbType.VarChar, 8).Value = usuario.DniUsuario.Trim();
-                    cmd.Parameters.Add("@nomUsuario", SqlDbType.VarChar, 20).Value = usuario.NomUsuario.Trim();
-                    cmd.Parameters.Add("@apeUsuario", SqlDbType.VarChar, 20).Value = usuario.ApeUsuario.Trim();
+                    cmd.Parameters.Add("@nomUsuario", SqlDbType.VarChar, 30).Value = usuario.NomUsuario.Trim();
+                    cmd.Parameters.Add("@apeUsuario", SqlDbType.VarChar, 30).Value = usuario.ApeUsuario.Trim();
                     cmd.Parameters.Add("@direccion", SqlDbType.VarChar, 50).Value = usuario.Direccion.Trim();
                     cmd.Parameters.Add("@telefonoUsuario", SqlDbType.VarChar, 10).Value = usuario.TelefonoUsuario.Trim();
-                    cmd.Parameters.Add("@correoUsuario", SqlDbType.VarChar, 20).Value = usuario.CorreoUsuario.Trim();
+                    cmd.Parameters.Add("@correoUsuario", SqlDbType.VarChar, 50).Value = usuario.CorreoUsuario.Trim();
                     cmd.Parameters.Add("@pasword", SqlDbType.VarChar, 256).Value = usuario.Pasword;
                     cmd.Parameters.Add("@estado", SqlDbType.Bit).Value = usuario.Estado;
                     cmd.Parameters.Add("@idRol", SqlDbType.Int).Value = usuario.IdRol;
@@ -261,11 +261,11 @@ namespace Datos
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.Add("@dniUsuario", SqlDbType.VarChar, 8).Value = usuario.DniUsuario.Trim();
-                    cmd.Parameters.Add("@nomUsuario", SqlDbType.VarChar, 20).Value = usuario.NomUsuario.Trim();
-                    cmd.Parameters.Add("@apeUsuario", SqlDbType.VarChar, 20).Value = usuario.ApeUsuario.Trim();
+                    cmd.Parameters.Add("@nomUsuario", SqlDbType.VarChar, 30).Value = usuario.NomUsuario.Trim();
+                    cmd.Parameters.Add("@apeUsuario", SqlDbType.VarChar, 30).Value = usuario.ApeUsuario.Trim();
                     cmd.Parameters.Add("@direccion", SqlDbType.VarChar, 50).Value = usuario.Direccion.Trim();
                     cmd.Parameters.Add("@telefonoUsuario", SqlDbType.VarChar, 10).Value = usuario.TelefonoUsuario.Trim();
-                    cmd.Parameters.Add("@correoUsuario", SqlDbType.VarChar, 20).Value = usuario.CorreoUsuario.Trim();
+                    cmd.Parameters.Add("@correoUsuario", SqlDbType.VarChar, 50).Value = usuario.CorreoUsuario.Trim();
                     cmd.Parameters.Add("@estado", SqlDbType.Bit).Value = usuario.Estado;
                     cmd.Parameters.Add("@idRol", SqlDbType.Int).Value = usuario.IdRol;
 

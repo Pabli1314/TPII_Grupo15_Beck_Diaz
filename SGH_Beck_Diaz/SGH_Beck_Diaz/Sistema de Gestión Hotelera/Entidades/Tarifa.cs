@@ -12,9 +12,11 @@ namespace Entidades
         public int IdTipoHabitacion { get; set; }
         public string TipoHabitacionNombre { get; set; } = string.Empty;
         public decimal PrecioPorHora { get; set; }
-        public decimal PrecioPorFraccion { get; set; }
-        public decimal PrecioAdicional { get; set; }
+       // public decimal PrecioPorFraccion { get; set; }
+       // public decimal PrecioAdicional { get; set; }
         public bool Activa { get; set; } = true;
         public DateTime UltimaModificacion { get; set; } = DateTime.Now;
     }
 }
+
+

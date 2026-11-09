@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Entidades;
@@ -172,7 +172,8 @@ namespace Logica
                 });
             }
 
-            _gestionTurnoCaja.ObtenerOAbrirTurno(dniUsuario);
+            // Bloqueo operativo: caja cerrada o con turno vencido pendiente de cierre.
+            _gestionTurnoCaja.ValidarCajaOperativa(dniUsuario);
 
             Venta venta = new Venta { Total = detalles.Sum(d => d.Subtotal), IdMetodo = idMetodo, DniHuesped = dniHuesped };
             venta.IdVenta = VentaDAO.RegistrarConDetalle(venta, detalles);
@@ -180,4 +181,4 @@ namespace Logica
             return venta;
         }
     }
-}
+}

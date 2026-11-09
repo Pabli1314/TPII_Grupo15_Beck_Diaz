@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Presentacion.Recepcionista.Vistas
 {
-    /// <summary>Historial unificado de check-in/check-out y ventas adicionales, con filtros.</summary>
+    /// <summary>Historial unificado de check-in, check-out, prórrogas y ventas adicionales, con filtros.</summary>
     internal class VistaHistorial : UserControl
     {
         private readonly GestionHistorialRecepcion _gestionHistorial = new();
@@ -25,33 +25,116 @@ namespace Presentacion.Recepcionista.Vistas
             Dock = DockStyle.Fill;
             BackColor = Paleta.FondoApp;
 
-            var lblTitulo = new Label { Text = "Historial de operaciones", Font = Paleta.FuenteSeccion, ForeColor = Paleta.TextoPrimario, AutoSize = true, Location = new Point(0, 0) };
+            // Panel superior con título y barra de filtros responsive
+            var panelSuperior = new Panel
+            {
+                Dock = DockStyle.Top,
+                AutoSize = true,
+                BackColor = Paleta.FondoApp,
+                Padding = new Padding(0, 0, 0, 14)
+            };
 
-            var panelFiltros = new FlowLayoutPanel { Location = new Point(0, 36), Size = new Size(1300, 40), FlowDirection = FlowDirection.LeftToRight, AutoSize = true };
+            var lblTitulo = new Label
+            {
+                Text = "Historial de operaciones",
+                Font = Paleta.FuenteSeccion,
+                ForeColor = Paleta.TextoPrimario,
+                AutoSize = true,
+                Location = new Point(0, 0)
+            };
 
-            _cmbTipo = CamposFormulario.Combo(Point.Empty, 140);
-            _cmbTipo.Items.AddRange(new object[] { "Todas", "Check-in", "Check-out", "Venta" });
+            var panelFiltros = new FlowLayoutPanel
+            {
+                Location = new Point(0, 36),
+                FlowDirection = FlowDirection.LeftToRight,
+                AutoSize = true,
+                WrapContents = true,
+                BackColor = Paleta.FondoApp
+            };
+
+            // 1. Selector de Tipo de Operación
+            _cmbTipo = CamposFormulario.Combo(Point.Empty, 130);
+            _cmbTipo.Items.AddRange(new object[] { "Todas", "Check-in", "Check-out", "Prórroga", "Venta" });
             _cmbTipo.SelectedIndex = 0;
-            _cmbTipo.Margin = new Padding(0, 0, 12, 0);
+            _cmbTipo.Margin = new Padding(0, 0, 10, 0);
 
-            _txtHuesped = CamposFormulario.Texto(Point.Empty, 180);
+            // 2. Filtro por Huésped / DNI
+            _txtHuesped = CamposFormulario.Texto(Point.Empty, 170);
             _txtHuesped.Margin = new Padding(0, 0, 4, 0);
-            var lblHuesped = new Label { Text = "Huésped", Font = Paleta.FuenteChica, ForeColor = Paleta.TextoTerciario, AutoSize = true, Margin = new Padding(0, 6, 12, 0) };
+            var lblHuesped = new Label
+            {
+                Text = "Huésped / DNI",
+                Font = Paleta.FuenteChica,
+                ForeColor = Paleta.TextoTerciario,
+                AutoSize = true,
+                Margin = new Padding(0, 6, 12, 0)
+            };
 
-            _numHabitacion = CamposFormulario.Numerico(Point.Empty, 90, 0, 999, 0);
+            // 3. Filtro por Habitación
+            _numHabitacion = CamposFormulario.Numerico(Point.Empty, 80, 0, 999, 0);
             _numHabitacion.Margin = new Padding(0, 0, 4, 0);
-            var lblHabitacion = new Label { Text = "Habitación", Font = Paleta.FuenteChica, ForeColor = Paleta.TextoTerciario, AutoSize = true, Margin = new Padding(0, 6, 12, 0) };
+            var lblHabitacion = new Label
+            {
+                Text = "Habitación",
+                Font = Paleta.FuenteChica,
+                ForeColor = Paleta.TextoTerciario,
+                AutoSize = true,
+                Margin = new Padding(0, 6, 12, 0)
+            };
 
-            _txtUsuario = CamposFormulario.Texto(Point.Empty, 140);
+            // 4. Filtro por Usuario
+            _txtUsuario = CamposFormulario.Texto(Point.Empty, 130);
             _txtUsuario.Margin = new Padding(0, 0, 4, 0);
-            var lblUsuario = new Label { Text = "Usuario", Font = Paleta.FuenteChica, ForeColor = Paleta.TextoTerciario, AutoSize = true, Margin = new Padding(0, 6, 12, 0) };
+            var lblUsuario = new Label
+            {
+                Text = "Usuario",
+                Font = Paleta.FuenteChica,
+                ForeColor = Paleta.TextoTerciario,
+                AutoSize = true,
+                Margin = new Padding(0, 6, 12, 0)
+            };
 
-            _chkUsarFecha = new CheckBox { Text = "Filtrar por fecha", Font = Paleta.FuenteBase, AutoSize = true, Margin = new Padding(0, 4, 6, 0) };
-            _dtpFecha = new DateTimePicker { Format = DateTimePickerFormat.Short, Width = 120, Margin = new Padding(0, 0, 12, 0), Enabled = false };
+            // 5. Filtro por Fecha
+            _chkUsarFecha = new CheckBox
+            {
+                Text = "Filtrar por fecha",
+                Font = Paleta.FuenteBase,
+                AutoSize = true,
+                Margin = new Padding(0, 4, 6, 0)
+            };
+            _dtpFecha = new DateTimePicker
+            {
+                Format = DateTimePickerFormat.Short,
+                Width = 120,
+                Margin = new Padding(0, 0, 12, 0),
+                Enabled = false
+            };
             _chkUsarFecha.CheckedChanged += (s, e) => _dtpFecha.Enabled = _chkUsarFecha.Checked;
 
-            var btnBuscar = EstiloBoton.Primario(new Button { Text = "Filtrar", Size = new Size(100, 34) });
+            // 6. Botones de Acción
+            var btnBuscar = EstiloBoton.Primario(new Button
+            {
+                Text = "Filtrar",
+                Size = new Size(90, 34),
+                Margin = new Padding(0, 0, 6, 0)
+            });
             btnBuscar.Click += (s, e) => Refrescar();
+
+            var btnLimpiar = EstiloBoton.Secundario(new Button
+            {
+                Text = "Limpiar filtros",
+                Size = new Size(110, 34)
+            });
+            btnLimpiar.Click += (s, e) => LimpiarFiltros();
+
+            // Eventos para auto-filtrar de forma inmediata
+            _txtHuesped.TextChanged += (s, e) => Refrescar();
+            _txtHuesped.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) Refrescar(); };
+            _txtUsuario.TextChanged += (s, e) => Refrescar();
+            _txtUsuario.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) Refrescar(); };
+            _cmbTipo.SelectedIndexChanged += (s, e) => Refrescar();
+            _numHabitacion.ValueChanged += (s, e) => Refrescar();
+            _dtpFecha.ValueChanged += (s, e) => { if (_chkUsarFecha.Checked) Refrescar(); };
 
             panelFiltros.Controls.Add(_cmbTipo);
             panelFiltros.Controls.Add(_txtHuesped);
@@ -63,28 +146,123 @@ namespace Presentacion.Recepcionista.Vistas
             panelFiltros.Controls.Add(_chkUsarFecha);
             panelFiltros.Controls.Add(_dtpFecha);
             panelFiltros.Controls.Add(btnBuscar);
+            panelFiltros.Controls.Add(btnLimpiar);
+
+            panelSuperior.Controls.Add(lblTitulo);
+            panelSuperior.Controls.Add(panelFiltros);
+
+            // Contenedor principal de la grilla (Dock = Fill)
+            var panelGrilla = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Paleta.FondoApp,
+                Padding = new Padding(0, 6, 0, 0)
+            };
 
             _grilla = new DataGridView
             {
-                Location = new Point(0, 86),
-                Size = new Size(1300, 700),
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                Dock = DockStyle.Fill,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                ScrollBars = ScrollBars.Both,
+                AutoGenerateColumns = false
             };
             EstiloGrid.Aplicar(_grilla);
-            _grilla.Columns.Add("fecha", "Fecha");
-            _grilla.Columns.Add("hora", "Hora");
-            _grilla.Columns.Add("tipo", "Tipo");
-            _grilla.Columns.Add("descripcion", "Descripción");
-            _grilla.Columns.Add("habitacion", "Habitación");
-            _grilla.Columns.Add("usuario", "Usuario");
-            _grilla.Columns.Add("monto", "Monto");
 
-            Controls.Add(lblTitulo);
-            Controls.Add(panelFiltros);
-            Controls.Add(_grilla);
+            ConfigurarColumnas();
+
+            panelGrilla.Controls.Add(_grilla);
+
+            Controls.Add(panelGrilla);
+            Controls.Add(panelSuperior);
 
             Refrescar();
+        }
+
+        private void ConfigurarColumnas()
+        {
+            _grilla.Columns.Clear();
+
+            // 1. Fecha
+            _grilla.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "fecha",
+                HeaderText = "Fecha",
+                FillWeight = 10,
+                MinimumWidth = 95,
+                HeaderCell = { Style = { Alignment = DataGridViewContentAlignment.MiddleCenter, Padding = new Padding(0) } },
+                DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleCenter, Padding = new Padding(0, 6, 0, 6) }
+            });
+
+            // 2. Hora
+            _grilla.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "hora",
+                HeaderText = "Hora",
+                FillWeight = 8,
+                MinimumWidth = 75,
+                HeaderCell = { Style = { Alignment = DataGridViewContentAlignment.MiddleCenter, Padding = new Padding(0) } },
+                DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleCenter, Padding = new Padding(0, 6, 0, 6) }
+            });
+
+            // 3. Tipo
+            _grilla.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "tipo",
+                HeaderText = "Tipo",
+                FillWeight = 11,
+                MinimumWidth = 100,
+                HeaderCell = { Style = { Alignment = DataGridViewContentAlignment.MiddleCenter, Padding = new Padding(0) } },
+                DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleCenter, Padding = new Padding(0, 6, 0, 6) }
+            });
+
+            // 4. Descripción
+            _grilla.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "descripcion",
+                HeaderText = "Descripción",
+                FillWeight = 36,
+                MinimumWidth = 220,
+                HeaderCell = { Style = { Alignment = DataGridViewContentAlignment.MiddleLeft, Padding = new Padding(10, 0, 0, 0) } },
+                DefaultCellStyle =
+                {
+                    Alignment = DataGridViewContentAlignment.MiddleLeft,
+                    Padding = new Padding(10, 6, 10, 6),
+                    WrapMode = DataGridViewTriState.False
+                }
+            });
+
+            // 5. Habitación
+            _grilla.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "habitacion",
+                HeaderText = "Habitación",
+                FillWeight = 9,
+                MinimumWidth = 85,
+                HeaderCell = { Style = { Alignment = DataGridViewContentAlignment.MiddleCenter, Padding = new Padding(0) } },
+                DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleCenter, Padding = new Padding(0, 6, 0, 6) }
+            });
+
+            // 6. Usuario
+            _grilla.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "usuario",
+                HeaderText = "Usuario",
+                FillWeight = 13,
+                MinimumWidth = 105,
+                HeaderCell = { Style = { Alignment = DataGridViewContentAlignment.MiddleLeft, Padding = new Padding(10, 0, 0, 0) } },
+                DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleLeft, Padding = new Padding(10, 6, 0, 6) }
+            });
+
+            // 7. Monto
+            _grilla.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "monto",
+                HeaderText = "Monto",
+                FillWeight = 13,
+                MinimumWidth = 95,
+                HeaderCell = { Style = { Alignment = DataGridViewContentAlignment.MiddleRight, Padding = new Padding(0, 0, 12, 0) } },
+                DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleRight, Padding = new Padding(0, 6, 12, 6) }
+            });
         }
 
         public void Refrescar()
@@ -111,6 +289,19 @@ namespace Presentacion.Recepcionista.Vistas
                     operacion.Usuario,
                     operacion.Monto.HasValue ? operacion.Monto.Value.ToString("C") : "-");
             }
+        }
+
+        private void LimpiarFiltros()
+        {
+            _cmbTipo.SelectedIndex = 0;
+            _txtHuesped.Clear();
+            _numHabitacion.Value = 0;
+            _txtUsuario.Clear();
+            _chkUsarFecha.Checked = false;
+            _dtpFecha.Value = DateTime.Now;
+            _dtpFecha.Enabled = false;
+
+            Refrescar();
         }
     }
 }

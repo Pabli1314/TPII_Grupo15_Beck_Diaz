@@ -1,4 +1,4 @@
-using Entidades;
+﻿using Entidades;
 using Logica;
 using Presentacion.Administrador.UI;
 using Presentacion.Recepcionista.UI;
@@ -563,6 +563,11 @@ namespace Presentacion.Recepcionista.Vistas
                 return;
             }
 
+            if (!Presentacion.Recepcionista.UI.ValidadorCaja.PuedeOperar(_usuario.DniUsuario, FindForm()))
+            {
+                return;
+            }
+
             try
             {
                 int idMetodo = (int)_cmbMetodoPago.SelectedValue;
@@ -594,4 +599,4 @@ namespace Presentacion.Recepcionista.Vistas
             }
         }
     }
-}
+}

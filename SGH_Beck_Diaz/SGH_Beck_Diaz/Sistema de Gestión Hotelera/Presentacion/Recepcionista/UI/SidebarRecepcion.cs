@@ -42,7 +42,7 @@ namespace Presentacion.Recepcionista.UI
             var panelNav = new FlowLayoutPanel
             {
                 Location = new Point(0, 184),
-                Size = new Size(260, 430),
+                Size = new Size(260, 470),
                 FlowDirection = FlowDirection.TopDown,
                 WrapContents = false,
                 BackColor = Color.Transparent
@@ -52,13 +52,13 @@ namespace Presentacion.Recepcionista.UI
             {
                 ("dashboard", "Inicio", Icono.Home),
                 ("habitaciones", "Habitaciones", Icono.Cama),
-                ("reservas", "Reservas", Icono.Etiqueta),
                 ("check-in", "Check-in", Icono.Check),
                 ("check-out", "Check-out", Icono.Salir),
                 ("caja", "Caja", Icono.Caja),
                 ("ventas", "Ventas adicionales", Icono.Grafico),
                 ("huespedes", "Huéspedes", Icono.Personas),
                 ("historial", "Historial", Icono.Reloj),
+                ("reportes", "Reportes", Icono.Grafico),
             };
 
             foreach (var (clave, texto, icono) in navegacion)

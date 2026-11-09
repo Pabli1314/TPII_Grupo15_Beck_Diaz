@@ -3,6 +3,7 @@ using Logica;
 using Presentacion.Administrador.Modales;
 using Presentacion.Administrador.UI;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -44,7 +45,8 @@ namespace Presentacion.Administrador.Vistas
 
             _panelHabitaciones = new FlowLayoutPanel
             {
-                Location = new Point(0, 36),
+                // Debajo del título y del botón "Nueva habitación" (38 px de alto).
+                Location = new Point(0, 52),
                 Size = new Size(1080, 900),
                 MaximumSize = new Size(1080, 0),
                 FlowDirection = FlowDirection.LeftToRight,
@@ -78,9 +80,18 @@ namespace Presentacion.Administrador.Vistas
         {
             int minutosTolerancia = _gestionConfiguracion.Obtener().MinutosTolerancia;
 
-            var habitaciones = _gestionHabitaciones.ObtenerResumenHabitaciones()
-                                                    .OrderBy(h => h.NroHabitacion)
-                                                    .ToList();
+            List<HabitacionResumen> habitaciones;
+            try
+            {
+                habitaciones = _gestionHabitaciones.ObtenerResumenHabitaciones()
+                                                   .OrderBy(h => h.NroHabitacion)
+                                                   .ToList();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"No se pudieron cargar las habitaciones.\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             _panelHabitaciones.Controls.Clear();
             foreach (HabitacionResumen resumen in habitaciones)
@@ -101,7 +112,10 @@ namespace Presentacion.Administrador.Vistas
         private void AbrirDetalleHabitacion(HabitacionResumen resumen)
         {
             using var modal = new FModalDetalleHabitacion(resumen);
-            modal.ShowDialog(this);
+            if (modal.ShowDialog(this) == DialogResult.OK)
+            {
+                Refrescar();
+            }
         }
 
         private void MarcarComoLimpia(int nroHabitacion)

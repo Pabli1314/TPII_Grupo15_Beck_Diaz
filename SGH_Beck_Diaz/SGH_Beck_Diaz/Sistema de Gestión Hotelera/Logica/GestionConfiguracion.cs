@@ -22,8 +22,6 @@ namespace Logica
             _configuracion.MinutosTolerancia = configuracion.MinutosTolerancia;
             _configuracion.AlertasVisualesActivas = configuracion.AlertasVisualesActivas;
             _configuracion.AlertasSonorasActivas = configuracion.AlertasSonorasActivas;
-            _configuracion.BackupAutomaticoActivo = configuracion.BackupAutomaticoActivo;
-            _configuracion.BackupAutomaticoHora = configuracion.BackupAutomaticoHora;
         }
     }
 }

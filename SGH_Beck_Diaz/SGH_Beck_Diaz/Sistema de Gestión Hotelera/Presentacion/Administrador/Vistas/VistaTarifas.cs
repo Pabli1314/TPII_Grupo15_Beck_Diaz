@@ -12,7 +12,6 @@ namespace Presentacion.Administrador.Vistas
     internal class VistaTarifas : UserControl, IVistaAdministrador
     {
         private const string ColEditar = "colEditar";
-        private const string ColEstado = "colEstadoAccion";
 
         private readonly GestionTarifas _gestionTarifas = new();
         private readonly DataGridView _dgv;
@@ -68,7 +67,6 @@ namespace Presentacion.Administrador.Vistas
             _dgv.Columns.Add(new DataGridViewTextBoxColumn { Name = "Estado", HeaderText = "Estado", Width = 100 });
             _dgv.Columns.Add(new DataGridViewTextBoxColumn { Name = "Modificacion", HeaderText = "Última modificación", Width = 160, AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill });
             _dgv.Columns.Add(new DataGridViewButtonColumn { Name = ColEditar, HeaderText = "", Text = "Editar", UseColumnTextForButtonValue = true, Width = 80, FlatStyle = FlatStyle.Flat });
-            _dgv.Columns.Add(new DataGridViewButtonColumn { Name = ColEstado, HeaderText = "", UseColumnTextForButtonValue = false, Width = 110, FlatStyle = FlatStyle.Flat });
         }
 
         private void CargarDatos()
@@ -81,11 +79,9 @@ namespace Presentacion.Administrador.Vistas
                 int fila = _dgv.Rows.Add(
                     tarifa.TipoHabitacionNombre,
                     tarifa.PrecioPorHora.ToString("C2"),
-                    tarifa.PrecioAdicional.ToString("C2"),
                     tarifa.Activa ? "Activa" : "Inactiva",
                     tarifa.UltimaModificacion.ToString("dd/MM/yyyy HH:mm"));
 
-                _dgv.Rows[fila].Cells[ColEstado].Value = tarifa.Activa ? "Desactivar" : "Activar";
                 _dgv.Rows[fila].Cells["Estado"].Style.ForeColor = tarifa.Activa ? Paleta.Exito : Paleta.Peligro;
             }
         }
@@ -94,24 +90,9 @@ namespace Presentacion.Administrador.Vistas
         {
             if (e.RowIndex < 0 || e.RowIndex >= _tarifas.Count) return;
 
-            Tarifa tarifa = _tarifas[e.RowIndex];
-            string columna = _dgv.Columns[e.ColumnIndex].Name;
-
-            if (columna == ColEditar)
+            if (_dgv.Columns[e.ColumnIndex].Name == ColEditar)
             {
-                AbrirModal(tarifa);
-            }
-            else if (columna == ColEstado)
-            {
-                try
-                {
-                    _gestionTarifas.CambiarEstado(tarifa.IdTarifa, !tarifa.Activa);
-                    CargarDatos();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error al cambiar estado", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                AbrirModal(_tarifas[e.RowIndex]);
             }
         }
 
@@ -125,3 +106,4 @@ namespace Presentacion.Administrador.Vistas
         }
     }
 }
+

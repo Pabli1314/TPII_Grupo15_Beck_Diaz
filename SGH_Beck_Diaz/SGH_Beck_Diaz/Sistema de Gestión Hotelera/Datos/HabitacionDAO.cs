@@ -81,6 +81,28 @@ namespace Datos
             }
         }
 
+        /// <summary>Actualiza piso, camas, tipo y estado. El número no se modifica: es la PK que referencian los hospedajes.</summary>
+        public static void Actualizar(Habitacion habitacion)
+        {
+            string query = @"
+                UPDATE habitacion
+                SET piso = @piso, cant_camas = @cantCamas, id_tipo_habitacion = @idTipoHabitacion, id_estado = @idEstado
+                WHERE nro_habitacion = @nroHabitacion";
+
+            using (SqlConnection con = _conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@nroHabitacion", habitacion.NroHabitacion);
+                cmd.Parameters.AddWithValue("@piso", habitacion.Piso);
+                cmd.Parameters.AddWithValue("@cantCamas", habitacion.CantCamas);
+                cmd.Parameters.AddWithValue("@idTipoHabitacion", habitacion.IdTipoHabitacion);
+                cmd.Parameters.AddWithValue("@idEstado", habitacion.IdEstado);
+
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         public static void ActualizarEstado(int nroHabitacion, int idEstado)
         {
             string query = @"

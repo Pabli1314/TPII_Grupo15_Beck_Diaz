@@ -59,6 +59,14 @@ namespace Sistema_de_Gestión_Hotelera
                 return;
             }
 
+            // Esta pantalla es el formulario principal de la app: si quedara oculta al cerrar el módulo
+            // (con la X o con "Cerrar sesión"), el proceso seguiría corriendo sin ninguna ventana.
+            modulo.FormClosed += (s, e) =>
+            {
+                Show();
+                Activate();
+            };
+
             modulo.Show();
             Hide();
         }

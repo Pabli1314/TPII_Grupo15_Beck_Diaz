@@ -10,6 +10,7 @@ namespace Presentacion.Recepcionista.Modales
     internal class FModalRegistrarHuesped : FormModalBase
     {
         private readonly GestionHuespedes _gestionHuespedes = new();
+        private readonly Huesped? _huespedOriginal;
         private readonly TextBox _txtDni;
         private readonly TextBox _txtNombre;
         private readonly TextBox _txtApellido;
@@ -18,9 +19,18 @@ namespace Presentacion.Recepcionista.Modales
         private readonly TextBox _txtCorreo;
         private readonly Label _lblError;
 
-        public FModalRegistrarHuesped()
+        public Huesped? HuespedGuardado { get; private set; }
+
+        public FModalRegistrarHuesped() : this(null)
         {
-            EstablecerTitulo("Registrar huésped");
+        }
+
+        public FModalRegistrarHuesped(Huesped? huesped)
+        {
+            _huespedOriginal = huesped;
+            bool esEdicion = huesped != null;
+
+            EstablecerTitulo(esEdicion ? "Modificar huésped" : "Registrar huésped");
 
             // Ancho de los campos de texto: alcanza para ver el valor completo mientras se escribe
             // (DNI, nombre, apellido, teléfono, dirección) sin que el modal quede más ancho que la
@@ -46,35 +56,62 @@ namespace Presentacion.Recepcionista.Modales
 
             Contenido.Controls.Add(CamposFormulario.Etiqueta("DNI", new Point(margenX, y)));
             _txtDni = CamposFormulario.SoloNumeros(CamposFormulario.Texto(new Point(margenX, y + separacionEtiquetaCampo), ancho), Huesped.LargoDni);
+            if (esEdicion)
+            {
+                _txtDni.Text = huesped!.DniHuesped;
+                _txtDni.ReadOnly = true;
+                _txtDni.BackColor = Paleta.FondoApp;
+                _txtDni.ForeColor = Paleta.TextoSecundario;
+            }
             Contenido.Controls.Add(_txtDni);
             y += altoFila;
 
             Contenido.Controls.Add(CamposFormulario.Etiqueta("Nombre", new Point(margenX, y)));
             _txtNombre = CamposFormulario.Texto(new Point(margenX, y + separacionEtiquetaCampo), ancho);
             _txtNombre.MaxLength = Huesped.LargoNombre;
+            if (esEdicion)
+            {
+                _txtNombre.Text = huesped!.Nombre;
+            }
             Contenido.Controls.Add(_txtNombre);
             y += altoFila;
 
             Contenido.Controls.Add(CamposFormulario.Etiqueta("Apellido", new Point(margenX, y)));
             _txtApellido = CamposFormulario.Texto(new Point(margenX, y + separacionEtiquetaCampo), ancho);
             _txtApellido.MaxLength = Huesped.LargoApellido;
+            if (esEdicion)
+            {
+                _txtApellido.Text = huesped!.Apellido;
+            }
             Contenido.Controls.Add(_txtApellido);
             y += altoFila;
 
             Contenido.Controls.Add(CamposFormulario.Etiqueta("Teléfono", new Point(margenX, y)));
             _txtTelefono = CamposFormulario.SoloNumeros(CamposFormulario.Texto(new Point(margenX, y + separacionEtiquetaCampo), ancho), Huesped.LargoTelefono);
+            if (esEdicion)
+            {
+                _txtTelefono.Text = huesped!.Telefono;
+            }
             Contenido.Controls.Add(_txtTelefono);
             y += altoFila;
 
             Contenido.Controls.Add(CamposFormulario.Etiqueta("Dirección", new Point(margenX, y)));
             _txtDireccion = CamposFormulario.Texto(new Point(margenX, y + separacionEtiquetaCampo), ancho);
             _txtDireccion.MaxLength = Huesped.LargoDireccion;
+            if (esEdicion)
+            {
+                _txtDireccion.Text = huesped!.Direccion;
+            }
             Contenido.Controls.Add(_txtDireccion);
             y += altoFila;
 
             Contenido.Controls.Add(CamposFormulario.Etiqueta("Correo electrónico", new Point(margenX, y)));
             _txtCorreo = CamposFormulario.Texto(new Point(margenX, y + separacionEtiquetaCampo), ancho);
             _txtCorreo.MaxLength = Huesped.LargoCorreo;
+            if (esEdicion)
+            {
+                _txtCorreo.Text = huesped!.Correo;
+            }
             Contenido.Controls.Add(_txtCorreo);
             y += altoFila;
 
@@ -91,14 +128,14 @@ namespace Presentacion.Recepcionista.Modales
             var btnCancelar = EstiloBoton.Secundario(new Button { Text = "Cancelar", Size = new Size(anchoBoton, 35), Location = new Point(margenX, y) });
             btnCancelar.Click += (s, e) => { DialogResult = DialogResult.Cancel; Close(); };
 
-            var btnGuardar = EstiloBoton.Primario(new Button { Text = "Registrar", Size = new Size(anchoBoton, 35), Location = new Point(anchoContenido - margenX - anchoBoton, y) });
+            var btnGuardar = EstiloBoton.Primario(new Button { Text = esEdicion ? "Guardar" : "Registrar", Size = new Size(anchoBoton, 35), Location = new Point(anchoContenido - margenX - anchoBoton, y) });
             btnGuardar.Click += (s, e) => Guardar();
 
             Contenido.Controls.Add(btnCancelar);
             Contenido.Controls.Add(btnGuardar);
 
             y += 35 + 20;
-            // Alto total del modal = contenido calculado + padding del marco (24 arriba y abajo) + barra de título.
+            // Alto total del modal = contenido calculated + padding del marco (24 arriba y abajo) + barra de título.
             // El ancho sale de anchoContenido + el padding del marco (24 a cada lado), en vez de un
             // valor fijo desacoplado del ancho real de los campos.
             Size = new Size(anchoContenido + 48, y + 48 + 53);
@@ -108,7 +145,7 @@ namespace Presentacion.Recepcionista.Modales
         {
             try
             {
-                _gestionHuespedes.RegistrarHuesped(new Huesped
+                var huesped = new Huesped
                 {
                     DniHuesped = _txtDni.Text.Trim(),
                     Nombre = _txtNombre.Text.Trim(),
@@ -116,8 +153,31 @@ namespace Presentacion.Recepcionista.Modales
                     Telefono = _txtTelefono.Text.Trim(),
                     Direccion = _txtDireccion.Text.Trim(),
                     Correo = _txtCorreo.Text.Trim()
-                });
+                };
 
+                if (_huespedOriginal == null)
+                {
+                    _gestionHuespedes.RegistrarHuesped(huesped);
+                }
+                else
+                {
+                    // Confirmación de seguridad previa a la modificación
+                    DialogResult confirmacion = MessageBox.Show(
+                        $"¿Está seguro de que desea guardar los cambios modificados para el huésped {huesped.Nombre} {huesped.Apellido} (DNI: {huesped.DniHuesped})?",
+                        "Confirmación de modificación",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning);
+
+                    if (confirmacion != DialogResult.Yes)
+                    {
+                        return; // Cancela si el usuario responde "No" y mantiene abierto el modal
+                    }
+
+                    _gestionHuespedes.ActualizarHuesped(huesped);
+                }
+
+                // Se guarda la entidad, se establece el resultado OK y se cierra el modal
+                HuespedGuardado = huesped;
                 DialogResult = DialogResult.OK;
                 Close();
             }
@@ -128,6 +188,4 @@ namespace Presentacion.Recepcionista.Modales
             }
         }
     }
-}
-
-
+}

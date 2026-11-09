@@ -1,3 +1,4 @@
+
 using System;
 using Microsoft.Data.SqlClient;
 
@@ -6,8 +7,8 @@ namespace Datos
     public class Conexion
     {
 
-        //private string stringConexion = "Server=(localdb)\\MSSQLLocalDB;Database=beck_diaz_db;Integrated Security=True;TrustServerCertificate=True;";
-        private string stringConexion = "Server=MCBECKMUSIC\\SQLEXPRESS01;Database=beck_diaz_db;Integrated Security=True;TrustServerCertificate=True;";
+        private string stringConexion = "Server=(localdb)\\MSSQLLocalDB;Database=beck_diaz_db;Integrated Security=True;TrustServerCertificate=True;";
+        //private string stringConexion = "Server=MCBECKMUSIC\\SQLEXPRESS01;Database=beck_diaz_db;Integrated Security=True;TrustServerCertificate=True;";
 
         public SqlConnection ObtenerConexion()
         {
@@ -25,3 +26,4 @@ namespace Datos
         }
     }
 }
+

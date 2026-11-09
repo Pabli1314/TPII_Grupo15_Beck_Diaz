@@ -3,7 +3,9 @@ using Logica;
 using Presentacion.Administrador.UI;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 
 namespace Presentacion.Recepcionista
@@ -11,6 +13,7 @@ namespace Presentacion.Recepcionista
     /// <summary>
     /// Alta de (huésped + hospedaje + pase de la habitación a Ocupada).
     /// Permite seleccionar un huésped registrado o ingresar/actualizar sus datos manualmente.
+    /// Muestra el resumen del costo estimado de la estadía y emite el comprobante de hospedaje.
     /// </summary>
     internal class FCheckIn : FormModalBase
     {
@@ -33,6 +36,19 @@ namespace Presentacion.Recepcionista
         private readonly Label _lblEncontrado;
         private readonly Label _lblError;
 
+        // --- Panel resumen de costo ---
+        private readonly Panel _pnlResumen;
+        private readonly Label _lblResumenTipo;
+        private readonly Label _lblResumenNoches;
+        private readonly Label _lblResumenTarifa;
+        private readonly Label _lblResumenTotal;
+
+        // --- Datos calculados para el ticket ---
+        private decimal _montoTotal;
+        private decimal _tarifaDiaria;
+        private int _noches;
+        private string _tipoHabitacion = string.Empty;
+
         public string NombreCompleto { get; private set; } = string.Empty;
         public DateTime HoraIngreso { get; private set; }
 
@@ -45,7 +61,7 @@ namespace Presentacion.Recepcionista
 
             _dniUsuario = dniUsuario ?? string.Empty;
 
-            Size = new Size(520, 750);
+            Size = new Size(520, 860);
             EstablecerTitulo($"Check-in — Habitación {nroHabitacion}");
 
             const int ancho = 440;
@@ -131,6 +147,7 @@ namespace Presentacion.Recepcionista
                 MinDate = DateTime.Today,
                 Value = DateTime.Today.AddDays(1)
             };
+            _dtpFechaSalida.ValueChanged += (s, e) => ActualizarResumenCosto();
             Contenido.Controls.Add(_dtpFechaSalida);
             y += 50;
 
@@ -142,10 +159,75 @@ namespace Presentacion.Recepcionista
                 Size = new Size(ancho, 30),
                 Format = DateTimePickerFormat.Time,
                 ShowUpDown = true,
-                Value = DateTime.Today.AddHours(12)
+                Value = DateTime.Now
             };
             Contenido.Controls.Add(_dtpHoraSalida);
             y += 54;
+
+            // -------------------------------------------------------
+            // Panel resumen de costo estimado
+            // -------------------------------------------------------
+            _pnlResumen = new Panel
+            {
+                Location = new Point(0, y),
+                Size = new Size(ancho, 110),
+                BackColor = Color.FromArgb(224, 234, 253),   // PrimarioSuave
+                Padding = new Padding(10)
+            };
+
+            var lblResumenTitulo = new Label
+            {
+                Text = "💰 Resumen de costo estimado",
+                Location = new Point(10, 8),
+                Size = new Size(ancho - 20, 20),
+                Font = Paleta.FuenteBaseNegrita,
+                ForeColor = Paleta.TextoPrimario,
+                BackColor = Color.Transparent
+            };
+
+            _lblResumenTipo = new Label
+            {
+                Location = new Point(10, 30),
+                Size = new Size(ancho - 20, 18),
+                Font = Paleta.FuenteChica,
+                ForeColor = Paleta.TextoSecundario,
+                BackColor = Color.Transparent
+            };
+
+            _lblResumenNoches = new Label
+            {
+                Location = new Point(10, 50),
+                Size = new Size(ancho - 20, 18),
+                Font = Paleta.FuenteChica,
+                ForeColor = Paleta.TextoSecundario,
+                BackColor = Color.Transparent
+            };
+
+            _lblResumenTarifa = new Label
+            {
+                Location = new Point(10, 68),
+                Size = new Size(ancho - 20, 18),
+                Font = Paleta.FuenteChica,
+                ForeColor = Paleta.TextoSecundario,
+                BackColor = Color.Transparent
+            };
+
+            _lblResumenTotal = new Label
+            {
+                Location = new Point(10, 86),
+                Size = new Size(ancho - 20, 20),
+                Font = Paleta.FuenteBaseNegrita,
+                ForeColor = Paleta.Primario,
+                BackColor = Color.Transparent
+            };
+
+            _pnlResumen.Controls.Add(lblResumenTitulo);
+            _pnlResumen.Controls.Add(_lblResumenTipo);
+            _pnlResumen.Controls.Add(_lblResumenNoches);
+            _pnlResumen.Controls.Add(_lblResumenTarifa);
+            _pnlResumen.Controls.Add(_lblResumenTotal);
+            Contenido.Controls.Add(_pnlResumen);
+            y += 118;
 
             // Mensajes de Error
             _lblError = CamposFormulario.Error(new Point(0, y), ancho);
@@ -153,17 +235,56 @@ namespace Presentacion.Recepcionista
             y += 30;
 
             // Botones de Acción
-            var btnCancelar = EstiloBoton.Secundario(new Button { Text = "Cancelar", Size = new Size(120, 40), Location = new Point(ancho - 120 - 140, y) });
+            var btnCancelar = EstiloBoton.Secundario(new Button { Text = "Cancelar", Size = new Size(120, 40), Location = new Point(0, y) });
             btnCancelar.Click += (s, e) => { DialogResult = DialogResult.Cancel; Close(); };
 
-            var btnConfirmar = EstiloBoton.Primario(new Button { Text = "Confirmar", Size = new Size(140, 40), Location = new Point(ancho - 140, y) });
+            var btnConfirmar = EstiloBoton.Primario(new Button { Text = "Confirmar Check-in", Size = new Size(165, 40), Location = new Point(ancho - 165, y) });
             btnConfirmar.Click += (s, e) => Confirmar();
 
             Contenido.Controls.Add(btnCancelar);
             Contenido.Controls.Add(btnConfirmar);
 
             CargarHuespedesDisponibles();
+            ActualizarResumenCosto();
         }
+
+        // ---------------------------------------------------------------
+        //  Actualización del panel de resumen
+        // ---------------------------------------------------------------
+
+        private void ActualizarResumenCosto()
+        {
+            try
+            {
+                var (monto, tarifa, noches, tipo) = _gestionHospedajes.CalcularMontoEstadia(
+                    _nroHabitacion, _dtpFechaSalida.Value);
+
+                _montoTotal = monto;
+                _tarifaDiaria = tarifa;
+                _noches = noches;
+                _tipoHabitacion = tipo;
+
+                var hab = Datos.HabitacionDAO.ObtenerPorNumero(_nroHabitacion);
+                string detalleHab = hab != null ? $"  ·  Piso {hab.Piso}  ·  {hab.CantCamas} {(hab.CantCamas == 1 ? "cama" : "camas")}" : string.Empty;
+                _lblResumenTipo.Text = $"Habitación {_nroHabitacion}  —  Tipo: {tipo}{detalleHab}";
+                _lblResumenNoches.Text = $"Noches: {noches}  (entrada hoy → salida {_dtpFechaSalida.Value:dd/MM/yyyy})";
+                _lblResumenTarifa.Text = $"Tarifa diaria: {tarifa:C}";
+                _lblResumenTotal.Text = $"Total estimado: {monto:C}";
+                _pnlResumen.BackColor = Color.FromArgb(224, 234, 253);   // PrimarioSuave
+            }
+            catch
+            {
+                _lblResumenTipo.Text = string.Empty;
+                _lblResumenNoches.Text = string.Empty;
+                _lblResumenTarifa.Text = string.Empty;
+                _lblResumenTotal.Text = "No se pudo calcular el costo.";
+                _pnlResumen.BackColor = Color.FromArgb(255, 243, 205);   // AdvertenciaSuave
+            }
+        }
+
+        // ---------------------------------------------------------------
+        //  Carga del combo de huéspedes
+        // ---------------------------------------------------------------
 
         private void CargarHuespedesDisponibles()
         {
@@ -189,6 +310,23 @@ namespace Presentacion.Recepcionista
             _cmbHuespedes.ValueMember = "Dni";
             _cmbHuespedes.DataSource = listaCombo;
             _cmbHuespedes.Enabled = true;
+
+            // Al enlazar el DataSource se selecciona solo el primer huésped y se precargan sus datos:
+            // se deja sin selección para que el recepcionista elija a conciencia o cargue uno nuevo.
+            _cmbHuespedes.SelectedIndex = -1;
+            LimpiarDatosHuesped();
+        }
+
+        private void LimpiarDatosHuesped()
+        {
+            _txtDni.Clear();
+            _txtNombre.Clear();
+            _txtApellido.Clear();
+            _txtTelefono.Clear();
+            _txtDireccion.Clear();
+            _txtCorreo.Clear();
+            _lblEncontrado.Visible = false;
+            _lblDetalleHuesped.Text = "Seleccione un huésped o complete los datos a continuación.";
         }
 
         private void CmbHuespedes_SelectedIndexChanged(object? sender, EventArgs e)
@@ -255,6 +393,10 @@ namespace Presentacion.Recepcionista
             }
         }
 
+        // ---------------------------------------------------------------
+        //  Confirmación y emisión del ticket
+        // ---------------------------------------------------------------
+
         private void Confirmar()
         {
             _lblError.Visible = false;
@@ -278,6 +420,13 @@ namespace Presentacion.Recepcionista
             };
 
             int idMetodo = Convert.ToInt32(_cmbMetodoPago.SelectedValue);
+            string nombreMetodo = (_cmbMetodoPago.SelectedItem as MetodoPago)?.NomMetodoPago
+                ?? _cmbMetodoPago.Text;
+
+            if (!Presentacion.Recepcionista.UI.ValidadorCaja.PuedeOperar(_dniUsuario, this))
+            {
+                return;
+            }
 
             try
             {
@@ -287,11 +436,17 @@ namespace Presentacion.Recepcionista
                     huesped,
                     idMetodo,
                     _dtpFechaSalida.Value,
-                    _dtpHoraSalida.Value.TimeOfDay
+                    _dtpHoraSalida.Value.TimeOfDay,
+                    _montoTotal
                 );
 
                 NombreCompleto = $"{huesped.Nombre} {huesped.Apellido}".Trim();
                 HoraIngreso = DateTime.Now;
+
+                // Recalcular para asegurarse de tener los valores actualizados
+                ActualizarResumenCosto();
+
+                EmitirTicketCheckIn(huesped, nombreMetodo);
 
                 DialogResult = DialogResult.OK;
                 Close();
@@ -304,6 +459,54 @@ namespace Presentacion.Recepcionista
             catch (Exception ex)
             {
                 MessageBox.Show($"Ocurrió un error al registrar el check-in.\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Genera el PDF del comprobante de hospedaje, lo guarda en la carpeta de Documentos
+        /// del usuario y lo abre automáticamente con el visor PDF predeterminado.
+        /// </summary>
+        private void EmitirTicketCheckIn(Huesped huesped, string nombreMetodo)
+        {
+            try
+            {
+                byte[] pdfBytes = GeneradorTicketPdf.GenerarBytesCheckIn(
+                    nombreHuesped: $"{huesped.Nombre} {huesped.Apellido}",
+                    dniHuesped: huesped.DniHuesped,
+                    nroHabitacion: _nroHabitacion,
+                    tipoHabitacion: _tipoHabitacion,
+                    fechaEntrada: HoraIngreso,
+                    fechaSalida: _dtpFechaSalida.Value,
+                    horaSalida: _dtpHoraSalida.Value.TimeOfDay,
+                    tarifaDiaria: _tarifaDiaria,
+                    noches: _noches,
+                    montoTotal: _montoTotal,
+                    metodoPago: nombreMetodo,
+                    emitidoPor: _dniUsuario
+                );
+
+                string carpeta = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                string nombreArchivo = $"CheckIn_{_nroHabitacion}_{huesped.DniHuesped}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+                string rutaArchivo = Path.Combine(carpeta, nombreArchivo);
+
+                File.WriteAllBytes(rutaArchivo, pdfBytes);
+
+                // Abrir el PDF con el visor predeterminado del sistema
+                Process.Start(new ProcessStartInfo(rutaArchivo) { UseShellExecute = true });
+
+                MessageBox.Show(
+                    $"Comprobante de hospedaje generado correctamente.\n\nArchivo: {nombreArchivo}\nUbicación: {carpeta}",
+                    "Ticket emitido",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"El check-in se registró correctamente, pero no se pudo generar el ticket PDF.\n\n{ex.Message}",
+                    "Advertencia",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
             }
         }
 
@@ -341,4 +544,4 @@ namespace Presentacion.Recepcionista
             return true;
         }
     }
-}
+}

@@ -1,4 +1,4 @@
---USE beck_diaz_db;
+USE beck_diaz_db;
 
 -- Insertar roles
 INSERT INTO Rol (nom_rol) VALUES ('Administrador'), ('Gerente'), ('Recepcionista');
@@ -86,4 +86,5 @@ WHERE nro_habitacion IN (102, 302)
 
 
 SELECT * FROM Huesped;
+SELECT * FROM Usuario;
 

@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace Presentacion.Administrador.UI
 {
-    /// <summary>Switch on/off dibujado a mano, usado en Configuración de alertas.</summary>
+    /// <summary>Switch on/off dibujado a mano, usado en los modales del Administrador.</summary>
     internal class ToggleSwitch : Control
     {
         private bool _checked;

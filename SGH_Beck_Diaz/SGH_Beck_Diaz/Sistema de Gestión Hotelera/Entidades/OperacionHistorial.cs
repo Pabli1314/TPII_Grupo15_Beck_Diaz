@@ -9,6 +9,7 @@ namespace Entidades
         public string Tipo { get; set; } = string.Empty;
         public string Descripcion { get; set; } = string.Empty;
         public string? Huesped { get; set; }
+        public string? DniHuesped { get; set; }
         public int? NroHabitacion { get; set; }
         public string Usuario { get; set; } = string.Empty;
         public decimal? Monto { get; set; }

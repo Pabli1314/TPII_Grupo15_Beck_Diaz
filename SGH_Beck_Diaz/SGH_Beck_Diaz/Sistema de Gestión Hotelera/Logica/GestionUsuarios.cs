@@ -2,6 +2,7 @@ using Datos;
 using Entidades;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Logica
 {
@@ -95,6 +96,16 @@ namespace Logica
                 throw new ArgumentException($"Ya existe otro usuario con el nombre de usuario \"{usuario.NomUsuario}\".");
             }
 
+            if (UsuarioDAO.ExisteCorreo(usuario.CorreoUsuario, usuario.DniUsuario))
+            {
+                throw new ArgumentException($"Ya existe otro usuario registrado con el correo \"{usuario.CorreoUsuario}\".");
+            }
+
+            if (UsuarioDAO.ExisteTelefono(usuario.TelefonoUsuario, usuario.DniUsuario))
+            {
+                throw new ArgumentException($"Ya existe otro usuario registrado con el teléfono \"{usuario.TelefonoUsuario}\".");
+            }
+
             bool cambiaPassword = !string.IsNullOrEmpty(password) || !string.IsNullOrEmpty(confirmarPassword);
             if (cambiaPassword)
             {
@@ -140,6 +151,20 @@ namespace Logica
             UsuarioDAO.Eliminar(dniUsuario);
         }
 
+        // Largos de la tabla Usuario. Los parámetros de UsuarioDAO tienen tamaño fijo: un valor más
+        // largo se truncaría en silencio en vez de fallar, por eso se valida antes acá.
+        // Son públicos para que FModalUsuario use los mismos valores como MaxLength.
+        public const int LargoDni = 8;
+        public const int LargoNombre = 30;
+        public const int LargoApellido = 30;
+        public const int LargoDireccion = 50;
+        public const int LargoTelefono = 10;
+        public const int LargoCorreo = 50;
+        public const int LargoPasswordMaximo = 50;
+        private const int LargoNombreMinimo = 2;
+        private const int LargoDireccionMinimo = 5;
+        private const int LargoPasswordMinimo = 8;
+
         private static void ValidarDatosBasicos(Usuario usuario)
         {
             if (usuario == null)
@@ -147,14 +172,22 @@ namespace Logica
                 throw new ArgumentException("No se recibieron datos del usuario.");
             }
 
+            usuario.DniUsuario = (usuario.DniUsuario ?? string.Empty).Trim();
+            usuario.NomUsuario = (usuario.NomUsuario ?? string.Empty).Trim();
+            usuario.ApeUsuario = (usuario.ApeUsuario ?? string.Empty).Trim();
+            usuario.Direccion = (usuario.Direccion ?? string.Empty).Trim();
+            usuario.TelefonoUsuario = (usuario.TelefonoUsuario ?? string.Empty).Trim();
+            usuario.CorreoUsuario = (usuario.CorreoUsuario ?? string.Empty).Trim();
+
             if (string.IsNullOrWhiteSpace(usuario.DniUsuario))
             {
                 throw new ArgumentException("Debe ingresar el DNI.");
             }
 
-            if (usuario.DniUsuario.Trim().Length > 8)
+            // CK_usuario_dni: solo dígitos / CK_usuario_dni_largo: exactamente 8
+            if (usuario.DniUsuario.Length != LargoDni || !EsSoloDigitos(usuario.DniUsuario))
             {
-                throw new ArgumentException("El DNI no puede superar los 8 caracteres.");
+                throw new ArgumentException($"El DNI debe contener exactamente {LargoDni} dígitos numéricos.");
             }
 
             if (string.IsNullOrWhiteSpace(usuario.NomUsuario))
@@ -162,9 +195,53 @@ namespace Logica
                 throw new ArgumentException("Debe ingresar el nombre de usuario.");
             }
 
+            // CK_usuario_nom_largo / CK_usuario_nom_sin_digitos
+            if (usuario.NomUsuario.Length < LargoNombreMinimo || usuario.NomUsuario.Length > LargoNombre)
+            {
+                throw new ArgumentException($"El nombre debe tener entre {LargoNombreMinimo} y {LargoNombre} caracteres.");
+            }
+
+            if (!EsSoloLetras(usuario.NomUsuario))
+            {
+                throw new ArgumentException("El nombre solo puede contener letras y espacios.");
+            }
+
             if (string.IsNullOrWhiteSpace(usuario.ApeUsuario))
             {
                 throw new ArgumentException("Debe ingresar el apellido.");
+            }
+
+            // CK_usuario_ape_largo / CK_usuario_ape_sin_digitos
+            if (usuario.ApeUsuario.Length < LargoNombreMinimo || usuario.ApeUsuario.Length > LargoApellido)
+            {
+                throw new ArgumentException($"El apellido debe tener entre {LargoNombreMinimo} y {LargoApellido} caracteres.");
+            }
+
+            if (!EsSoloLetras(usuario.ApeUsuario))
+            {
+                throw new ArgumentException("El apellido solo puede contener letras y espacios.");
+            }
+
+            if (string.IsNullOrWhiteSpace(usuario.Direccion))
+            {
+                throw new ArgumentException("Debe ingresar la dirección.");
+            }
+
+            // CK_usuario_direccion_largo
+            if (usuario.Direccion.Length < LargoDireccionMinimo || usuario.Direccion.Length > LargoDireccion)
+            {
+                throw new ArgumentException($"La dirección debe tener entre {LargoDireccionMinimo} y {LargoDireccion} caracteres.");
+            }
+
+            // CK_usuario_telefono: solo dígitos / CK_usuario_telefono_largo: exactamente 10
+            if (string.IsNullOrWhiteSpace(usuario.TelefonoUsuario))
+            {
+                throw new ArgumentException("Debe ingresar el teléfono.");
+            }
+
+            if (usuario.TelefonoUsuario.Length != LargoTelefono || !EsSoloDigitos(usuario.TelefonoUsuario))
+            {
+                throw new ArgumentException($"El teléfono debe tener exactamente {LargoTelefono} dígitos (código de área sin 0 y número sin 15).");
             }
 
             if (string.IsNullOrWhiteSpace(usuario.CorreoUsuario))
@@ -172,9 +249,15 @@ namespace Logica
                 throw new ArgumentException("Debe ingresar el correo.");
             }
 
-            if (!usuario.CorreoUsuario.Contains('@') || !usuario.CorreoUsuario.Contains('.'))
+            // CK_usuario_correo_formato
+            if (!Regex.IsMatch(usuario.CorreoUsuario, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
             {
                 throw new ArgumentException("El correo ingresado no es válido.");
+            }
+
+            if (usuario.CorreoUsuario.Length > LargoCorreo)
+            {
+                throw new ArgumentException($"El correo no puede superar los {LargoCorreo} caracteres.");
             }
 
             if (usuario.IdRol <= 0)
@@ -183,11 +266,38 @@ namespace Logica
             }
         }
 
+        private static bool EsSoloDigitos(string valor)
+        {
+            foreach (char c in valor)
+            {
+                if (c < '0' || c > '9') return false;
+            }
+
+            return true;
+        }
+
+        private static bool EsSoloLetras(string valor)
+        {
+            foreach (char c in valor)
+            {
+                if (!char.IsLetter(c) && c != ' ') return false;
+            }
+
+            return true;
+        }
+
         private static void ValidarPassword(string password, string confirmarPassword, bool esObligatoria)
         {
             if (esObligatoria && string.IsNullOrWhiteSpace(password))
             {
                 throw new ArgumentException("Debe ingresar una contraseña.");
+            }
+
+            // Si no es obligatoria y viene vacía, no se cambia: el largo solo se controla cuando se ingresa una
+            if (!string.IsNullOrEmpty(password) &&
+                (password.Length < LargoPasswordMinimo || password.Length > LargoPasswordMaximo))
+            {
+                throw new ArgumentException($"La contraseña debe tener entre {LargoPasswordMinimo} y {LargoPasswordMaximo} caracteres.");
             }
 
             if (password != confirmarPassword)

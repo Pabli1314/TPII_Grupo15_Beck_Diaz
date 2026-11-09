@@ -16,10 +16,6 @@ namespace Presentacion.Administrador
     public partial class FAdministrador : Form
     {
         private readonly Usuario _usuario;
-
-        // Usuario con el que se abrió el módulo (null si se entró sin login). Se devuelve tal cual a
-        // FSeleccionUsuario al cerrar sesión, para no pasarle el Administrador de respaldo a otro módulo.
-        private readonly Usuario? _usuarioSesion;
         private readonly SidebarAdmin _sidebar;
         private readonly HeaderAdmin _header;
         private readonly Panel _contenido;
@@ -33,8 +29,7 @@ namespace Presentacion.Administrador
             ["tarifas"] = "Gestión de Tarifas",
             ["inventario"] = "Gestión de Inventario",
             ["reportes"] = "Reportes y Estadísticas",
-            ["configuracion"] = "Configuración",
-            ["backups"] = "Copias de Seguridad",
+            ["historico"] = "Histórico Administrativo",
         };
 
         public FAdministrador() : this(null)
@@ -48,7 +43,6 @@ namespace Presentacion.Administrador
             // Adaptación a la nueva estructura: DniUsuario como string y NomUsuario/ApeUsuario para el perfil
             // Sin login: se opera con el primer Administrador activo de la base, para que lo que registre
             // (p. ej. limpiezas en registro_limpieza) quede a nombre de un dni_usuario que exista.
-            _usuarioSesion = usuario;
             _usuario = usuario
                 ?? new Logica.GestionUsuarios().ObtenerUsuarioActivoPorRol("Administrador")
                 ?? throw new InvalidOperationException("No hay ningún usuario Administrador activo en la base de datos. Inicie sesión.");
@@ -62,7 +56,6 @@ namespace Presentacion.Administrador
             _header = new HeaderAdmin();
             _header.MiPerfilClick += (s, e) => MostrarPerfil();
             _header.CambiarPasswordClick += (s, e) => MostrarCambiarPassword();
-            _header.ConfiguracionClick += (s, e) => Navegar("configuracion");
             _header.CerrarSesionClick += (s, e) => CerrarSesion();
 
             _contenido = new Panel { Dock = DockStyle.Fill, BackColor = Paleta.FondoApp, Padding = new Padding(28) };
@@ -108,13 +101,12 @@ namespace Presentacion.Administrador
         private Control CrearVista(string clave) => clave switch
         {
             "dashboard" => new VistaDashboard(),
-            //"habitaciones" => new VistaSupervisionHabitaciones(_usuario),
+            "habitaciones" => new VistaSupervisionHabitaciones(_usuario),
             "usuarios" => new VistaUsuarios(),
             "tarifas" => new VistaTarifas(),
             "inventario" => new VistaInventario(),
-            "reportes" => new VistaReportes(),
-            "configuracion" => new VistaConfiguracion(),
-            "backups" => new VistaCopiasSeguridad(),
+            "reportes" => new VistaReportes(_usuario),
+            "historico" => new VistaHistorico(),
             _ => new VistaDashboard()
         };
 
@@ -143,15 +135,7 @@ namespace Presentacion.Administrador
                 return;
             }
 
-            // Vuelve a la pantalla de selección de módulo. FSeleccionUsuario quedó oculta al abrir este
-            // módulo (y suele ser el formulario principal de la app): se reutiliza esa instancia en vez
-            // de crear otra, para no acumular ventanas ocultas ni dejar la app corriendo sin ventana.
-            Sistema_de_Gestión_Hotelera.FSeleccionUsuario seleccion =
-                Application.OpenForms.OfType<Sistema_de_Gestión_Hotelera.FSeleccionUsuario>().FirstOrDefault()
-                ?? new Sistema_de_Gestión_Hotelera.FSeleccionUsuario(_usuarioSesion);
-
-            seleccion.Show();
-            seleccion.Activate();
+            // FLogin, que abrió este módulo, se vuelve a mostrar al cerrarse (FormClosed).
             Close();
         }
     }

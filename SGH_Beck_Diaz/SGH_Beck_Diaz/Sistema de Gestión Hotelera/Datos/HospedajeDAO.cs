@@ -11,16 +11,16 @@ namespace Datos
     {
         private static readonly Conexion _conexion = new Conexion();
 
-        /// <summary>Hospedajes cuya fecha de entrada cae dentro del rango (inclusive), para reportes.</summary>
+        /// <summary>Hospedajes cuya estadía (entrada a salida) se superpone con el rango (inclusive), para reportes.</summary>
         public static List<Hospedaje> ObtenerEnRango(DateTime desde, DateTime hasta)
         {
             List<Hospedaje> hospedajes = new List<Hospedaje>();
 
             string query = @"
                 SELECT id_hospedaje, fecha_entrada, hora_entrada, fecha_salida, hora_salida,
-                       id_metodo, nro_habitacion, id_turno, dni_huesped
+                       monto_total, id_metodo, nro_habitacion, id_turno, dni_huesped
                 FROM hospedaje
-                WHERE fecha_entrada BETWEEN @desde AND @hasta
+                WHERE fecha_entrada <= @hasta AND fecha_salida >= @desde
                 ORDER BY fecha_entrada";
 
             using (SqlConnection con = _conexion.ObtenerConexion())
@@ -41,6 +41,7 @@ namespace Datos
                             HoraEntrada = (TimeSpan)reader["hora_entrada"],
                             FechaSalida = Convert.ToDateTime(reader["fecha_salida"]),
                             HoraSalida = (TimeSpan)reader["hora_salida"],
+                            monto_total = reader["monto_total"] != DBNull.Value ? Convert.ToSingle(reader["monto_total"]) : 0f,
                             IdMetodo = Convert.ToInt32(reader["id_metodo"]),
                             NroHabitacion = Convert.ToInt32(reader["nro_habitacion"]),
                             IdTurno = Convert.ToInt32(reader["id_turno"]),
@@ -53,18 +54,49 @@ namespace Datos
             return hospedajes;
         }
 
+        /// <summary>
+        /// Id del PRIMER hospedaje de cada huésped (por DNI). Sirve para clasificar una estadía como
+        /// "huésped nuevo" (es su primera) o "recurrente" (ya se había alojado antes).
+        /// </summary>
+        public static Dictionary<string, int> ObtenerPrimerHospedajePorHuesped()
+        {
+            var resultado = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+            string query = @"
+                SELECT dni_huesped, MIN(id_hospedaje) AS primer_hospedaje
+                FROM hospedaje
+                GROUP BY dni_huesped";
+
+            using (SqlConnection con = _conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+
+                con.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (reader["dni_huesped"] == DBNull.Value) continue;
+                        resultado[reader["dni_huesped"].ToString()!.Trim()] = Convert.ToInt32(reader["primer_hospedaje"]);
+                    }
+                }
+            }
+
+            return resultado;
+        }
+
         /// <summary>Inserta el hospedaje. fecha_entrada/hora_entrada quedan a cargo del DEFAULT de la base.</summary>
         public static void Crear(Hospedaje hospedaje)
         {
             string query = @"
-                INSERT INTO hospedaje (fecha_salida, hora_salida, id_metodo, nro_habitacion, id_turno, dni_huesped)
-                VALUES (@fechaSalida, @horaSalida, @idMetodo, @nroHabitacion, @idTurno, @dniHuesped)";
-
+                INSERT INTO hospedaje (fecha_salida, hora_salida, monto_total, id_metodo, nro_habitacion, id_turno, dni_huesped)
+                VALUES (@fechaSalida, @horaSalida, @montoTotal, @idMetodo, @nroHabitacion, @idTurno, @dniHuesped)";
             using (SqlConnection con = _conexion.ObtenerConexion())
             {
                 SqlCommand cmd = new SqlCommand(query, con);
                 cmd.Parameters.AddWithValue("@fechaSalida", hospedaje.FechaSalida.Date);
                 cmd.Parameters.AddWithValue("@horaSalida", hospedaje.HoraSalida);
+                cmd.Parameters.AddWithValue("@montoTotal", hospedaje.monto_total);
                 cmd.Parameters.AddWithValue("@idMetodo", hospedaje.IdMetodo);
                 cmd.Parameters.AddWithValue("@nroHabitacion", hospedaje.NroHabitacion);
                 cmd.Parameters.AddWithValue("@idTurno", hospedaje.IdTurno);
@@ -84,7 +116,7 @@ namespace Datos
 
             string query = @"
                 SELECT TOP 1 id_hospedaje, fecha_entrada, hora_entrada, fecha_salida, hora_salida,
-                       id_metodo, nro_habitacion, id_turno, dni_huesped
+                       monto_total, id_metodo, nro_habitacion, id_turno, dni_huesped
                 FROM hospedaje
                 WHERE nro_habitacion = @nroHabitacion
                 ORDER BY id_hospedaje DESC";
@@ -106,6 +138,7 @@ namespace Datos
                             HoraEntrada = (TimeSpan)reader["hora_entrada"],
                             FechaSalida = Convert.ToDateTime(reader["fecha_salida"]),
                             HoraSalida = (TimeSpan)reader["hora_salida"],
+                            monto_total = reader["monto_total"] != DBNull.Value ? Convert.ToSingle(reader["monto_total"]) : 0f,
                             IdMetodo = Convert.ToInt32(reader["id_metodo"]),
                             NroHabitacion = Convert.ToInt32(reader["nro_habitacion"]),
                             IdTurno = Convert.ToInt32(reader["id_turno"]),
@@ -118,14 +151,14 @@ namespace Datos
             return hospedaje;
         }
 
-        /// <summary>Hospedajes cargados durante un turno de caja, con la tarifa del tipo de habitación.</summary>
-        public static List<(Hospedaje Hospedaje, decimal TarifaBase)> ObtenerPorTurno(int idTurno)
+        /// <summary>Hospedajes cargados durante un turno de caja, con el monto total cobrado por la estadía completa.</summary>
+        public static List<(Hospedaje Hospedaje, decimal MontoTotal)> ObtenerPorTurno(int idTurno)
         {
             var resultado = new List<(Hospedaje, decimal)>();
 
             string query = @"
                 SELECT h.id_hospedaje, h.fecha_entrada, h.hora_entrada, h.fecha_salida, h.hora_salida,
-                       h.id_metodo, h.nro_habitacion, h.id_turno, h.dni_huesped, th.tarifa
+                       h.monto_total, h.id_metodo, h.nro_habitacion, h.id_turno, h.dni_huesped, th.tarifa
                 FROM hospedaje h
                 INNER JOIN habitacion hab ON hab.nro_habitacion = h.nro_habitacion
                 INNER JOIN Tipo_habitacion th ON th.id_tipo_habitacion = hab.id_tipo_habitacion
@@ -141,6 +174,10 @@ namespace Datos
                 {
                     while (reader.Read())
                     {
+                        decimal tarifaBase = reader["tarifa"] != DBNull.Value ? Convert.ToDecimal(reader["tarifa"]) : 0m;
+                        decimal montoTotal = reader["monto_total"] != DBNull.Value ? Convert.ToDecimal(reader["monto_total"]) : 0m;
+                        decimal montoEstadia = montoTotal > 0 ? montoTotal : tarifaBase;
+
                         Hospedaje hospedaje = new Hospedaje
                         {
                             IdHospedaje = Convert.ToInt32(reader["id_hospedaje"]),
@@ -148,13 +185,14 @@ namespace Datos
                             HoraEntrada = (TimeSpan)reader["hora_entrada"],
                             FechaSalida = Convert.ToDateTime(reader["fecha_salida"]),
                             HoraSalida = (TimeSpan)reader["hora_salida"],
+                            monto_total = (float)montoEstadia,
                             IdMetodo = Convert.ToInt32(reader["id_metodo"]),
                             NroHabitacion = Convert.ToInt32(reader["nro_habitacion"]),
                             IdTurno = Convert.ToInt32(reader["id_turno"]),
                             DniHuesped = reader["dni_huesped"].ToString() ?? string.Empty
                         };
 
-                        resultado.Add((hospedaje, Convert.ToDecimal(reader["tarifa"])));
+                        resultado.Add((hospedaje, montoEstadia));
                     }
                 }
             }
@@ -185,6 +223,7 @@ namespace Datos
                     h.hora_entrada,
                     h.fecha_salida,
                     h.hora_salida,
+                    h.monto_total,
                     h.id_metodo,
                     h.nro_habitacion,
                     h.id_turno,
@@ -248,6 +287,7 @@ namespace Datos
                             HoraEntrada = reader["hora_entrada"] != DBNull.Value ? (TimeSpan)reader["hora_entrada"] : TimeSpan.Zero,
                             FechaSalida = reader["fecha_salida"] != DBNull.Value ? Convert.ToDateTime(reader["fecha_salida"]) : DateTime.MinValue,
                             HoraSalida = reader["hora_salida"] != DBNull.Value ? (TimeSpan)reader["hora_salida"] : TimeSpan.Zero,
+                            monto_total = reader["monto_total"] != DBNull.Value ? Convert.ToSingle(reader["monto_total"]) : 0f,
                             IdMetodo = reader["id_metodo"] != DBNull.Value ? Convert.ToInt32(reader["id_metodo"]) : 0,
                             NroHabitacion = reader["nro_habitacion"] != DBNull.Value ? Convert.ToInt32(reader["nro_habitacion"]) : 0,
                             IdTurno = reader["id_turno"] != DBNull.Value ? Convert.ToInt32(reader["id_turno"]) : 0,
@@ -275,6 +315,56 @@ namespace Datos
                 SqlCommand cmd = new SqlCommand(query, con);
                 cmd.Parameters.AddWithValue("@fechaSalida", fechaSalida.Date);
                 cmd.Parameters.AddWithValue("@horaSalida", horaSalida);
+                cmd.Parameters.AddWithValue("@idHospedaje", idHospedaje);
+
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        /// <summary>
+        /// Actualiza la fecha y hora de salida pactadas y el monto total acumulado de la estadía (Prórroga).
+        /// </summary>
+        public static void ActualizarEstadia(int idHospedaje, DateTime nuevaFechaSalida, TimeSpan nuevaHoraSalida, decimal nuevoMontoTotal)
+        {
+            string query = @"
+                UPDATE hospedaje
+                SET fecha_salida = @fechaSalida,
+                    hora_salida = @horaSalida,
+                    monto_total = @montoTotal
+                WHERE id_hospedaje = @idHospedaje";
+
+            using (SqlConnection con = _conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@fechaSalida", nuevaFechaSalida.Date);
+                cmd.Parameters.AddWithValue("@horaSalida", nuevaHoraSalida);
+                cmd.Parameters.AddWithValue("@montoTotal", (float)nuevoMontoTotal);
+                cmd.Parameters.AddWithValue("@idHospedaje", idHospedaje);
+
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        /// <summary>
+        /// Registra la salida real del huésped actualizando la fecha, hora y el monto final liquidado (incluyendo días extras).
+        /// </summary>
+        public static void RegistrarSalidaConMonto(int idHospedaje, DateTime fechaSalida, TimeSpan horaSalida, decimal montoTotalFinal)
+        {
+            string query = @"
+                UPDATE hospedaje
+                SET fecha_salida = @fechaSalida,
+                    hora_salida = @horaSalida,
+                    monto_total = @montoTotal
+                WHERE id_hospedaje = @idHospedaje";
+
+            using (SqlConnection con = _conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@fechaSalida", fechaSalida.Date);
+                cmd.Parameters.AddWithValue("@horaSalida", horaSalida);
+                cmd.Parameters.AddWithValue("@montoTotal", (float)montoTotalFinal);
                 cmd.Parameters.AddWithValue("@idHospedaje", idHospedaje);
 
                 con.Open();

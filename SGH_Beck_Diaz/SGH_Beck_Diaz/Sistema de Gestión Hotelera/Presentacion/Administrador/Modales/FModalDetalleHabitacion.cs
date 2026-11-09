@@ -85,20 +85,61 @@ namespace Presentacion.Administrador.Modales
                 AgregarFila(panelDetalle, "Última Limpieza:", hab.UltimaLimpieza?.ToString("dd/MM/yyyy HH:mm") ?? "Sin registro", ref top);
             }
 
+            var btnEditar = new Button
+            {
+                Text = "Editar",
+                Location = new Point(175, 300),
+                Size = new Size(100, 32),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                FlatStyle = FlatStyle.System
+            };
+            btnEditar.Click += (s, e) => EditarHabitacion(hab.NroHabitacion);
+
+            // Cancel en lugar de OK: OK queda reservado para avisar que la habitación se editó.
             var btnCerrar = new Button
             {
                 Text = "Cerrar",
-                DialogResult = DialogResult.OK,
+                DialogResult = DialogResult.Cancel,
                 Location = new Point(285, 300),
                 Size = new Size(100, 32),
                 Font = new Font("Segoe UI", 9, FontStyle.Regular),
                 FlatStyle = FlatStyle.System
             };
+            CancelButton = btnCerrar;
 
             Controls.Add(lblTitulo);
             Controls.Add(lblEstado);
             Controls.Add(panelDetalle);
+            Controls.Add(btnEditar);
             Controls.Add(btnCerrar);
+        }
+
+        private void EditarHabitacion(int nroHabitacion)
+        {
+            Habitacion? habitacion;
+            try
+            {
+                habitacion = _gestionHabitaciones.ObtenerHabitacion(nroHabitacion);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"No se pudo cargar la habitación.\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (habitacion == null)
+            {
+                MessageBox.Show($"La habitación {nroHabitacion} ya no existe.", "Editar habitación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using var modal = new FModalHabitacion(habitacion);
+            if (modal.ShowDialog(this) == DialogResult.OK)
+            {
+                // Se cierra el detalle para que la vista recargue los datos ya modificados.
+                DialogResult = DialogResult.OK;
+                Close();
+            }
         }
 
         private void AgregarFila(Control contenedor, string titulo, string valor, ref int top)
@@ -127,3 +168,5 @@ namespace Presentacion.Administrador.Modales
         }
     }
 }
+
+

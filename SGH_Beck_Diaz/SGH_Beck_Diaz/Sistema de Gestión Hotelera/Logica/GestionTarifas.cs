@@ -45,8 +45,6 @@ namespace Logica
             existente.IdTipoHabitacion = tarifa.IdTipoHabitacion;
             existente.TipoHabitacionNombre = tarifa.TipoHabitacionNombre;
             existente.PrecioPorHora = tarifa.PrecioPorHora;
-            existente.PrecioPorFraccion = tarifa.PrecioPorFraccion;
-            existente.PrecioAdicional = tarifa.PrecioAdicional;
             existente.Activa = tarifa.Activa;
             existente.UltimaModificacion = DateTime.Now;
         }
@@ -68,9 +66,16 @@ namespace Logica
                 throw new ArgumentException("Debe seleccionar un tipo de habitación.");
             }
 
-            if (tarifa.PrecioPorHora < 0 || tarifa.PrecioPorFraccion < 0 || tarifa.PrecioAdicional < 0)
+            if (tarifa.PrecioPorHora < 0)
             {
-                throw new ArgumentException("Los precios no pueden ser negativos.");
+                throw new ArgumentException("El precio por hora no puede ser negativo.");
+            }
+
+            // Un tipo de habitación solo puede tener una tarifa; al editar se excluye la propia.
+            if (_tarifas.Any(t => t.IdTipoHabitacion == tarifa.IdTipoHabitacion && t.IdTarifa != tarifa.IdTarifa))
+            {
+                throw new InvalidOperationException(
+                    $"Ya existe una tarifa para el tipo de habitación \"{tarifa.TipoHabitacionNombre}\".");
             }
         }
 
@@ -89,8 +94,6 @@ namespace Logica
                     IdTipoHabitacion = tipo.IdTipoHabitacion,
                     TipoHabitacionNombre = tipo.Descripcion,
                     PrecioPorHora = tipo.Tarifa,
-                    PrecioPorFraccion = 0,
-                    PrecioAdicional = 0,
                     Activa = true,
                     UltimaModificacion = DateTime.Now
                 });
@@ -100,3 +103,6 @@ namespace Logica
         }
     }
 }
+
+
+

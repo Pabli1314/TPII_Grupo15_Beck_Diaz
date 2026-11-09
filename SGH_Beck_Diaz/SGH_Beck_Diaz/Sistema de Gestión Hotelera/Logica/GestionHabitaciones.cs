@@ -19,7 +19,7 @@ namespace Logica
 
         /// <summary>
         /// Genera la lista resumida para vistas Grid/Tarjetas unificando entidad Habitacion,
-        /// su Hospedaje activo si está ocupada y el último RegistroLimpieza.
+        /// características técnicas/comerciales, su Hospedaje activo si está ocupada y el último RegistroLimpieza.
         /// </summary>
         public List<HabitacionResumen> ObtenerResumenHabitaciones()
         {
@@ -44,7 +44,9 @@ namespace Logica
                 {
                     NroHabitacion = habitacion.NroHabitacion,
                     Piso = habitacion.Piso,
+                    CantCamas = habitacion.CantCamas,
                     TipoHabitacion = tipo?.Descripcion ?? "-",
+                    TarifaPorDia = tipo?.Tarifa ?? 0m,
                     IdEstado = habitacion.IdEstado,
                     Estado = estado?.NomEstadoHabitacion ?? "-"
                 };
@@ -59,6 +61,8 @@ namespace Logica
                         item.Huesped = huesped != null ? $"{huesped.Nombre} {huesped.Apellido}" : hospedaje.DniHuesped;
                         item.HoraEntrada = hospedaje.FechaEntrada.Date + hospedaje.HoraEntrada;
                         item.HoraSalidaEstimada = hospedaje.FechaSalida.Date + hospedaje.HoraSalida;
+                        item.Noches = GestionHospedajes.CalcularNoches(item.HoraEntrada.Value, item.HoraSalidaEstimada.Value);
+                        item.CostoHospedaje = item.TarifaPorDia * item.Noches.Value;
                     }
                 }
 
@@ -73,6 +77,55 @@ namespace Logica
             }
 
             return resumen;
+        }
+
+        /// <summary>
+        /// Obtiene el detalle técnico y comercial completo de una habitación específica por su número.
+        /// Proporciona acceso directo a sus características (piso, tipo, camas, tarifa y estado actual).
+        /// </summary>
+        public HabitacionResumen? ObtenerDetalleHabitacion(int nroHabitacion)
+        {
+            Habitacion? habitacion = HabitacionDAO.ObtenerPorNumero(nroHabitacion);
+            if (habitacion == null)
+            {
+                return null;
+            }
+
+            var tipo = TipoHabitacionDAO.ObtenerTodos().FirstOrDefault(t => t.IdTipoHabitacion == habitacion.IdTipoHabitacion);
+            var estado = EstadoHabitacionDAO.ObtenerTodos().FirstOrDefault(e => e.IdEstado == habitacion.IdEstado);
+
+            var detalle = new HabitacionResumen
+            {
+                NroHabitacion = habitacion.NroHabitacion,
+                Piso = habitacion.Piso,
+                CantCamas = habitacion.CantCamas,
+                TipoHabitacion = tipo?.Descripcion ?? "-",
+                TarifaPorDia = tipo?.Tarifa ?? 0m,
+                IdEstado = habitacion.IdEstado,
+                Estado = estado?.NomEstadoHabitacion ?? "-"
+            };
+
+            if (string.Equals(detalle.Estado, ESTADO_OCUPADA, StringComparison.OrdinalIgnoreCase))
+            {
+                Hospedaje? hospedaje = HospedajeDAO.ObtenerActivoPorHabitacion(habitacion.NroHabitacion);
+                if (hospedaje != null)
+                {
+                    Huesped? huesped = HuespedDAO.ObtenerPorDni(hospedaje.DniHuesped);
+                    detalle.DniHuesped = hospedaje.DniHuesped;
+                    detalle.Huesped = huesped != null ? $"{huesped.Nombre} {huesped.Apellido}" : hospedaje.DniHuesped;
+                    detalle.HoraEntrada = hospedaje.FechaEntrada.Date + hospedaje.HoraEntrada;
+                    detalle.HoraSalidaEstimada = hospedaje.FechaSalida.Date + hospedaje.HoraSalida;
+                }
+            }
+
+            RegistroLimpieza? ultimaLimpieza = RegistroLimpiezaDAO.ObtenerUltimaPorHabitacion(habitacion.NroHabitacion);
+            if (ultimaLimpieza != null)
+            {
+                detalle.UltimaLimpieza = ultimaLimpieza.FechaLimpieza.Date + ultimaLimpieza.HoraFin;
+                detalle.DuracionUltimaLimpieza = ultimaLimpieza.HoraFin - ultimaLimpieza.HoraInicio;
+            }
+
+            return detalle;
         }
 
         /// <summary>
@@ -108,6 +161,35 @@ namespace Logica
             }
 
             HabitacionDAO.Crear(habitacion);
+        }
+
+        public Habitacion? ObtenerHabitacion(int nroHabitacion) => HabitacionDAO.ObtenerPorNumero(nroHabitacion);
+
+        /// <summary>
+        /// Modifica piso, camas, tipo y estado de una habitación existente. El estado 'Ocupada' solo
+        /// lo manejan el check-in y el check-out: no se puede poner ni sacar a mano desde acá.
+        /// </summary>
+        public void ModificarHabitacion(Habitacion habitacion)
+        {
+            ValidarHabitacion(habitacion);
+
+            Habitacion actual = HabitacionDAO.ObtenerPorNumero(habitacion.NroHabitacion)
+                ?? throw new InvalidOperationException($"La habitación número {habitacion.NroHabitacion} no existe.");
+
+            if (actual.IdEstado != habitacion.IdEstado)
+            {
+                List<EstadoHabitacion> estados = EstadoHabitacionDAO.ObtenerTodos();
+                bool EsOcupada(int idEstado) => estados.Any(e => e.IdEstado == idEstado
+                    && string.Equals(e.NomEstadoHabitacion?.Trim(), ESTADO_OCUPADA, StringComparison.OrdinalIgnoreCase));
+
+                if (EsOcupada(actual.IdEstado))
+                    throw new InvalidOperationException("La habitación está ocupada: su estado cambia al registrar el check-out.");
+
+                if (EsOcupada(habitacion.IdEstado))
+                    throw new InvalidOperationException("Una habitación solo pasa a 'Ocupada' al registrar un check-in.");
+            }
+
+            HabitacionDAO.Actualizar(habitacion);
         }
 
         public void MarcarComoDisponible(int nroHabitacion, string dniUsuario)

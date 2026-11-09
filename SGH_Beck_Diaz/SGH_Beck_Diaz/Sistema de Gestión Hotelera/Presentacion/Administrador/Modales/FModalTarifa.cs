@@ -15,8 +15,7 @@ namespace Presentacion.Administrador.Modales
 
         private readonly ComboBox _cmbTipo;
         private readonly NumericUpDown _numHora;
-        private readonly NumericUpDown _numFraccion;
-        private readonly NumericUpDown _numAdicional;
+        
         private readonly ToggleSwitch _switchEstado;
         private readonly Label _lblError;
 
@@ -44,11 +43,6 @@ namespace Presentacion.Administrador.Modales
             Contenido.Controls.Add(_numHora);
             y += 62;
 
-
-            Contenido.Controls.Add(CamposFormulario.Etiqueta("Precio adicional ($)", new Point(0, y)));
-            _numAdicional = CamposFormulario.Numerico(new Point(0, y + 22), ancho, 0, 9_999_999, 2);
-            Contenido.Controls.Add(_numAdicional);
-            y += 62;
 
             Contenido.Controls.Add(CamposFormulario.Etiqueta("Estado", new Point(0, y)));
             _switchEstado = new ToggleSwitch { Location = new Point(0, y + 24), Checked = true };
@@ -89,7 +83,6 @@ namespace Presentacion.Administrador.Modales
             }
 
             _numHora.Value = _tarifaOriginal.PrecioPorHora;
-            _numAdicional.Value = _tarifaOriginal.PrecioAdicional;
             _switchEstado.Checked = _tarifaOriginal.Activa;
         }
 
@@ -133,3 +126,5 @@ namespace Presentacion.Administrador.Modales
         }
     }
 }
+
+

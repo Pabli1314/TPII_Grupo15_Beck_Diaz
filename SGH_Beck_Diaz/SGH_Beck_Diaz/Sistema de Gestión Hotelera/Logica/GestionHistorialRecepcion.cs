@@ -7,12 +7,12 @@ using Datos;
 namespace Logica
 {
     /// <summary>
-    /// Combina check-in/check-out (hospedaje) y ventas adicionales en una sola línea de
+    /// Combina check-in/check-out (hospedaje), prórrogas de estadía y ventas adicionales en una sola línea de
     /// tiempo, para la pantalla Historial.
     /// </summary>
     public class GestionHistorialRecepcion
     {
-        public List<OperacionHistorial> Obtener(DateTime? fecha = null, string? huesped = null, int? nroHabitacion = null, string? usuario = null, string? tipo = null)
+        public List<OperacionHistorial> Obtener(DateTime? fecha = null, string? huesped = null, int? nroHabitacion = null, string? usuario = null, string? tipo = null, string? dniHuesped = null)
         {
             List<TurnoCaja> turnos = TurnoCajaDAO.ObtenerTodos()
                 .Where(t => !string.IsNullOrWhiteSpace(t.DniUsuario))
@@ -67,11 +67,13 @@ namespace Logica
                     Tipo = "Check-in",
                     Descripcion = $"Check-in de {nombreH} en habitación {hospedaje.NroHabitacion}",
                     Huesped = nombreH,
+                    DniHuesped = hospedaje.DniHuesped?.Trim(),
                     NroHabitacion = hospedaje.NroHabitacion,
-                    Usuario = NombreUsuarioDeTurno(hospedaje.IdTurno)
+                    Usuario = NombreUsuarioDeTurno(hospedaje.IdTurno),
+                    Monto = Convert.ToDecimal(hospedaje.monto_total)
                 });
 
-                // Reemplazo de la evaluación .Finalizada en memoria sin modificar la entidad Hospedaje
+                // Si la fecha y hora de salida ya pasaron, se muestra en el historial como check-out
                 if ((hospedaje.FechaSalida.Date + hospedaje.HoraSalida) <= DateTime.Now)
                 {
                     operaciones.Add(new OperacionHistorial
@@ -81,10 +83,31 @@ namespace Logica
                         Tipo = "Check-out",
                         Descripcion = $"Check-out de {nombreH} de habitación {hospedaje.NroHabitacion}",
                         Huesped = nombreH,
+                        DniHuesped = hospedaje.DniHuesped?.Trim(),
                         NroHabitacion = hospedaje.NroHabitacion,
                         Usuario = NombreUsuarioDeTurno(hospedaje.IdTurno)
                     });
                 }
+            }
+
+            // Prórrogas de estadía
+            List<ProrrogaEstadia> prorrogas = ProrrogaDAO.ObtenerTodas();
+            foreach (ProrrogaEstadia p in prorrogas)
+            {
+                string nombreH = !string.IsNullOrWhiteSpace(p.NombreHuesped) ? p.NombreHuesped : ObtenerNombreHuesped(p.DniHuesped);
+
+                operaciones.Add(new OperacionHistorial
+                {
+                    Fecha = p.FechaProrroga,
+                    Hora = p.HoraProrroga,
+                    Tipo = "Prórroga",
+                    Descripcion = $"Prórroga de estadía (+{p.DiasAdicionales} noche(s)) de {nombreH} en hab. {p.NroHabitacion} (nueva salida: {p.NuevaFechaSalida:dd/MM/yyyy})",
+                    Huesped = nombreH,
+                    DniHuesped = p.DniHuesped?.Trim(),
+                    NroHabitacion = p.NroHabitacion,
+                    Usuario = NombreUsuarioDeTurno(p.IdTurno),
+                    Monto = p.MontoAdicional
+                });
             }
 
             foreach (Venta venta in VentaDAO.ObtenerTodas())
@@ -110,6 +133,7 @@ namespace Logica
                         ? $"Venta adicional #{venta.IdVenta} a {nombreHuespedVenta} (habitación {estadia.NroHabitacion})"
                         : $"Venta adicional #{venta.IdVenta} (mostrador)",
                     Huesped = nombreHuespedVenta,
+                    DniHuesped = (estadia != null ? estadia.DniHuesped : venta.DniHuesped)?.Trim(),
                     NroHabitacion = estadia?.NroHabitacion,
                     Usuario = idTurnoVenta.HasValue ? NombreUsuarioDeTurno(idTurnoVenta.Value) : "-",
                     Monto = venta.Total
@@ -126,7 +150,17 @@ namespace Logica
             if (!string.IsNullOrWhiteSpace(huesped))
             {
                 string filtroHuesped = huesped.Trim();
-                resultado = resultado.Where(o => o.Huesped != null && o.Huesped.Contains(filtroHuesped, StringComparison.OrdinalIgnoreCase));
+                resultado = resultado.Where(o =>
+                    (o.Huesped != null && o.Huesped.Contains(filtroHuesped, StringComparison.OrdinalIgnoreCase)) ||
+                    (o.DniHuesped != null && o.DniHuesped.Contains(filtroHuesped, StringComparison.OrdinalIgnoreCase)) ||
+                    (o.Descripcion != null && o.Descripcion.Contains(filtroHuesped, StringComparison.OrdinalIgnoreCase)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(dniHuesped))
+            {
+                string filtroDni = dniHuesped.Trim();
+                resultado = resultado.Where(o =>
+                    o.DniHuesped != null && o.DniHuesped.Contains(filtroDni, StringComparison.OrdinalIgnoreCase));
             }
 
             if (nroHabitacion.HasValue)
