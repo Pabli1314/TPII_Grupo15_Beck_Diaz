@@ -1,6 +1,7 @@
 using Entidades;
 using Logica;
 using Presentacion.Administrador.UI;
+using Presentacion.Recepcionista;
 using Presentacion.Recepcionista.UI;
 using System;
 using System.Collections.Generic;
@@ -62,8 +63,10 @@ namespace Presentacion.Administrador.Vistas
             var btnFiltrar = EstiloBoton.Primario(new Button { Text = "Filtrar", Size = new Size(110, 34), Margin = new Padding(0, 0, 8, 0) });
             btnFiltrar.Click += (s, e) => CargarHistorial();
 
-            var btnLimpiar = EstiloBoton.Secundario(new Button { Text = "Limpiar filtros", Size = new Size(130, 34), Margin = new Padding(0, 0, 0, 0) });
+            var btnLimpiar = EstiloBoton.Secundario(new Button { Text = "Limpiar filtros", Size = new Size(130, 34), Margin = new Padding(0, 0, 8, 0) });
             btnLimpiar.Click += (s, e) => LimpiarFiltros();
+
+            var btnToggleGraficos = EstiloBoton.Secundario(new Button { Text = "Ocultar gráficos", Size = new Size(130, 34), Margin = new Padding(0, 0, 0, 0) });
 
             barraFiltros.Controls.Add(CrearEtiqueta("Desde"));
             barraFiltros.Controls.Add(_dtpDesde);
@@ -75,6 +78,7 @@ namespace Presentacion.Administrador.Vistas
             barraFiltros.Controls.Add(_cmbTipo);
             barraFiltros.Controls.Add(btnFiltrar);
             barraFiltros.Controls.Add(btnLimpiar);
+            barraFiltros.Controls.Add(btnToggleGraficos);
 
             _panelKpis = new FlowLayoutPanel
             {
@@ -106,7 +110,7 @@ namespace Presentacion.Administrador.Vistas
             var panelGraficos = new TableLayoutPanel
             {
                 Dock = DockStyle.Top,
-                Height = 386,
+                Height = 250,
                 ColumnCount = 2,
                 RowCount = 1
             };
@@ -116,17 +120,61 @@ namespace Presentacion.Administrador.Vistas
             panelGraficos.Controls.Add(_panelPorTipo, 0, 0);
             panelGraficos.Controls.Add(_panelPorHuesped, 1, 0);
 
+            btnToggleGraficos.Click += (s, e) =>
+            {
+                panelGraficos.Visible = !panelGraficos.Visible;
+                btnToggleGraficos.Text = panelGraficos.Visible ? "Ocultar gráficos" : "Mostrar gráficos";
+            };
+
             _dgv = new DataGridView
             {
                 Dock = DockStyle.Fill,
                 AutoGenerateColumns = false,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                ShowCellToolTips = true,
+                AllowUserToResizeColumns = true
             };
             EstiloGrid.Aplicar(_dgv);
+            _dgv.AllowUserToResizeColumns = true;
             ConfigurarColumnas();
 
-            var contenedorGrilla = new Panel { Dock = DockStyle.Fill, Padding = new Padding(8, 8, 8, 0) };
+            var contenedorGrilla = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Paleta.FondoTarjeta,
+                Padding = new Padding(1),
+                Margin = new Padding(0, 8, 0, 0)
+            };
+            contenedorGrilla.Paint += (s, e) =>
+            {
+                using var lapiz = new Pen(Paleta.Borde, 1f);
+                e.Graphics.DrawRectangle(lapiz, 0, 0, contenedorGrilla.Width - 1, contenedorGrilla.Height - 1);
+            };
+
+            var headerGrilla = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 36,
+                BackColor = Color.FromArgb(249, 250, 252),
+                Padding = new Padding(12, 0, 12, 0)
+            };
+            headerGrilla.Paint += (s, e) =>
+            {
+                using var lapiz = new Pen(Paleta.BordeSuave, 1f);
+                e.Graphics.DrawLine(lapiz, 0, headerGrilla.Height - 1, headerGrilla.Width, headerGrilla.Height - 1);
+            };
+            var lblTituloGrilla = new Label
+            {
+                Text = "Listado de eventos de huéspedes",
+                Font = Paleta.FuenteBaseNegrita,
+                ForeColor = Paleta.TextoPrimario,
+                AutoSize = true,
+                Location = new Point(12, 8)
+            };
+            headerGrilla.Controls.Add(lblTituloGrilla);
+
             contenedorGrilla.Controls.Add(_dgv);
+            contenedorGrilla.Controls.Add(headerGrilla);
 
             Controls.Add(contenedorGrilla);
             Controls.Add(panelGraficos);
@@ -145,12 +193,77 @@ namespace Presentacion.Administrador.Vistas
 
         private void ConfigurarColumnas()
         {
-            _dgv.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = nameof(EventoAdministrativo.Fecha), HeaderText = "Fecha", FillWeight = 11, DefaultCellStyle = { Format = "dd/MM/yyyy" } });
-            _dgv.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = nameof(EventoAdministrativo.Hora), HeaderText = "Hora", FillWeight = 7, DefaultCellStyle = { Format = @"hh\:mm" } });
-            _dgv.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = nameof(EventoAdministrativo.Tipo), HeaderText = "Tipo", FillWeight = 14 });
-            _dgv.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = nameof(EventoAdministrativo.Huesped), HeaderText = "Huésped", FillWeight = 16 });
-            _dgv.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = nameof(EventoAdministrativo.DniHuesped), HeaderText = "DNI", FillWeight = 9 });
-            _dgv.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = nameof(EventoAdministrativo.NroHabitacion), HeaderText = "Habitación", FillWeight = 9 });
+            _dgv.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = nameof(EventoAdministrativo.Fecha), HeaderText = "Fecha", FillWeight = 9, MinimumWidth = 85, DefaultCellStyle = { Format = "dd/MM/yyyy", Alignment = DataGridViewContentAlignment.MiddleCenter }, HeaderCell = { Style = { Alignment = DataGridViewContentAlignment.MiddleCenter } } });
+            _dgv.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = nameof(EventoAdministrativo.Hora), HeaderText = "Hora", FillWeight = 7, MinimumWidth = 65, DefaultCellStyle = { Format = @"hh\:mm", Alignment = DataGridViewContentAlignment.MiddleCenter }, HeaderCell = { Style = { Alignment = DataGridViewContentAlignment.MiddleCenter } } });
+            _dgv.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = nameof(EventoAdministrativo.Tipo), HeaderText = "Tipo", FillWeight = 12, MinimumWidth = 100, HeaderCell = { Style = { Alignment = DataGridViewContentAlignment.MiddleCenter } }, DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleCenter } });
+            _dgv.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = nameof(EventoAdministrativo.Huesped), HeaderText = "Huésped", FillWeight = 16, MinimumWidth = 130, DefaultCellStyle = { Font = Paleta.FuenteBaseNegrita } });
+            _dgv.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = nameof(EventoAdministrativo.DniHuesped), HeaderText = "DNI", FillWeight = 9, MinimumWidth = 85, DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleCenter, ForeColor = Paleta.TextoSecundario }, HeaderCell = { Style = { Alignment = DataGridViewContentAlignment.MiddleCenter } } });
+            _dgv.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = nameof(EventoAdministrativo.NroHabitacion), HeaderText = "Habitación", FillWeight = 8, MinimumWidth = 80, DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleCenter }, HeaderCell = { Style = { Alignment = DataGridViewContentAlignment.MiddleCenter } } });
+            _dgv.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = nameof(EventoAdministrativo.Descripcion), HeaderText = "Descripción / Detalle", FillWeight = 28, MinimumWidth = 180 });
+
+            _dgv.CellPainting += (s, e) =>
+            {
+                if (e.RowIndex < 0) return;
+                if (e.ColumnIndex == 2 && e.Value != null)
+                {
+                    e.PaintBackground(e.ClipBounds, true);
+                    string tipo = e.Value.ToString() ?? "";
+                    Color colorFondo;
+                    Color colorTexto;
+                    Color colorBorde;
+
+                    switch (tipo)
+                    {
+                        case "Ingreso (check-in)":
+                            colorFondo = Paleta.ExitoSuave;
+                            colorBorde = Color.FromArgb(167, 243, 208);
+                            colorTexto = Paleta.Exito;
+                            break;
+                        case "Egreso (check-out)":
+                            colorFondo = Paleta.PeligroSuave;
+                            colorBorde = Color.FromArgb(254, 202, 202);
+                            colorTexto = Paleta.Peligro;
+                            break;
+                        case "Consumo":
+                            colorFondo = Paleta.PrimarioSuave;
+                            colorBorde = Color.FromArgb(191, 219, 254);
+                            colorTexto = Paleta.Primario;
+                            break;
+                        case "Alta de huésped":
+                            colorFondo = Paleta.AdvertenciaSuave;
+                            colorBorde = Color.FromArgb(253, 230, 138);
+                            colorTexto = Color.FromArgb(180, 83, 9);
+                            break;
+                        default:
+                            colorFondo = Color.FromArgb(243, 244, 246);
+                            colorBorde = Color.FromArgb(229, 231, 235);
+                            colorTexto = Paleta.TextoSecundario;
+                            break;
+                    }
+
+                    Rectangle r = e.CellBounds;
+                    int badgeAncho = Math.Min(r.Width - 14, 110);
+                    int badgeAlto = 24;
+                    int x = r.X + (r.Width - badgeAncho) / 2;
+                    int y = r.Y + (r.Height - badgeAlto) / 2;
+                    var badgeRect = new RectangleF(x, y, badgeAncho, badgeAlto);
+
+                    e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                    using (var path = DibujoUtil.RutaRedondeada(badgeRect, 10))
+                    {
+                        using var brush = new SolidBrush(colorFondo);
+                        e.Graphics.FillPath(brush, path);
+                        using var pen = new Pen(colorBorde, 1f);
+                        e.Graphics.DrawPath(pen, path);
+                    }
+
+                    TextRenderer.DrawText(e.Graphics, tipo, Paleta.FuenteChica,
+                        Rectangle.Round(badgeRect), colorTexto,
+                        TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+
+                    e.Handled = true;
+                }
+            };
         }
 
         public void Refrescar()

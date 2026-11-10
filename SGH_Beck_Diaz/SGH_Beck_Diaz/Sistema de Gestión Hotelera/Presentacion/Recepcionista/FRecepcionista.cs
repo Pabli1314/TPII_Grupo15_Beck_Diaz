@@ -29,7 +29,7 @@ namespace Presentacion.Recepcionista
             ["check-out"] = "Check-out",
             ["caja"] = "Gestión de Caja",
             ["ventas"] = "Ventas Adicionales",
-            ["historial"] = "Historial de Operaciones",
+            ["historial"] = "Histórico Administrativo de Operaciones",
             ["reportes"] = "Reportes de Recepción",
         };
 

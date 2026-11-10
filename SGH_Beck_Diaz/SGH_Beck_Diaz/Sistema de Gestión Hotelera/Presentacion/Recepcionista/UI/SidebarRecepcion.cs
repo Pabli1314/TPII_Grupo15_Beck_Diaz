@@ -57,7 +57,7 @@ namespace Presentacion.Recepcionista.UI
                 ("caja", "Caja", Icono.Caja),
                 ("ventas", "Ventas adicionales", Icono.Grafico),
                 ("huespedes", "Huéspedes", Icono.Personas),
-                ("historial", "Historial", Icono.Reloj),
+                ("historial", "Histórico", Icono.Reloj),
                 ("reportes", "Reportes", Icono.Grafico),
             };
 
