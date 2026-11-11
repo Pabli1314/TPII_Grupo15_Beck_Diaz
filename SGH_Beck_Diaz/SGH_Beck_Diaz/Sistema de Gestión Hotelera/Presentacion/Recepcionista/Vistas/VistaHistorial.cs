@@ -76,16 +76,7 @@ namespace Presentacion.Recepcionista.Vistas
                 Height = 44,
                 BackColor = Color.Transparent
             };
-
-            var lblTitulo = new Label
-            {
-                Text = "Histórico Administrativo de Operaciones",
-                Font = Paleta.FuenteTitulo,
-                ForeColor = Paleta.TextoPrimario,
-                AutoSize = true,
-                Location = new Point(0, 0)
-            };
-
+            
             var lblSubtitulo = new Label
             {
                 Text = "Registro y auditoría en tiempo real de check-in, check-out, prórrogas y ventas adicionales",
@@ -95,7 +86,6 @@ namespace Presentacion.Recepcionista.Vistas
                 Location = new Point(1, 26)
             };
 
-            panelTitulos.Controls.Add(lblTitulo);
             panelTitulos.Controls.Add(lblSubtitulo);
 
             // Tarjeta de Filtros
